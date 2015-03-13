@@ -230,7 +230,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 DISTCLEANFILES = vgrammar.h vgrammar.c luthor.c
 BUILT_SOURCES = vgrammar.h
-AM_CFLAGS = @TOP_IPATH@ @COMMON_IPATH@
+AM_CXXFLAGS = @TOP_IPATH@ @COMMON_IPATH@
 AM_YFLAGS = -d
 verga_SOURCES = bytecode.cpp channel.cpp circuit.cpp commands.cpp directive.cpp error.cpp evqueue.cpp expr.cpp \
 	io.cpp memory.cpp mitem.cpp module.cpp multint.cpp net.cpp operators.cpp pathmod.cpp paux.cpp specify.cpp \

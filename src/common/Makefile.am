@@ -17,7 +17,7 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 
-AM_CFLAGS=@TOP_IPATH@
+AM_CXXFLAGS=@TOP_IPATH@
 
 noinst_LIBRARIES = libcommon.a
 libcommon_a_SOURCES=hash.cpp list.cpp misc.cpp ycmalloc.cpp hash.h list.h misc.h vparser.h ycmalloc.h

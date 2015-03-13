@@ -216,7 +216,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_CFLAGS = @TOP_IPATH@
+AM_CXXFLAGS = @TOP_IPATH@
 noinst_LIBRARIES = libcommon.a
 libcommon_a_SOURCES = hash.cpp list.cpp misc.cpp ycmalloc.cpp hash.h list.h misc.h vparser.h ycmalloc.h
 all: all-am
