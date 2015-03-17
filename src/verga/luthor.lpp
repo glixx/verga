@@ -269,7 +269,7 @@ any	[^ \t\r\n]
 <PV>"//:"{white}*"endscript".*"\n"	{ Place_incLineno(&curPlace,1); return ENDSCRIPT; }
 
 
-.			{ FLEX_FIX_STAT return yc_bogochar(*yytext); }
+.			{ FLEX_FIX_STAT return yc_bogochar(); }
 %%
 
 void BeginPV() { BEGIN PV; }

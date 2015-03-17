@@ -69,8 +69,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 bin_PROGRAMS = verga$(EXEEXT)
 subdir = src/verga
-DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in luthor.c \
-	vgrammar.c vgrammar.h
+DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in luthor.cpp \
+	vgrammar.cpp vgrammar.h
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
 	$(top_srcdir)/configure.ac
@@ -90,7 +90,8 @@ am_verga_OBJECTS = bytecode.$(OBJEXT) channel.$(OBJEXT) \
 	pathmod.$(OBJEXT) paux.$(OBJEXT) specify.$(OBJEXT) \
 	statement.$(OBJEXT) systask.$(OBJEXT) task.$(OBJEXT) \
 	thyme.$(OBJEXT) trigger.$(OBJEXT) value.$(OBJEXT) \
-	verilog.$(OBJEXT) vgrammar.$(OBJEXT) luthor.$(OBJEXT)
+	verilog.$(OBJEXT) vgrammar.$(OBJEXT) luthor.$(OBJEXT) \
+	yywrap.$(OBJEXT)
 verga_OBJECTS = $(am_verga_OBJECTS)
 verga_DEPENDENCIES =
 verga_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(verga_LDFLAGS) \
@@ -228,13 +229,14 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-DISTCLEANFILES = vgrammar.h vgrammar.c luthor.c
+DISTCLEANFILES = vgrammar.h vgrammar.cpp luthor.cpp
 BUILT_SOURCES = vgrammar.h
+AM_CFLAGS = @TOP_IPATH@ @COMMON_IPATH@
 AM_CXXFLAGS = @TOP_IPATH@ @COMMON_IPATH@
 AM_YFLAGS = -d
 verga_SOURCES = bytecode.cpp channel.cpp circuit.cpp commands.cpp directive.cpp error.cpp evqueue.cpp expr.cpp \
 	io.cpp memory.cpp mitem.cpp module.cpp multint.cpp net.cpp operators.cpp pathmod.cpp paux.cpp specify.cpp \
-	statement.cpp systask.cpp task.cpp thyme.cpp trigger.cpp value.cpp verilog.cpp vgrammar.y luthor.l \
+	statement.cpp systask.cpp task.cpp thyme.cpp trigger.cpp value.cpp verilog.cpp vgrammar.ypp luthor.lpp yywrap.c \
 	bytecode.h directive.h evqueue.h memory.h multint.h specify.h task.h trigger.h \
 	channel.h dynitem.h expr.h mitem.h net.h  statement.h thyme.h value.h yybasic.h \
 	circuit.h error.h io.h module.h operators.h systask.h thyme_config.h verilog.h
@@ -245,7 +247,7 @@ all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
-.SUFFIXES: .c .cpp .l .o .obj .y
+.SUFFIXES: .c .cpp .lpp .o .obj .ypp
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -316,9 +318,9 @@ uninstall-binPROGRAMS:
 
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
-vgrammar.h: vgrammar.c
-	@if test ! -f $@; then rm -f vgrammar.c; else :; fi
-	@if test ! -f $@; then $(MAKE) $(AM_MAKEFLAGS) vgrammar.c; else :; fi
+vgrammar.h: vgrammar.cpp
+	@if test ! -f $@; then rm -f vgrammar.cpp; else :; fi
+	@if test ! -f $@; then $(MAKE) $(AM_MAKEFLAGS) vgrammar.cpp; else :; fi
 verga$(EXEEXT): $(verga_OBJECTS) $(verga_DEPENDENCIES) $(EXTRA_verga_DEPENDENCIES) 
 	@rm -f verga$(EXEEXT)
 	$(verga_LINK) $(verga_OBJECTS) $(verga_LDADD) $(LIBS)
@@ -356,6 +358,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/value.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/verilog.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vgrammar.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/yywrap.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -385,10 +388,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
-.l.c:
+.lpp.cpp:
 	$(am__skiplex) $(SHELL) $(YLWRAP) $< $(LEX_OUTPUT_ROOT).c $@ -- $(LEXCOMPILE)
 
-.y.c:
+.ypp.cpp:
 	$(am__skipyacc) $(SHELL) $(YLWRAP) $< y.tab.c $@ y.tab.h $*.h y.output $*.output -- $(YACCCOMPILE)
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
@@ -513,8 +516,8 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-	-rm -f luthor.c
-	-rm -f vgrammar.c
+	-rm -f luthor.cpp
+	-rm -f vgrammar.cpp
 	-rm -f vgrammar.h
 	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-am

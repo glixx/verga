@@ -149,9 +149,16 @@
 %{
 #include "thyme.h"
 
-void BeginPV();		/* Pure verilog */
+/*#include <sys/cdefs.h>
+
+__BEGIN_DECLS
+
+void BeginPV();
 void BeginLC();
 void BeginBC();
+
+__END_DECLS
+*/
 
 %}
 
@@ -575,9 +582,9 @@ specitems	:
 		;
 
 specitem	: SYSLITERAL LPAREN otgparms RPAREN SEMI			{ VerSpecTask($1,$3); }
-		| LPAREN lvals ptype lvals RPAREN ASGN expr SEMI 		{ VerSpecify(0,$3,$2,$4,$7); }
+		| LPAREN lvals ptype lvals RPAREN ASGN expr SEMI 		{ VerSpecify(0,(spectype_t)$3,$2,$4,$7); }
 		| IF LPAREN expr RPAREN LPAREN lvals ptype lvals RPAREN
-			 ASGN expr SEMI						{ VerSpecify($3,$7,$6,$8,$11); }
+			 ASGN expr SEMI						{ VerSpecify($3,(spectype_t)$7,$6,$8,$11); }
 		| SPECPARAM LITERAL ASGN expr SEMI				{ VerSpecParam($2,$4); }
 		;
 
