@@ -19,6 +19,8 @@
 ****************************************************************************/
 #include "thyme.h"
 
+extern const char *release_date;
+
 int errCount = 0;
 int warnCount = 0;
 extern Place curPlace;			/* The current place */
@@ -452,7 +454,7 @@ int startSimulation(const char *topName,int warning_mode,List *load_scripts,cons
  *****************************************************************************/
 void showLicense()
 {
-  printf("%s %s - Verilog Simulator for TkGate\n",VGSIM_NAME,VGSIM_VERSION);
+  printf("    %s %s - Verilog Simulator\n",PACKAGE_NAME,PACKAGE_VERSION);
   printf("%s\n",VGSIM_COPYRIGHT);
   printf("\n");
   printf("    This program is free software; you can redistribute it and/or modify\n");
@@ -587,10 +589,10 @@ int main(int argc,char *argv[])
     VGSecurity_init(&vgsim.vg_sec,1);
 
   if (!quiet) {
-    vgio_comment("%s %s - Verilog Simulator for TkGate\n",VGSIM_NAME,VGSIM_VERSION);
+    vgio_comment("%s %s - Verilog Simulator (released %s)\n",PACKAGE_NAME,PACKAGE_VERSION,release_date);
     vgio_comment("%s\n",VGSIM_COPYRIGHT);
-    vgio_comment("  %s comes with ABSOLUTELY NO WARRANTY;  run with -l switch\n",VGSIM_NAME);
-    vgio_comment("  for license and warranty details.  Report problems to hansen@tkgate.org\n");
+    vgio_comment("  %s comes with ABSOLUTELY NO WARRANTY;  run with -l switch\n",PACKAGE_NAME);
+    vgio_comment("  for license and warranty details.  Report problems to %s\n", PACKAGE_BUGREPORT);
     vgio_comment("  [compiled on %s %s]\n",__DATE__,__TIME__);
   }
 

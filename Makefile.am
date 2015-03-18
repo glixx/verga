@@ -59,7 +59,7 @@ noinst_HEADERS = options.h
 # Update the release data for this compilation
 #
 release:
-	echo 'char *release_date = "'`(LANG=; date "+%b %d %Y")`'";' > $(srcdir)/src/verga/release.cpp
+	echo 'const char *release_date = "'`(LANG=; date "+%b %d %Y")`'";' > $(srcdir)/src/verga/release.cpp
 
 dist-hook:
 	@echo Packaging data files...

@@ -22,16 +22,14 @@ BUILT_SOURCES=vgrammar.h
 AM_CFLAGS=@TOP_IPATH@ @COMMON_IPATH@
 AM_CXXFLAGS=@TOP_IPATH@ @COMMON_IPATH@
 AM_YFLAGS=-d
-#AM_LFLAGS= -o luthor.cpp
 
-bin_PROGRAMS=verga
-verga_SOURCES=bytecode.cpp channel.cpp circuit.cpp commands.cpp directive.cpp error.cpp evqueue.cpp expr.cpp \
+bin_PROGRAMS=verga++
+verga___SOURCES=bytecode.cpp channel.cpp circuit.cpp commands.cpp directive.cpp error.cpp evqueue.cpp expr.cpp \
 	io.cpp memory.cpp mitem.cpp module.cpp multint.cpp net.cpp operators.cpp pathmod.cpp paux.cpp specify.cpp \
 	statement.cpp systask.cpp task.cpp thyme.cpp trigger.cpp value.cpp verilog.cpp vgrammar.ypp luthor.lpp yywrap.c \
-	bytecode.h directive.h evqueue.h memory.h multint.h specify.h task.h trigger.h \
+	release.cpp bytecode.h directive.h evqueue.h memory.h multint.h specify.h task.h trigger.h \
 	channel.h dynitem.h expr.h mitem.h net.h  statement.h thyme.h value.h yybasic.h \
 	circuit.h error.h io.h module.h operators.h systask.h thyme_config.h verilog.h
 
-verga_LDFLAGS=@COMMON_LPATH@
-verga_LDADD=-lcommon
-
+verga___LDFLAGS=@COMMON_LPATH@
+verga___LDADD=-lcommon

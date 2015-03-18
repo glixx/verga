@@ -67,7 +67,7 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-bin_PROGRAMS = verga$(EXEEXT)
+bin_PROGRAMS = verga++$(EXEEXT)
 subdir = src/verga
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in luthor.cpp \
 	vgrammar.cpp vgrammar.h
@@ -82,7 +82,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_verga_OBJECTS = bytecode.$(OBJEXT) channel.$(OBJEXT) \
+am_verga___OBJECTS = bytecode.$(OBJEXT) channel.$(OBJEXT) \
 	circuit.$(OBJEXT) commands.$(OBJEXT) directive.$(OBJEXT) \
 	error.$(OBJEXT) evqueue.$(OBJEXT) expr.$(OBJEXT) io.$(OBJEXT) \
 	memory.$(OBJEXT) mitem.$(OBJEXT) module.$(OBJEXT) \
@@ -91,10 +91,10 @@ am_verga_OBJECTS = bytecode.$(OBJEXT) channel.$(OBJEXT) \
 	statement.$(OBJEXT) systask.$(OBJEXT) task.$(OBJEXT) \
 	thyme.$(OBJEXT) trigger.$(OBJEXT) value.$(OBJEXT) \
 	verilog.$(OBJEXT) vgrammar.$(OBJEXT) luthor.$(OBJEXT) \
-	yywrap.$(OBJEXT)
-verga_OBJECTS = $(am_verga_OBJECTS)
-verga_DEPENDENCIES =
-verga_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(verga_LDFLAGS) \
+	yywrap.$(OBJEXT) release.$(OBJEXT)
+verga___OBJECTS = $(am_verga___OBJECTS)
+verga___DEPENDENCIES =
+verga___LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(verga___LDFLAGS) \
 	$(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -112,8 +112,8 @@ CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 LEXCOMPILE = $(LEX) $(AM_LFLAGS) $(LFLAGS)
 YLWRAP = $(top_srcdir)/ylwrap
 YACCCOMPILE = $(YACC) $(AM_YFLAGS) $(YFLAGS)
-SOURCES = $(verga_SOURCES)
-DIST_SOURCES = $(verga_SOURCES)
+SOURCES = $(verga___SOURCES)
+DIST_SOURCES = $(verga___SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -234,15 +234,15 @@ BUILT_SOURCES = vgrammar.h
 AM_CFLAGS = @TOP_IPATH@ @COMMON_IPATH@
 AM_CXXFLAGS = @TOP_IPATH@ @COMMON_IPATH@
 AM_YFLAGS = -d
-verga_SOURCES = bytecode.cpp channel.cpp circuit.cpp commands.cpp directive.cpp error.cpp evqueue.cpp expr.cpp \
+verga___SOURCES = bytecode.cpp channel.cpp circuit.cpp commands.cpp directive.cpp error.cpp evqueue.cpp expr.cpp \
 	io.cpp memory.cpp mitem.cpp module.cpp multint.cpp net.cpp operators.cpp pathmod.cpp paux.cpp specify.cpp \
 	statement.cpp systask.cpp task.cpp thyme.cpp trigger.cpp value.cpp verilog.cpp vgrammar.ypp luthor.lpp yywrap.c \
-	bytecode.h directive.h evqueue.h memory.h multint.h specify.h task.h trigger.h \
+	release.cpp bytecode.h directive.h evqueue.h memory.h multint.h specify.h task.h trigger.h \
 	channel.h dynitem.h expr.h mitem.h net.h  statement.h thyme.h value.h yybasic.h \
 	circuit.h error.h io.h module.h operators.h systask.h thyme_config.h verilog.h
 
-verga_LDFLAGS = @COMMON_LPATH@
-verga_LDADD = -lcommon
+verga___LDFLAGS = @COMMON_LPATH@
+verga___LDADD = -lcommon
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -257,9 +257,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/verga/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/verga/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu src/verga/Makefile
+	  $(AUTOMAKE) --foreign src/verga/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -321,9 +321,9 @@ clean-binPROGRAMS:
 vgrammar.h: vgrammar.cpp
 	@if test ! -f $@; then rm -f vgrammar.cpp; else :; fi
 	@if test ! -f $@; then $(MAKE) $(AM_MAKEFLAGS) vgrammar.cpp; else :; fi
-verga$(EXEEXT): $(verga_OBJECTS) $(verga_DEPENDENCIES) $(EXTRA_verga_DEPENDENCIES) 
-	@rm -f verga$(EXEEXT)
-	$(verga_LINK) $(verga_OBJECTS) $(verga_LDADD) $(LIBS)
+verga++$(EXEEXT): $(verga___OBJECTS) $(verga___DEPENDENCIES) $(EXTRA_verga___DEPENDENCIES) 
+	@rm -f verga++$(EXEEXT)
+	$(verga___LINK) $(verga___OBJECTS) $(verga___LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -349,6 +349,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/operators.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pathmod.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/paux.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/release.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/specify.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/statement.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/systask.Po@am__quote@

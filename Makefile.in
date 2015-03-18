@@ -73,8 +73,8 @@ subdir = .
 DIST_COMMON = README $(am__configure_deps) $(dist_doc_DATA) \
 	$(dist_man_MANS) $(noinst_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
-	$(top_srcdir)/configure COPYING ChangeLog INSTALL TODO depcomp \
-	install-sh missing ylwrap
+	$(top_srcdir)/configure AUTHORS COPYING ChangeLog INSTALL TODO \
+	depcomp install-sh missing ylwrap
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
 	$(top_srcdir)/configure.ac
@@ -917,7 +917,7 @@ uninstall-man: uninstall-man1
 # Update the release data for this compilation
 #
 release:
-	echo 'char *release_date = "'`(LANG=; date "+%b %d %Y")`'";' > $(srcdir)/src/verga/release.cpp
+	echo 'const char *release_date = "'`(LANG=; date "+%b %d %Y")`'";' > $(srcdir)/src/verga/release.cpp
 
 dist-hook:
 	@echo Packaging data files...
