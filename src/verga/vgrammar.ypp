@@ -84,6 +84,11 @@
 %token PARAMETER
 %token PRIMITIVE
 %token QUEST
+%token REAL
+%token PULL0
+%token PULL1
+%token PULLDOWN
+%token PULLUP
 %token REG
 %token REPEAT
 %token SCALAR
@@ -94,23 +99,32 @@
 %token SUPPLY0
 %token SUPPLY1
 %token TASK
+%token TIME
 %token TRI
 %token TRI0
 %token TRI1
 %token TRIAND
+%token TRIGGER
 %token TRIOR
 %token TRIREG
+%token POSEDGE
+%token RBRACE
+%token RBRACK
+%token REPCAT
+%token RPAREN
+%token SEMI
+%token UINV
+%token RSHIFTEQ
+%token SPECIFY
+%token SPECPARAM
+%token VECTORED
 %token WAIT
+%token WAND
+%token WEAK0
+%token WEAK1
 %token WHILE
 %token WIRE
-%token POSEDGE TRIGGER
-%token RPAREN RBRACE RBRACK
-%token SEMI REPCAT
-%token UINV
-%token RSHIFTEQ SPECIFY SPECPARAM
-%token WAND WOR VECTORED
-%token REAL TIME PULLUP PULLDOWN
-%token PULL0 PULL1 WEAK0 WEAK1
+%token WOR
 
 %token <I> CMOS RCMOS BUFIF0 BUFIF1 NOTIF0 NOTIF1 NMOS PMOS RNMOS RPMOS
 %token <I> PRIMAND PRIMNAND PRIMNOR PRIMXOR PRIMXNOR BUF PRIMNOT

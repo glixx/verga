@@ -208,7 +208,7 @@ void VerEndModule()
 
 /*****************************************************************************
  *
- * Begin a group of net/wire declarations.
+ * Begin a group of net declarations.
  *
  * Parameters:
  *     dtype		Type for subsequent declarations.
@@ -830,4 +830,3 @@ void VerEndEScript()
   vgio_printf("embeddedscript end %s %d\n",cur.esName,curPlace.p_lineNo-2);
   cur.esName = 0;
 }
-

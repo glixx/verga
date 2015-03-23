@@ -42,7 +42,7 @@ static GateDesc gateTable[] = {
   {NOTIF0,	"notif0",	GAC_FIXED,	3,	Value_bufif0,	Value_not},
   {NOTIF1,	"notif1",	GAC_FIXED,	3,	Value_bufif1,	Value_not},
   {BUF,		"buf",		GAC_MULTOUT,	2,	0,		Value_buf},
-  {PRIMNOT,	"not",		GAC_MULTOUT,	2,	0,		Value_not},
+  {PRIMNOT,	"not",		GAC_MULTOUT,	2,	0,		Value_not}
 };
 
 static void MIParameter_print(MIParameter *mip, FILE *f);
@@ -80,7 +80,6 @@ static MItemVTable vtable_MIGate = {
   (MIgenerate_f*) MIGate_generate,
   (MIprint_f*) MIGate_print
 };
-
 
 /*****************************************************************************
  *
