@@ -113,7 +113,7 @@ Net *new_Net(const char *name,nettype_t ntype,unsigned msb,unsigned lsb)
     Value_unknown(value);
   }
 
-  value->permFlags = SF_NETVAL | value->flags;
+  value->permFlags = (ValueFlags)(SF_NETVAL | value->flags);
 
   return n;
 }

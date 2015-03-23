@@ -161,7 +161,7 @@ typedef enum net_type_prop_en {
 #define NT_EVENT		(NT_P_REG|NT_P_EVENT)
 #define NT_TIME			(NT_P_REG|NT_P_TIME)
 #define NT_REAL			(NT_P_REG|NT_P_REAL)
-#define NT_REG_OUTPUT		(NT_P_REG|NT_P_OUTPUT)
+#define NT_REG_OUTPUT	(NT_P_REG|NT_P_OUTPUT)
 #define NT_SUPPLY0		(NT_P_REG|NT_P_SUPPLY0)
 #define NT_SUPPLY1		(NT_P_REG|NT_P_SUPPLY1)
 

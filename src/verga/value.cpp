@@ -25,8 +25,8 @@
 
 #define ABS(n)		((n) < 0 ? -(n) : (n))
 
-static char *sym_table_lc = "*01@zlhx";
-static char *sym_table = "*01@zLHx";
+static char sym_table_lc[] = "*01@zlhx";
+static char sym_table[] = "*01@zLHx";
 static int sym_table_len = 8;
 
 static int value_print_showbits = 1;
@@ -68,7 +68,7 @@ Value *new_Value(int nbits)
   }
 
   S->state.flags = SF_NONE;
-  S->state.permFlags = 0;
+  S->state.permFlags = SF_NONE;
 
 #if DEBUG_VALUE
   if (((fl_count+ma_count) % 10000) == 0) {
@@ -149,7 +149,7 @@ void Value_init(Value *S,int nbits)
   S->zero = (unsigned*)malloc(wc*sizeof(unsigned));
   S->flt = (unsigned*)malloc(wc*sizeof(unsigned));
   S->flags = SF_NONE;
-  S->permFlags = 0;
+  S->permFlags = SF_NONE;
 }
 
 void Value_uninit(Value *S)
@@ -209,17 +209,6 @@ int Value_isPartZero(Value *A,int lowz)
   return 1;
 }
 
-/*****************************************************************************
- *
- * Check for exact equivalence (including tests z and x bits)
- *
- * Paramaters:
- *     A,B		Values to compare
- *
- * Returns:		Non-zero if A and B are identical including x/z bits.
- *
- *
- *****************************************************************************/
 int Value_isEqual(Value *A,Value *B)
 {
   unsigned nbits = imin(A->nbits, B->nbits);
@@ -253,12 +242,6 @@ int Value_isEqual(Value *A,Value *B)
     return 1;
 }
 
-/*****************************************************************************
- *
- * Returns the transition type
- *
- *
- *****************************************************************************/
 transtype_t Value_transitionType(Value *A,Value *B)
 {
   if (Value_nbits(A) == 1) {
@@ -517,16 +500,6 @@ static void Value_extendSym(Value *S,int d,StateSymbol sym)
     Value_putBitSym(S,i,sym);
 }
 
-/*****************************************************************************
- *
- * Resize a Value value object
- *
- * Paramaters:
- *     R			Value value object
- *     nbits			Number of bits
- *     dosign			Do sign extension.
- *
- *****************************************************************************/
 void Value_resize(Value *R,int nbits)
 {
   if (nbits < R->nbits) { 		/* Downsizing */
@@ -1142,7 +1115,6 @@ static int Value_getstr_oct(Value *S,char *p,int prefix)
     p += sprintf(p,"%d'o",N);
   trimPart = p;
 
-
   for (i = M;i > 0;i -= 3) {
     int x0 = Value_getBitSym(S,i-3);
     int x1 = Value_getBitSym(S,i-2);
@@ -1177,7 +1149,6 @@ static int Value_getstr_oct(Value *S,char *p,int prefix)
 
   return Value_trim(trimPart) - q;
 }
-
 
 static int Value_getstr_real(Value *S,char *p,int useG)
 {
@@ -1433,8 +1404,6 @@ int Value_format(Value *S,const char *fmt,char *p)
   return 0;
 }
 
-
-
 void Value_print(Value *S,FILE *f)
 {
   char buf[STRMAX];
@@ -1479,15 +1448,6 @@ void Value_makeSameSize3(Value *A,Value *B,Value *C)
   Value_resize(C,maxSize);
 }
 
-/*****************************************************************************
- *
- * Copy a Value value
- *
- * Parameters:
- *     r		Target of assignment
- *     a		Source of assignment
- *
- *****************************************************************************/
 void Value_copy(Value *r,Value *a)
 {
   int wc = SSNUMWORDS(r->nbits);
@@ -1502,32 +1462,15 @@ void Value_copy(Value *r,Value *a)
   }
 }
 
-/*****************************************************************************
- *
- * Copy range of bits
- *
- * Parameters:
- *     R		Target Value value
- *     rl		Low bit in R at which to start copy
- *     A		Source Value value
- *     ah		High bit in source to copy
- *     al		Low bit in source to copy
- *
- * Returns:		Type of transition that occured.
- *
- * Copy a range of bits.  Copies bits in the range [ah:al] of A into R
- * starting at bit rl.
- *
- *****************************************************************************/
 transtype_t Value_copyRange(Value *R,int rl,Value *A,int ah,int al)
 {
   transtype_t tt = TT_NONE;
   int rh = rl+(ah-al);						/* High bit of target in R */
 
   if (ah == al) {
-    /*****************************************************************************
+    /*
      * Special case for one-bit copy.
-     *****************************************************************************/
+     */
     StateSymbol fromSym = Value_getBitSym(R,rl);
     StateSymbol toSym   = Value_getBitSym(A,ah);
 
@@ -1826,25 +1769,6 @@ void Value_tri0(Value *R,Value *A,Value *B)
   }
 }
 
-/*****************************************************************************
- *
- *  Wire merge function for "tri1"
- *
- * Parameters:
- *      R		Return value
- *      A		Wire A
- *      B		Wire B
- *
- *TRI1
- *   0 1 x z L H
- *  +-----------
- * 0|0 x x 0 0 x
- * 1|x 1 x 1 x 1
- * x|x x x x x x
- * z|0 1 x 1 x 1
- * L|0 x x x x x
- * H|x 1 x 1 x 1
- */
 void Value_tri1(Value *R,Value *A,Value *B)
 {
   int wc = SSNUMWORDS(R->nbits);
@@ -1862,26 +1786,6 @@ void Value_tri1(Value *R,Value *A,Value *B)
   }
 }
 
-/*****************************************************************************
- *
- *  Wire assignment function for trireg wires
- *
- * Parameters:
- *      R		Return value
- *      A		Driven value
- *      B		Current net value
- *
- *TRIREG
- *          (A)          one                zero                flt
- *       0 1 x z L H       0 1 x z L H        0 1 x z L H        0 1 x z L H  01z
- *      +-----------      +-----------       +-----------       +-----------  ---
- *     0|0 1 x 0 0 x     0|0 1 1 0 0 1      0|1 0 1 1 1 1      0|0 0 1 0 0 1  100
- *     1|0 1 x 1 x 1     1|0 1 1 1 1 1      1|1 0 1 0 1 0      1|0 0 1 0 1 0  010
- * (B) x|0 1 x x x x     x|0 1 1 1 1 1      x|1 0 1 1 1 1      x|0 0 1 1 1 1  111
- *     z|0 1 x z L H     z|0 1 1 0 0 1      z|1 0 1 0 1 0      z|0 0 1 1 1 1  001
- *     L|0 1 x L L x     L|0 1 1 0 0 1      L|1 0 1 1 1 1      L|0 0 1 1 1 1  101
- *     H|0 1 x H x H     H|0 1 1 1 1 1      H|1 0 1 0 1 0      H|0 0 1 1 1 1  011
- */
 void Value_trireg(Value *R,Value *A,Value *B)
 {
   int wc = SSNUMWORDS(R->nbits);

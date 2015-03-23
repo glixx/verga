@@ -980,7 +980,6 @@ void Circuit_installScript(Circuit *c,ModuleDecl *m,DynamicModule *dm)
 
   SHash_init(&reported);
 
-
   for (he = Hash_first(&c->c_nets);he;he = Hash_next(&c->c_nets, he)) {
     Net *n = (Net*) HashElem_obj(he);
 
