@@ -1,3 +1,5 @@
+Verga++ is a Verilog simulator. It was developed by Jeffery P. Hansen as part of TkGate digital circuit editor and simulator.
+
 This file contains notes on the internal commands sent between tkgate and the simulator verga.
 
 Commands recognized by simulator:
@@ -35,4 +37,3 @@ error gate <gate> <text>			Error occuring related to a gate/module
 error net <net> <text>				Error occuring related to a net
 error run <text>				Run-time error report
 error command <text>				Error in command from tkgate
-
