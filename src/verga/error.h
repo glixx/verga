@@ -149,8 +149,8 @@ typedef enum {
 typedef struct ErrorDescriptor_str {
   errorcode_t	ed_code;		/* Error code number */
   int		ed_level;		/* Error level */
-  char		*ed_tag;		/* Message tag for error */
-  char		*ed_text;		/* Default text of error */
+  char const	*ed_tag;		/* Message tag for error */
+  char const		*ed_text;		/* Default text of error */
   int		ed_numArgs;		/* Number of arguments */
 } ErrorDescriptor;
 

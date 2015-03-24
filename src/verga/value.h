@@ -162,23 +162,30 @@ struct Value_str {
 };
 
 typedef enum strength_en {
-  ST_HIGHZ = 0,
-#define ST_HIGHZ ST_HIGHZ
-  ST_SMALL = 1,
-#define ST_SMALL ST_SMALL
-  ST_MEDIUM = 2,
-#define ST_MEDIUM ST_MEDIUM
-  ST_WEAK = 3,
-#define ST_WEAK ST_WEAK
-  ST_LARGE = 4,
-#define ST_LARGE ST_LARGE
-  ST_PULL = 5,
-#define ST_PULL ST_PULL
-  ST_STRONG = 6,
-#define ST_STRONG ST_STRONG
-  ST_SUPPLY = 7
-#define ST_SUPPLY ST_SUPPLY
+  STR_HIGHZ = 0,
+#define STR_HIGHZ STR_HIGHZ
+  STR_SMALL = 1,
+#define STR_SMALL STR_SMALL
+  STR_MEDIUM = 2,
+#define STR_MEDIUM STR_MEDIUM
+  STR_WEAK = 3,
+#define STR_WEAK STR_WEAK
+  STR_LARGE = 4,
+#define STR_LARGE STR_LARGE
+  STR_PULL = 5,
+#define STR_PULL STR_PULL
+  STR_STRONG = 6,
+#define STR_STRONG STR_STRONG
+  STR_SUPPLY = 7
+#define STR_SUPPLY STR_SUPPLY
+} StrengthLevel;
+
+typedef struct {
+  StrengthLevel one:4;
+  StrengthLevel zero:4;
 } Strength;
+
+Strength Strength_fromNettype(unsigned nettype);
 
 /*****************************************************************************
  *

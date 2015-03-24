@@ -28,7 +28,7 @@
 typedef void circexec_f(Circuit*c,int argc,char *argv[]);
 
 typedef struct {
-  char		*cet_command;
+  char const	*cet_command;
   circexec_f	*cet_func;
 } CircExecFunc;
 

@@ -26,7 +26,7 @@ extern int ycLineNumber;
 extern char *ycFileName;
 
 struct lex_keywordentry {
-    char *Keyword;
+    char const *Keyword;
     int Value;
 };
 

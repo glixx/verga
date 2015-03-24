@@ -20,6 +20,9 @@
 #ifndef __mitem_h
 #define __mitem_h
 
+#include "value.h"
+
+
 /*
  * Module item flags
  */
@@ -55,7 +58,7 @@ typedef enum {
 
 typedef struct GateDesc_str {
   int		gd_code;	/* Code for this gate type */
-  char		*gd_name;	/* Name of this gate type */
+  char const		*gd_name;	/* Name of this gate type */
   gateargcode_t	gd_gac;		/* Gate argument handling */
   int		gd_minPorts;	/* Minimum number of ports */
   valueop_f	*gd_baseFunc;	/* Base function */
@@ -75,7 +78,6 @@ typedef struct {
   VRange	*n_addrRange;		/* Address range for memories */
   Place		n_place;		/* Place where net was declared */
 } NetDecl;
-
 
 typedef VGThread *MIgenerate_f(ModuleItem *mi,ModuleInst *modCtx,CodeBlock *cb);
 typedef void MIprint_f(ModuleItem *mi,FILE *f);
@@ -181,6 +183,7 @@ typedef struct {
   const	char		*mig_instName;		/* Name of instance */
   VRange		*mig_slices;		/* Range/number of slices */
   List/*Expr*/		*mig_ports;		/* Ports */
+  Strength mig_strength;    /* Strength of the output values */
 } MIGate;
 
 
@@ -237,7 +240,8 @@ Expr *MIInstance_findParm(MIInstance *mi,const char *name, int ppIdx);
 /*****************************************************************************
  * MIGate methods
  *****************************************************************************/
-MIGate *new_MIGate(unsigned gateType, Expr *delay, const char *instName, VRange *slices, List *ports);
+
+MIGate *new_MIGate(unsigned gateType, unsigned strength, Expr *delay, const char *instName, VRange *slices, List *ports);
 int MIGate_pathdGenerate(MIGate *mig,ModuleInst *mi,CodeBlock *codeBlock,List *asgns);
 
 /*****************************************************************************

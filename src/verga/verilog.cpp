@@ -27,7 +27,6 @@ void yyrestart(FILE*);
 
 Place		curPlace;			/* The current place */
 
-
 /*****************************************************************************
  *
  * "current" object structure used by parser
@@ -46,6 +45,7 @@ typedef struct {
   ScopeDecl	*scope;			/* Scope in which to make variable declarations */
   int		isRedef;		/* This module is a redefinition (i.e., in error). */
   const char	*esName;		/* Name of embedded script  */
+  unsigned	gstrength;	/* Strength of the signals */
 } Current;
 
 static Current cur = {0};
@@ -82,6 +82,8 @@ static void cur_init(const char *fileName)
   cur.task = 0;
   cur.range = 0;
   cur.instType = 0;
+  cur.gstrength = 0;
+  
   Place_init(&curPlace, fileName);
 }
 
@@ -602,7 +604,7 @@ void VerModInst(const char *name, VRange *range, List *ports)
 
 /*****************************************************************************
  *
- * Create an instance of a module
+ * Create a breakpoint
  *
  * Parameters:
  *      n		ID number of breakpoint
@@ -708,11 +710,18 @@ void VerGateDecl(int gtype, Expr *delay)
   cur.gdelay = delay;
 }
 
+void VerGateDecl(int gtype, unsigned strength, Expr *delay)
+{
+  cur.gtype = gtype;
+  cur.gstrength = strength;
+  cur.gdelay = delay;
+}
+
 void VerGateInst(const char *iname, VRange *range, List *ports)
 {
   MIGate *mig;
 
-  mig = new_MIGate(cur.gtype, cur.gdelay, iname, range, ports);
+  mig = new_MIGate(cur.gtype, cur.gstrength, cur.gdelay, iname, range, ports);
 
   List_addToTail(&cur.mod->m_items,mig);
 

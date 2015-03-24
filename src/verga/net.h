@@ -52,6 +52,8 @@
  *
  *****************************************************************************/
 typedef enum net_type_prop_en {
+  NT_NONE = 0,
+#define NT_NONE		NT_NONE	/* Base type is wire */
   NT_P_WIRE = 0x1,
 #define NT_P_WIRE		NT_P_WIRE	/* Base type is wire */
   NT_P_REG = 0x2,

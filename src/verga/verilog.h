@@ -78,7 +78,19 @@ void VerSpecParam(const char *name,Expr *value);
  *      delay		Delay expression
  *
  *****************************************************************************/
-void VerGateDecl(int gtype, Expr *delay);
+void VerGateDecl(int, Expr*);
+
+/*****************************************************************************
+ *
+ * Set the type for declaring built-in gates ("and", "or", etc.)
+ *
+ * Parameters:
+ *      gtype		Type code
+ *      strength    Strength of the out values
+ *      delay		Delay expression
+ *
+ *****************************************************************************/
+void VerGateDecl(int, unsigned, Expr*);
 
 /*****************************************************************************
  *

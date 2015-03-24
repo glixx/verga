@@ -155,7 +155,7 @@ typedef struct {
   exprcode_t	od_type;	/* Type code for operand */
   int		od_plev;	/* Precidence level */
   int 		od_nopr;	/* Number of operands */
-  char		*od_text;	/* Text for operand */
+  char 		*od_text;	/* Text for operand */
   outsize_t	od_outSize;	/* Code representing output bit sizing */
   valueop_f	*od_opfunc;	/* Function implementing operator */
   valueop_f	*od_w_opfunc;	/* Function implementing operator when operands <32 bits */

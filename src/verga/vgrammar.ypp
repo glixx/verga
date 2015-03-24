@@ -152,7 +152,7 @@
 %type <S> dlit decltail dlits
 %type <I> casekw cmos_gtype mos_gtype inx_gtype outx_gtype bif_gtype tran_gtype trif_gtype
 
-%type <I> net_type reg_type xreg_type port_type capsize netattrs netattr size0 size1 ptype oautomatic
+%type <I> net_type reg_type xreg_type port_type capsize netattrs netattr drstrength size0 size1 ptype oautomatic
 %type <E> expr bval lval lvals catexprs delay dexpr odelay econd trigger triggers event catexpr starg
 %type <R> orange range
 %type <L> caseents stats miports miexprs miasgns exprs oexprs otgparms tgparms
@@ -369,7 +369,7 @@ esitem	: decl
  *
  *****************************************************************************/
 gate	: inx_gtype LPAREN drstrength RPAREN odelay
-	    { fprintf(stderr, "fixme: drive strength\n"); VerGateDecl($1,$5); } inx_ginsts SEMI
+	    { fprintf(stderr, "fixme: drive strength\n"); VerGateDecl($1,$3,$5); } inx_ginsts SEMI
 	| inx_gtype LPAREN lval COMMA exprs RPAREN
 	    { VerGateDecl($1,NULL);
 	      VerGateInst(NULL,NULL,VerListPrepend($3,$5));
@@ -381,7 +381,7 @@ gate	: inx_gtype LPAREN drstrength RPAREN odelay
 	| inx_gtype odelay { VerGateDecl($1,$2); } inx_named_ginst oinx_ginsts
 	    SEMI
 	| outx_gtype LPAREN drstrength RPAREN odelay
-	    { fprintf(stderr, "fixme: drive strength\n"); VerGateDecl($1,$5); } outx_ginsts SEMI
+	    { fprintf(stderr, "fixme: drive strength\n"); VerGateDecl($1,$3,$5); } outx_ginsts SEMI
 	| outx_gtype LPAREN exprs COMMA expr RPAREN
 	    { VerGateDecl($1,NULL);
 	      VerGateInst(NULL,NULL,VerListAppend($3,$5));
@@ -407,8 +407,8 @@ bif_gtype	: BUFIF0 | BUFIF1 | NOTIF0 | NOTIF1 ;
 tran_gtype	: TRAN | RTRAN ;
 trif_gtype	: TRANIF0 | TRANIF1 | RTRANIF0 | RTRANIF1 ;
 
-drstrength	: size0 COMMA size1
-		| size1 COMMA size0
+drstrength	: size0 COMMA size1 { $$ = $1|$3; }
+		| size1 COMMA size0 { $$ = $1|$3; }
 		;
 
 ginsts		: ginst

@@ -172,8 +172,8 @@ static ErrorDescriptor unknownError = {
 };
 
 #define EL_SCRIPTERR 2
-static char *errLevelText[] = {"warning", "error", "scripterror"};
-static char *errLevelTextCap[] = {"Warning", "Error", "ScriptError"};
+static char const *errLevelText[] = {"warning", "error", "scripterror"};
+static char const *errLevelTextCap[] = {"Warning", "Error", "ScriptError"};
 
 /*****************************************************************************
  *
@@ -196,7 +196,7 @@ void initErrorMessages()
 
   for (i = 0;i < errorTableLen;i++) {
     ErrorDescriptor *ed = &errorTable[i];
-    char *p;
+    char const *p;
     int count = 0;
 
 

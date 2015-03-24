@@ -32,9 +32,9 @@ static GateDesc gateTable[] = {
   {PRIMAND,	"and",		GAC_MULTIN,	2,	Value_and,	0},
   {KWOR,	"or",		GAC_MULTIN,	2,	Value_or,	0},
   {PRIMXOR,	"xor",		GAC_MULTIN,	2,	Value_xor,	0},
-  {PRIMNAND,	"nand",		GAC_MULTIN,	2,	Value_and,	Value_not},
-  {PRIMNOR,	"nor",		GAC_MULTIN,	2,	Value_or,	Value_not},
-  {PRIMXNOR,	"xnor",		GAC_MULTIN,	2,	Value_xor,	Value_not},
+  {PRIMNAND,	"nand",		GAC_MULTIN,	2,	Value_nand,	0},
+  {PRIMNOR,	"nor",		GAC_MULTIN,	2,	Value_nor,	0},
+  {PRIMXNOR,	"xnor",		GAC_MULTIN,	2,	Value_nxor,	0},
   {PMOS,	"pmos",		GAC_FIXED,	3,	Value_pmos,	0},
   {NMOS,	"nmos",		GAC_FIXED,	3,	Value_nmos,	0},
   {BUFIF0,	"bufif0",	GAC_FIXED,	3,	Value_bufif0,	0},
@@ -129,7 +129,14 @@ MIBlock *new_MIBlock(itemcode_t btype,StatDecl *stat)
   return mib;
 }
 
-MIGate *new_MIGate(unsigned gateType, Expr *delay, const char *instName, VRange *slices, List *ports)
+MIGate *
+new_MIGate(
+  unsigned gateType,
+  unsigned strength,
+  Expr *delay,
+  const char *instName,
+  VRange *slices,
+  List *ports)
 {
   MIGate *mig = (MIGate*) new_ModuleItem(IC_GATE);
   int i;
@@ -146,6 +153,7 @@ MIGate *new_MIGate(unsigned gateType, Expr *delay, const char *instName, VRange 
   mig->mig_delay = delay;
   mig->mig_slices = slices;
   mig->mig_ports = ports;
+  mig->mig_strength = Strength_fromNettype(strength);
 
   if (!mig->mig_desc)
     errorFile(ModuleItem_getPlace(mig), ERR_GATEUNIMP, instName);
@@ -897,8 +905,6 @@ static VGThread *MIGate_generate_multin(MIGate *mig, ModuleInst *mi,CodeBlock *c
   BCTrigger_init(CodeBlock_nextEmpty(codeBlock),t);
   BCGoto_init(CodeBlock_nextEmpty(codeBlock),0,0,codeBlock,top_bc);
 
-
-
   /*
    * Create thread starting at the top of the gate instance handler code.
    */
@@ -907,7 +913,7 @@ static VGThread *MIGate_generate_multin(MIGate *mig, ModuleInst *mi,CodeBlock *c
   if (ModuleItem_getDynamicModule(mig))
     DynamicModule_addThread(ModuleItem_getDynamicModule(mig), thread);
 
- abortGate:
+abortGate:
   PHash_uninit(&P);
 
   return thread;

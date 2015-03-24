@@ -132,10 +132,13 @@ int Value_w_not(Value *R,Value *A,Value *B,Value *C)
   return 0;
 }
 
-
 /*****************************************************************************
  *
  * Do a bitwise-NOT operation: r = ~b
+ * 
+ * Parameters:
+ *      R		Return value
+ *      B		Input value.
  *
  *****************************************************************************/
 int Value_not(Value *R,Value *A,Value *B,Value *C)
@@ -161,7 +164,7 @@ int Value_not(Value *R,Value *A,Value *B,Value *C)
  *
  * Parameters:
  *      R		Return value
- *      A		Input value.
+ *      B		Input value.
  *
  * Buffers the input and returns the result in R.  A buffered value will filter
  * and floating values and convert them to unknown.
