@@ -4,7 +4,7 @@ module test;
   trireg w2;
   reg b;
 
-  assign w1 = a;	
+  assign w1 = a;
   assign w2 = b;
 
   integer i,j;

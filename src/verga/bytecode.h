@@ -67,14 +67,11 @@
  * Thread states
  *
  *****************************************************************************/
-enum {
+typedef enum _ThreadState_t {
   TS_ACTIVE = 0x0, /**< Thread is actively executing */
-#define TS_ACTIVE TS_ACTIVE
   TS_BLOCKED = 0x1, /**< Thread is blocked waiting for event */
-#define TS_BLOCKED TS_BLOCKED
   TS_DISABLED = 0x2, /**< Thread is disabled */
-#define TS_DISABLED	TS_DISABLED
-};
+} ThreadState_t;
 
 /*****************************************************************************
  *
@@ -87,7 +84,6 @@ struct VGFrame_str {
   VGFrame	*f_next;	/* Next address on stack */
 };
 
-
 /*****************************************************************************
  *
  * VGThread - Thread state
@@ -95,15 +91,15 @@ struct VGFrame_str {
  *****************************************************************************/
 struct VGThread_str {
   Event		*t_pending;	/* Pointer to event if pending, null otherwise */
-  int		t_state;	/* State of the thread (active, blocked, paused, etc.)  */
-  int		t_isLive;	/* Non-zero if this thread is live */
-  int		t_wait;		/* Suspend until this many threads end */
+  ThreadState_t	 t_state;	/* State of the thread (active, blocked, paused, etc.)  */
+  int		 t_isLive;	/* Non-zero if this thread is live */
+  int		 t_wait;	/* Suspend until this many threads end */
   CodeBlock	*t_start_block;	/* CodeBlock to use for starting thread */
-  unsigned	t_start_pc;	/* Offset into starting thread for PC */
+  unsigned	 t_start_pc;	/* Offset into starting thread for PC */
   ByteCode	*t_pc;		/* Thread program counter */
   ModuleInst	*t_modCtx;	/* Module context in which thread was initiated */
   ModuleItem	*t_mitem;	/* Module item of thead (if applicable) */
-  int		t_numChild;	/* Number of running child tasks */
+  int		 t_numChild;	/* Number of running child tasks */
   VGThread	*t_parent;	/* Parent task */
   VGThread	*t_next;	/* Next pointer when we are in the active queue */
   VGFrame	*t_callStack;	/* Call stack for any calls to user tasks/functions */
@@ -655,10 +651,10 @@ void VGThread_kill(VGThread *thread);
 #define VGThread_getModCtx(thread) (thread)->t_modCtx
 #define VGThread_getCircuit(thread) (thread)->t_modCtx->mc_circuit
 #define VGThread_getQueue(thread) Circuit_getQueue((thread)->t_modCtx->mc_circuit)
-#define VGThread_suspend(t) ((t)->t_state |= TS_BLOCKED)
-#define VGThread_resume(t) ((t)->t_state &= ~TS_BLOCKED)
-#define VGThread_enable(t) ((t)->t_state &= ~TS_DISABLED)
-#define VGThread_disable(t) ((t)->t_state |= TS_DISABLED)
+#define VGThread_suspend(t) ((t)->t_state = ThreadState_t((t)->t_state | TS_BLOCKED))
+#define VGThread_resume(t) ((t)->t_state = ThreadState_t((t)->t_state & ~TS_BLOCKED))
+#define VGThread_enable(t) ((t)->t_state = ThreadState_t((t)->t_state & ~TS_DISABLED))
+#define VGThread_disable(t) ((t)->t_state = ThreadState_t((t)->t_state | TS_DISABLED))
 #define VGThread_isActive(t) ((t)->t_state == TS_ACTIVE)
 #define VGThread_doNextInsruction(t) (*t->t_pc->bc_func)(t->t_pc,t)
 #define VGThread_getMItem(t) (t)->t_mitem

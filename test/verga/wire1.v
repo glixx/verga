@@ -6,8 +6,8 @@ module test;
   tri0 w4;
   tri1 w5;
 
-  assign w1 = a;	
-  assign w1 = b;	
+  assign w1 = a;
+  assign w1 = b;
 
   assign w2 = a;	
   assign w2 = b;	

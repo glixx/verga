@@ -19,6 +19,8 @@
 ****************************************************************************/
 #include "thyme.h"
 
+#include <list>
+
 extern const char *release_date;
 
 int errCount = 0;
@@ -655,7 +657,7 @@ int main(int argc,char *argv[])
       && vgsim.vg_haveTScount != Hash_numElems(&vgsim.vg_modules)) {
     errorFile(&curPlace,ERR_TIMESCALEAN);
     exitIfError();
-    return 1;
+    return (EXIT_FAILURE);
   }
 
   /*
@@ -664,11 +666,11 @@ int main(int argc,char *argv[])
   if (!vgsim.vg_topModuleName) {
     errorFile(&curPlace,ERR_NOTOP, "<none>");
     exitIfError();
-    return 1;
+    return (EXIT_FAILURE);
   }
 
   startSimulation(vgsim.vg_topModuleName,warning_mode,&load_scripts,initTimeSpec);
 
-  return 0;
+  return (EXIT_SUCCESS);
 }
 

@@ -72,8 +72,6 @@ static EventVTable evmem_vtable = {
   (EventUninit_f*) EvMem_uninit,
 };
 
-
-
 /*****************************************************************************
  *
  * Insert an event E into the sorted list Q.  This insert is only used for "overflow"

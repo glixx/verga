@@ -117,7 +117,7 @@ am_verga___OBJECTS = bytecode.$(OBJEXT) channel.$(OBJEXT) \
 	multint.$(OBJEXT) net.$(OBJEXT) operators.$(OBJEXT) \
 	pathmod.$(OBJEXT) paux.$(OBJEXT) specify.$(OBJEXT) \
 	statement.$(OBJEXT) systask.$(OBJEXT) task.$(OBJEXT) \
-	thyme.$(OBJEXT) trigger.$(OBJEXT) value.$(OBJEXT) \
+	verga.$(OBJEXT) trigger.$(OBJEXT) value.$(OBJEXT) \
 	verilog.$(OBJEXT) vgrammar.$(OBJEXT) luthor.$(OBJEXT) \
 	yywrap.$(OBJEXT) release.$(OBJEXT)
 verga___OBJECTS = $(am_verga___OBJECTS)
@@ -313,17 +313,20 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-DISTCLEANFILES = vgrammar.h vgrammar.cpp luthor.cpp
-BUILT_SOURCES = vgrammar.h
+DISTCLEANFILES = vgrammar.hpp vgrammar.cpp luthor.cpp
+BUILT_SOURCES = vgrammar.hpp
 AM_CFLAGS = @TOP_IPATH@ @COMMON_IPATH@
 AM_CXXFLAGS = @TOP_IPATH@ @COMMON_IPATH@
 AM_YFLAGS = -d
-verga___SOURCES = bytecode.cpp channel.cpp circuit.cpp commands.cpp directive.cpp error.cpp evqueue.cpp expr.cpp \
-	io.cpp memory.cpp mitem.cpp module.cpp multint.cpp net.cpp operators.cpp pathmod.cpp paux.cpp specify.cpp \
-	statement.cpp systask.cpp task.cpp thyme.cpp trigger.cpp value.cpp verilog.cpp vgrammar.ypp luthor.lpp yywrap.c \
-	release.cpp bytecode.h directive.h evqueue.h memory.h multint.h specify.h task.h trigger.h \
-	channel.h dynitem.h expr.h mitem.h net.h  statement.h thyme.h value.h yybasic.h \
-	circuit.h error.h io.h module.h operators.h systask.h thyme_config.h verilog.h
+verga___SOURCES = bytecode.cpp channel.cpp circuit.cpp commands.cpp directive.cpp \
+	error.cpp evqueue.cpp expr.cpp io.cpp memory.cpp mitem.cpp module.cpp \
+	multint.cpp net.cpp operators.cpp pathmod.cpp paux.cpp specify.cpp \
+	statement.cpp systask.cpp task.cpp verga.cpp trigger.cpp value.cpp \
+	verilog.cpp vgrammar.ypp luthor.lpp yywrap.c release.cpp bytecode.h \
+	directive.h evqueue.h memory.h multint.h specify.h task.h trigger.h \
+	channel.h dynitem.h expr.h mitem.h net.h  statement.h thyme.h value.h \
+	yybasic.h circuit.h error.h io.h module.h operators.h systask.h \
+	thyme_config.h verilog.h
 
 verga___LDFLAGS = @COMMON_LPATH@
 verga___LDADD = -lcommon
@@ -441,9 +444,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/statement.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/systask.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/task.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/thyme.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/trigger.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/value.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/verga.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/verilog.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vgrammar.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/yywrap.Po@am__quote@

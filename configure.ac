@@ -9,7 +9,6 @@ AC_PREREQ(2.57)
 AC_CONFIG_HEADER(config.h)
 AC_LANG(C++)
 
-
 #############################################################################
 #
 # Default prefix directory for installation by OS

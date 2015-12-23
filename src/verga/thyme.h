@@ -19,13 +19,14 @@
 ****************************************************************************/
 #ifndef __thyme_h
 #define __thyme_h
-#include <stdlib.h>
-#include <stdio.h>
+
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
+#include <cstdarg>
 #include <sys/types.h>
 #include <sys/time.h>
 #include <unistd.h>
-#include <stdarg.h>
-#include <string.h>
 #include "config.h"		/* Tkgate global configuration parameters */
 #include "thyme_config.h"	/* thyme-specific configuration parameters */
 #include "misc.h"		/* libcommon miscelaneous functions/macros */
@@ -54,7 +55,7 @@
 #include "bytecode.h"		/* Simulation byte code */
 #include "verilog.h"		/* Parser functions */
 #include "yybasic.h"		/* Basic parser functions */
-#include "vgrammar.h"		/* Symbols definitions for tokens */
+#include "vgrammar.hpp"		/* Symbols definitions for tokens */
 
 typedef enum delay_type_en {
 	DT_MIN = 0,
