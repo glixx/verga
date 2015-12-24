@@ -715,12 +715,13 @@ void EvQueue_print(EvQueue *Q)
   }
 }
 
-void EvQueue_go(EvQueue *Q)
+void
+EvQueue_go(EvQueue *Q)
 {
-  (Q)->eq_flags = (eqflag_t)((Q)->eq_flags | EVF_RUN);
+	(Q)->eq_flags = (eqflag_t)((Q)->eq_flags | EVF_RUN);
 
-  if (vgsim.vg_interactive)
-    vgio_printf("go @ %llu\n",Q->eq_curTime);
+	if (vgsim.interactive())
+		vgio_printf("go @ %llu\n",Q->eq_curTime);
 }
 
 

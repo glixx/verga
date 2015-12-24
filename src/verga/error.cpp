@@ -594,24 +594,24 @@ static int marshalString(char *p,char *s)
  * Format an error message
  *
  *****************************************************************************/
-static int formatErrorMsg(char *p,ErrorDescriptor *ed,va_list ap)
+static int
+formatErrorMsg(char *p,ErrorDescriptor *ed,va_list ap)
 {
-  if (vgsim.vg_interactive) {
-    int i;
-    char *q = p;
+	if (vgsim.interactive()) {
+		int i;
+		char *q = p;
 
-    p += sprintf(p,"`%s",ed->ed_tag);
-    for (i = 0;i < ed->ed_numArgs;i++) {
-      p += sprintf(p," ");
-      p += marshalString(p,va_arg(ap,char*));
-    }
-    *p = 0;
-    return p-q;
-  } else {
-    return vsprintf(p,ed->ed_text,ap);
-  }
+		p += sprintf(p,"`%s",ed->ed_tag);
+		for (i = 0;i < ed->ed_numArgs;i++) {
+			p += sprintf(p," ");
+			p += marshalString(p,va_arg(ap,char*));
+		}
+		*p = 0;
+		return (p-q);
+	} else
+		return (vsprintf(p,ed->ed_text,ap));
 
-  return 0;
+	return (0);
 }
 
 /*****************************************************************************
@@ -653,26 +653,27 @@ static void doErrorOutput(ErrorDescriptor *ed,const char *msg)
  *      ...			Error-specific arguments
  *
  *****************************************************************************/
-void errorCmd(errorcode_t ecode,...)
+void
+errorCmd(errorcode_t ecode,...)
 {
-  ErrorDescriptor *ed = findError(ecode);
-  char buf[STRMAX],*p;
-  va_list ap;
-  extern int errCount;
+	ErrorDescriptor *ed = findError(ecode);
+	char buf[STRMAX],*p;
+	va_list ap;
+	extern int errCount;
 
-  p = buf;
-  if (vgsim.vg_interactive)
-    p += sprintf(p,"%s command ",errLevelText[ed->ed_level]);
-  else
-    p += sprintf(p,"Command %s: ",errLevelTextCap[ed->ed_level]);
+	p = buf;
+	if (vgsim.interactive())
+		p += sprintf(p,"%s command ",errLevelText[ed->ed_level]);
+	else
+		p += sprintf(p,"Command %s: ",errLevelTextCap[ed->ed_level]);
 
-  va_start(ap,ecode);
-  p += formatErrorMsg(p,ed,ap);
-  va_end(ap);
+	va_start(ap,ecode);
+	p += formatErrorMsg(p,ed,ap);
+	va_end(ap);
 
-  doErrorOutput(ed,buf);
+	doErrorOutput(ed,buf);
 
-  errCount++;
+	errCount++;
 }
 
 /*****************************************************************************
@@ -684,25 +685,26 @@ void errorCmd(errorcode_t ecode,...)
  *      ...			Error-specific arguments
  *
  *****************************************************************************/
-void errorRun(errorcode_t ecode,...)
+void
+errorRun(errorcode_t ecode,...)
 {
-  ErrorDescriptor *ed = findError(ecode);
-  char buf[STRMAX],*p;
-  va_list ap;
-  EvQueue *Q = Circuit_getQueue(&vgsim.vg_circuit);
-  simtime_t curTime = EvQueue_getCurTime(Q);
+	ErrorDescriptor *ed = findError(ecode);
+	char buf[STRMAX],*p;
+	va_list ap;
+	EvQueue *Q = Circuit_getQueue(&vgsim.vg_circuit);
+	simtime_t curTime = EvQueue_getCurTime(Q);
 
-  p = buf;
-  if (vgsim.vg_interactive)
-    p += sprintf(p,"%s run %llu : ",errLevelText[ed->ed_level],curTime);
-  else
-    p += sprintf(p,"Runtime %s at %llu: ",errLevelTextCap[ed->ed_level],curTime);
+	p = buf;
+	if (vgsim.interactive())
+		p += sprintf(p,"%s run %llu : ",errLevelText[ed->ed_level],curTime);
+	else
+		p += sprintf(p,"Runtime %s at %llu: ",errLevelTextCap[ed->ed_level],curTime);
 
-  va_start(ap,ecode);
-  p += formatErrorMsg(p,ed,ap);
-  va_end(ap);
+	va_start(ap,ecode);
+	p += formatErrorMsg(p,ed,ap);
+	va_end(ap);
 
-  doErrorOutput(ed,buf);
+	doErrorOutput(ed,buf);
 }
 
 /*****************************************************************************

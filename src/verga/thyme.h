@@ -27,6 +27,9 @@
 #include <sys/types.h>
 #include <sys/time.h>
 #include <unistd.h>
+
+#include <list>
+
 #include "config.h"		/* Tkgate global configuration parameters */
 #include "thyme_config.h"	/* thyme-specific configuration parameters */
 #include "misc.h"		/* libcommon miscelaneous functions/macros */
@@ -56,6 +59,8 @@
 #include "verilog.h"		/* Parser functions */
 #include "yybasic.h"		/* Basic parser functions */
 #include "vgrammar.hpp"		/* Symbols definitions for tokens */
+
+typedef std::list<const char*>	Stringlist;
 
 typedef enum delay_type_en {
 	DT_MIN = 0,
@@ -91,29 +96,60 @@ typedef struct {
  * GVSim - Top level structure for simulator data.
  *
  *****************************************************************************/
-typedef struct vgsim_str {
-  char *vg_baseDirectory;	/* Base directory for input files */
-  char *vg_topModuleName;	/* Name of top-level module */
-  char *vg_defaultTopModuleName;	/* Default name of top-level module */
-  SHash vg_modules;	/* Table of modules */
-  Circuit vg_circuit;	/* Instantiated circuit to be simulated */
-  int vg_interactive;	/* Non-zero if we are in interactive mode */
+class VGSim
+{
+public:
+	VGSim();
+	void init();
+	
+	void loadFiles(Stringlist&);
+	
+	ModuleDecl *findModule(const char*);
+	void addModule(ModuleDecl*);
+	
+	void setBaseDirectory(char *newVal)
+	{
+		_baseDirectory = newVal;
+	}
+	char *baseDirectory()
+	{
+		return (_baseDirectory);
+	}
+	
+	bool interactive() const
+	{
+		return (_interactive);
+	}
+	void setInteractive(bool newVal)
+	{
+		_interactive = newVal;
+	}
+	
+	/* Name of top-level module */
+	char		*vg_topModuleName;
+	/* Default name of top-level module */
+	char		*vg_defaultTopModuleName;
+	/* Table of modules */
+	SHash		 vg_modules;
+	/* Instantiated circuit to be simulated */
+	Circuit		 vg_circuit;
 
-  VGSecurity vg_sec;	/* Security options */
+	VGSecurity	 vg_sec;	/* Security options */
 
-  Timescale vg_timescale;	/* Lowest timescale of any loaded module */
-  int vg_haveTScount;	/* Number of modules with timescale */
+	Timescale	 vg_timescale;	/* Lowest timescale of any loaded module */
+	int		 vg_haveTScount;	/* Number of modules with timescale */
 
-  int vg_noTimeViolations;	/* Supress all timing violations? */
-  simtime_t vg_initTime;	/* Time need for user circuit to initialize. */
+	int vg_noTimeViolations;	/* Supress all timing violations? */
+	simtime_t vg_initTime;	/* Time need for user circuit to initialize. */
 
-  DelayType vg_delayType;	/* Type of delays to use */
-  VerilogStd vg_std;
-} VGSim;
-
-void VGSim_init(VGSim *);
-void VGSim_addModule(VGSim *, ModuleDecl * m);
-ModuleDecl *VGSim_findModule(VGSim *, const char *name);
+	DelayType vg_delayType;	/* Type of delays to use */
+	VerilogStd vg_std;
+private:
+	/* Base directory for input files */
+	char	*_baseDirectory;
+	/* Non-zero if we are in interactive mode */
+	bool	 _interactive;
+};
 
 void VGSecurity_init(VGSecurity *, int trusted);
 void VGSecurity_handleException(VGSecurity *, VGThread * t, const char *name);

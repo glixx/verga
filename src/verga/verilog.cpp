@@ -171,41 +171,40 @@ int VerilogLoad(const char *name)
 
 void VerNewModule(const char *name)
 {
-  Place *p = Place_getCurrent();
+	Place *p = Place_getCurrent();
 
-  cur.isRedef = 0;
+	cur.isRedef = 0;
 
-  if (VGSim_findModule(&vgsim, name)) {
-    errorFile(&curPlace,ERR_MODREDEF,name);
-    cur.isRedef = 1;
-  }
+	if (vgsim.findModule(name)) {
+		errorFile(&curPlace,ERR_MODREDEF,name);
+		cur.isRedef = 1;
+	}
 
 #if DEBUG
-  printf("%s(%s)\n",__PRETTY_FUNCTION__,name);
+	printf("%s(%s)\n",__PRETTY_FUNCTION__,name);
 #endif
-  cur.mod = new_ModuleDecl(name);
-  cur.scope = ModuleDecl_getScope(cur.mod);
-  Place_startModule(p, name);
-  Place_copy(&cur.mod->m_place,p);
+	cur.mod = new_ModuleDecl(name);
+	cur.scope = ModuleDecl_getScope(cur.mod);
+	Place_startModule(p, name);
+	Place_copy(&cur.mod->m_place,p);
 
-  if (strcmp(p->p_moduleName,name) != 0) {
-    errorModule(cur.mod,p,ERR_WRONGMOD,name,p->p_moduleName);
-  }
+	if (strcmp(p->p_moduleName,name) != 0)
+		errorModule(cur.mod,p,ERR_WRONGMOD,name,p->p_moduleName);
 }
 
 void VerEndModule()
 {
 #if DEBUG
-  printf("%s()\n",__PRETTY_FUNCTION__);
+	std::puts (__PRETTY_FUNCTION__);
 #endif
 
-  if (!cur.isRedef)
-    VGSim_addModule(&vgsim, cur.mod);
-  cur.mod = 0;
-  cur.isRedef = 0;
-  cur.scope = 0;
+	if (!cur.isRedef)
+		vgsim.addModule(cur.mod);
+	cur.mod = 0;
+	cur.isRedef = 0;
+	cur.scope = 0;
 
-  Place_endModule(Place_getCurrent());
+	Place_endModule(Place_getCurrent());
 }
 
 /*****************************************************************************

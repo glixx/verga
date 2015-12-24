@@ -19,8 +19,6 @@
 ****************************************************************************/
 #include "thyme.h"
 
-#include <list>
-
 extern const char *release_date;
 
 int errCount = 0;
@@ -87,30 +85,28 @@ void VGSecurity_handleException(VGSecurity *vgs,VGThread *t,const char *name)
   }
 }
 
-/*****************************************************************************
- *
- * Initialize the VGSim object
- *
- * Parameters:
- *     vg		VGSim object to be initialized.
- *
- *****************************************************************************/
-void VGSim_init(VGSim *vg)
+VGSim::VGSim()
 {
-  vg->vg_baseDirectory = 0;
-  vg->vg_topModuleName = 0;
-  vg->vg_defaultTopModuleName = 0;
-  SHash_init(&vg->vg_modules);
-  Circuit_init(&vg->vg_circuit);
-  vg->vg_interactive = 0;
-  VGSecurity_init(&vg->vg_sec,0);
-  vg->vg_timescale.ts_units = 0;
-  vg->vg_timescale.ts_precision = 0;
-  vg->vg_haveTScount = 0;
-  vg->vg_noTimeViolations = 0;
-  vg->vg_initTime = 0;
-  vg->vg_delayType = DT_TYP;
-  vg->vg_std = VSTD_1995;
+	this->init();
+}
+
+void
+VGSim::init()
+{
+	this->_baseDirectory = NULL;
+	this->_interactive = false;
+	this->vg_topModuleName = 0;
+	this->vg_defaultTopModuleName = 0;
+	SHash_init(&this->vg_modules);
+	Circuit_init(&this->vg_circuit);
+	VGSecurity_init(&this->vg_sec,0);
+	this->vg_timescale.ts_units = 0;
+	this->vg_timescale.ts_precision = 0;
+	this->vg_haveTScount = 0;
+	this->vg_noTimeViolations = 0;
+	this->vg_initTime = 0;
+	this->vg_delayType = DT_TYP;
+	this->vg_std = VSTD_1995;
 }
 
 static void usage()
@@ -151,8 +147,8 @@ FILE *openInPath(const char *name)
   /*
    * If a base directory is specified, look in that directory.
    */
-  if ((r = vgsim.vg_baseDirectory)) {
-    strcpy(buf,r);
+  if ((r = vgsim.baseDirectory())) {
+    std::strncpy(buf, r, STRMAX);
     if ((r = strrchr(buf,'/'))) {
       if (r != buf) {
 	strcpy(r+1,name);
@@ -189,29 +185,32 @@ FILE *openInPath(const char *name)
  *     m		Module declatation object
  *
  *****************************************************************************/
-void VGSim_addModule(VGSim *vg, ModuleDecl *m)
+void
+VGSim::addModule(ModuleDecl *m)
 {
-  if (!vg->vg_defaultTopModuleName && List_numElems(&m->m_ports) == 0)
-    vg->vg_defaultTopModuleName = m->m_name;
+	if (!this->vg_defaultTopModuleName && List_numElems(&m->m_ports) == 0)
+		this->vg_defaultTopModuleName = m->m_name;
 
-  SHash_insert(&vg->vg_modules, m->m_name, m);
+	SHash_insert(&this->vg_modules, m->m_name, m);
 
-  /* Do post-definition processing of module */
-  if (m->m_specify && Specify_numStats(m->m_specify) > 0) {
-    ModuleDecl_makeFaninTree(m);
-  }
+	/* Do post-definition processing of module */
+	if (m->m_specify && Specify_numStats(m->m_specify) > 0)
+		ModuleDecl_makeFaninTree(m);
 
-  /* Update global timescale */
-  if (m->m_timescale.ts_units != 0) {
-    if (vg->vg_timescale.ts_units == 0 || m->m_timescale.ts_units < vg->vg_timescale.ts_units)
-      vg->vg_timescale.ts_units = m->m_timescale.ts_units;
+	/* Update global timescale */
+	if (m->m_timescale.ts_units != 0) {
+		if (this->vg_timescale.ts_units == 0 || m->m_timescale.ts_units
+		    < this->vg_timescale.ts_units)
+			this->vg_timescale.ts_units = m->m_timescale.ts_units;
 
-    vg->vg_haveTScount++;
-  }
-  if (m->m_timescale.ts_precision != 0) {
-    if (vg->vg_timescale.ts_precision == 0 || m->m_timescale.ts_precision < vg->vg_timescale.ts_precision)
-      vg->vg_timescale.ts_precision = m->m_timescale.ts_precision;
-  }
+		this->vg_haveTScount++;
+	}
+	if (m->m_timescale.ts_precision != 0) {
+		if (this->vg_timescale.ts_precision == 0 || (m->m_timescale.
+		    ts_precision < this->vg_timescale.ts_precision))
+			this->vg_timescale.ts_precision = m->m_timescale.
+			    ts_precision;
+	}
 }
 
 /*****************************************************************************
@@ -225,9 +224,11 @@ void VGSim_addModule(VGSim *vg, ModuleDecl *m)
  * Returns:		Module declaration object or null if not found.
  *
  *****************************************************************************/
-ModuleDecl *VGSim_findModule(VGSim *vg, const char *name)
+ModuleDecl*
+VGSim::findModule(const char *name)
 {
-  return (ModuleDecl*) SHash_find(&vg->vg_modules, name);
+	return (reinterpret_cast<ModuleDecl*>(SHash_find(&this->vg_modules,
+	    name)));
 }
 
 /*****************************************************************************
@@ -235,21 +236,16 @@ ModuleDecl *VGSim_findModule(VGSim *vg, const char *name)
  * Load a list of files
  *
  * Parameters:
- *     vg		The vgsim object
  *     load_files	List of files to be loaded.
  *
  *****************************************************************************/
-void VGSim_loadFiles(VGSim *vg, List *load_files)
+void
+VGSim::loadFiles(Stringlist &load_files)
 {
-  ListElem *E;
-
-  for (E = List_first(load_files);E;E = List_next(load_files,E)) {
-    const char *fileName = (const char*)ListElem_obj(E);
-
-    if (VerilogLoad(fileName) < 0) {
-      errorCmd(ERR_NOREAD,fileName);
-    }
-  }
+	for (Stringlist::const_iterator it = load_files.begin();
+	    it != load_files.end(); ++it)
+		if (VerilogLoad(*it) < 0)
+			errorCmd(ERR_NOREAD, *it);
 }
 
 /*****************************************************************************
@@ -261,7 +257,7 @@ void VGSim_loadFiles(VGSim *vg, List *load_files)
  *     show_modules	List of modules to be printed
  *
  *****************************************************************************/
-void VGSim_printModules(VGSim *vg,List *show_modules)
+void VGSim_printModules(VGSim *vg, List *show_modules)
 {
   ListElem *E;
 
@@ -276,7 +272,7 @@ void VGSim_printModules(VGSim *vg,List *show_modules)
 	ModuleDecl_print(m, stdout);
       }
     } else {
-      ModuleDecl *m = VGSim_findModule(vg, modName);
+      ModuleDecl *m = vg->findModule(modName);
       if (m) {
 	printf("\n");
 	ModuleDecl_print(m, stdout);
@@ -332,7 +328,7 @@ void VGSim_useDefaultTimescale(VGSim *vg)
 
 void exitIfError()
 {
-  if (vgsim.vg_interactive) {
+  if (vgsim.interactive()) {
     if (errCount > 0) {
       waitForExit();
       exit(0);
@@ -342,7 +338,7 @@ void exitIfError()
 
 int startSimulation(const char *topName,int warning_mode,List *load_scripts,const char *initTimeSpec)
 {
-  ModuleDecl *m = VGSim_findModule(&vgsim, topName);
+  ModuleDecl *m = vgsim.findModule(topName);
   ListElem *le;
 
   /*
@@ -361,7 +357,7 @@ int startSimulation(const char *topName,int warning_mode,List *load_scripts,cons
   Circuit_sortThreads(&vgsim.vg_circuit);
   Circuit_check(&vgsim.vg_circuit);
 
-  if (vgsim.vg_interactive) {
+  if (vgsim.interactive()) {
     exitIfError();
 
     /*
@@ -479,198 +475,202 @@ void showLicense()
  * main program
  *
  *****************************************************************************/
-int main(int argc,char *argv[])
+int
+main(int argc, char *argv[])
 {
-  extern char *optarg;
-  extern int optind;
-  extern int yy_is_editor;
-  extern int warning_mode;
-  List load_files;
-  List load_scripts;
-  List show_modules;
-  int scan_mode = 0;
-  int c;
-  int quiet = 0;
-  int delete_on_load = 0;
-  unsigned delete_hash_code = 0;
-  ListElem *le;
-  const char *initTimeSpec = 0;
+	extern char	*optarg;
+	extern int	 optind;
+	extern int	 yy_is_editor;
+	extern int	 warning_mode;
+	Stringlist	 load_files;
+	List		 load_scripts;
+	List		 show_modules;
+	int		 scan_mode = 0;
+	int		 c;
+	int		 quiet = 0;
+	int		 delete_on_load = 0;
+	unsigned	 delete_hash_code = 0;
+	ListElem	*le;
+	const char	*initTimeSpec = 0;
 
-  initErrorMessages();
-  List_init(&load_files);
-  List_init(&load_scripts);
-  List_init(&show_modules);
-  VGSim_init(&vgsim);
+	initErrorMessages();
+	
+	List_init(&load_scripts);
+	List_init(&show_modules);
 
-  yy_is_editor = 0;
+	yy_is_editor = 0;
 
-  /*
-   * Parse the command-line options.
-   */
-  while (argc > 0) {
-    while ((c = getopt(argc,argv,"eslqid:S:P:t:B:D:W:I:V:")) != EOF) {
-      switch (c) {
-      case 'e' :
-	dumpErrorMessages();
-	exit(0);
-	break;
-      case 'l' :
-	showLicense();
-	break;
-      case 'S' :
-	List_addToTail(&load_scripts,optarg);
-	break;
-      case 'D' :
-	if (sscanf(optarg,"%u",&delete_hash_code) == 1)
-	  delete_on_load = 1;
-	break;
-      case 'V' :
-      	if (strncmp(optarg, "v1995", strlen("v1995")) == 0)
-		vgsim.vg_std = VSTD_1995;
-	else if (strncmp(optarg, "v2001", strlen("v2001")) == 0)
-		vgsim.vg_std = VSTD_2001;
-	break;
-      case 'W' :
-	sscanf(optarg,"%d",&warning_mode);
-	break;
-      case 'q' :
-	quiet = 1;
-	break;
-      case 's' :
-	scan_mode = 1;
-	Place_setMode((placemode_t)(PM_MODULE|PM_MODLINE));
-	break;
-      case 'i' :
-	vgsim.vg_interactive = 1;
-	Place_setMode((placemode_t)(PM_FILE|PM_LINE|PM_MODULE|PM_MODLINE));
-	break;
-      case 'P' :
-	List_addToTail(&show_modules,optarg);
-	break;
-      case 'B' :
-	vgsim.vg_baseDirectory = optarg;
-	break;
-      case 't' :
-	vgsim.vg_topModuleName = optarg;
-	break;
-      case 'd' :
-	if (strcasecmp(optarg,"min") == 0)
-	  vgsim.vg_delayType = DT_MIN;
-	else if (strcasecmp(optarg,"max") == 0)
-	  vgsim.vg_delayType = DT_MAX;
-	else if (strcasecmp(optarg,"typical") == 0)
-	  vgsim.vg_delayType = DT_TYP;
-	break;
-      case 'I' :
-	initTimeSpec = optarg;
-	break;
-      default :
-	usage();
-	break;
-      }
-    }
-    argc -= optind;
-    argv += optind;
+	/*
+	* Parse the command-line options.
+	*/
+	while (argc > 0) {
+		while ((c = getopt(argc,argv,"eslqid:S:P:t:B:D:W:I:V:"))
+		    != EOF) {
+			switch (c) {
+			case 'e' :
+				dumpErrorMessages();
+				std::exit(EXIT_SUCCESS);
+				break;
+			case 'l' :
+				showLicense();
+				break;
+			case 'S' :
+				List_addToTail(&load_scripts,optarg);
+				break;
+			case 'D' :
+				if (sscanf(optarg,"%u",&delete_hash_code) == 1)
+				  delete_on_load = 1;
+				break;
+			case 'V' :
+				if (strncmp(optarg, "v1995", strlen("v1995")) == 0)
+					vgsim.vg_std = VSTD_1995;
+				else if (strncmp(optarg, "v2001", strlen("v2001")) == 0)
+					vgsim.vg_std = VSTD_2001;
+				break;
+			case 'W' :
+				sscanf(optarg,"%d",&warning_mode);
+				break;
+			case 'q' :
+				quiet = 1;
+				break;
+			case 's' :
+				scan_mode = 1;
+				Place_setMode((placemode_t)(PM_MODULE|PM_MODLINE));
+				break;
+			case 'i' :
+				vgsim.setInteractive(true);
+				Place_setMode((placemode_t)(PM_FILE|PM_LINE|PM_MODULE|PM_MODLINE));
+				break;
+			case 'P' :
+				List_addToTail(&show_modules,optarg);
+				break;
+			case 'B' :
+				vgsim.setBaseDirectory(optarg);
+				break;
+			case 't' :
+				vgsim.vg_topModuleName = optarg;
+				break;
+			case 'd' :
+				if (strcasecmp(optarg,"min") == 0)
+				  vgsim.vg_delayType = DT_MIN;
+				else if (strcasecmp(optarg,"max") == 0)
+				  vgsim.vg_delayType = DT_MAX;
+				else if (strcasecmp(optarg,"typical") == 0)
+				  vgsim.vg_delayType = DT_TYP;
+				break;
+			case 'I' :
+				initTimeSpec = optarg;
+				break;
+			default :
+				usage();
+				break;
+			}
+		}
+		argc -= optind;
+		argv += optind;
 #if OPTRESET
-    optreset = 1;
+		optreset = 1;
 #endif
-    optind = 0;
-    if (argc > 0) {
-      List_addToTail(&load_files,argv[0]);
-      argc--;
-      argv++;
-    }
-  }
+		optind = 0;
+		if (argc > 0) {
+			load_files.push_back(argv[0]);
+			--argc;
+			++argv;
+		}
+	}
 
-  /*
-   * Disable security guards if not running in interactive mode.
-   */
-  if (!vgsim.vg_interactive)
-    VGSecurity_init(&vgsim.vg_sec,1);
+	/*
+	 * Disable security guards if not running in interactive mode.
+	 */
+	if (!vgsim.interactive())
+		VGSecurity_init(&vgsim.vg_sec,1);
 
-  if (!quiet) {
-    vgio_comment("%s %s - Verilog Simulator (released %s)\n",PACKAGE_NAME,PACKAGE_VERSION,release_date);
-    vgio_comment("%s\n",VGSIM_COPYRIGHT);
-    vgio_comment("  %s comes with ABSOLUTELY NO WARRANTY;  run with -l switch\n",PACKAGE_NAME);
-    vgio_comment("  for license and warranty details.  Report problems to %s\n", PACKAGE_BUGREPORT);
-    vgio_comment("  [compiled on %s %s]\n",__DATE__,__TIME__);
-  }
+	if (!quiet) {
+		vgio_comment("%s %s - Verilog Simulator (released %s)\n",
+		    PACKAGE_NAME,PACKAGE_VERSION,release_date);
+		vgio_comment("%s\n",VGSIM_COPYRIGHT);
+		vgio_comment("  %s comes with ABSOLUTELY NO WARRANTY;  "
+		    "run with -l switch\n", PACKAGE_NAME);
+		vgio_comment("  for license and warranty details. "
+		    "Report problems to %s\n", PACKAGE_BUGREPORT);
+		vgio_comment("  [compiled on %s %s]\n", __DATE__, __TIME__);
+	}
 
-  /*
-   * Load design files specified on the command line.
-   */
-  VGSim_loadFiles(&vgsim,&load_files);
+	/*
+	 * Load design files specified on the command line.
+	 */
+	vgsim.loadFiles(load_files);
 
-  /*
-   * If no timescale specified, assume a default.
-   */
-  if (vgsim.vg_timescale.ts_units == 0) {
-    VGSim_useDefaultTimescale(&vgsim);
-  }
+	/*
+	 * If no timescale specified, assume a default.
+	 */
+	if (vgsim.vg_timescale.ts_units == 0)
+		VGSim_useDefaultTimescale(&vgsim);
 
 
-  /*
-   * When thyme is executed by tkgate, the circuit files are passed indirectly as
-   * temporary files and after loading the files, it is ok to delete them.  The '-D n'
-   * switch can be used to delete the files after reading, but in order to prevent
-   * accidental deletion of user files, we require that a hash code computed from
-   * the file name matches the value given to the -D switch.  This value can be computed
-   * within tkgate, but it is unlikely that a correct value can be given accidentally.
-   */
-  if (delete_on_load) {
-    for (le = List_first(&load_files);le;le = List_next(&load_files,le)) {
-      char *fileName = (char*)ListElem_obj(le);
-      unsigned fileHash = computestrhash(fileName);
-      if (fileHash == delete_hash_code)
-	unlink(fileName);
-    }
-  }
+	/*
+	 * When thyme is executed by tkgate, the circuit files are passed indirectly as
+	 * temporary files and after loading the files, it is ok to delete them.  The '-D n'
+	 * switch can be used to delete the files after reading, but in order to prevent
+	 * accidental deletion of user files, we require that a hash code computed from
+	 * the file name matches the value given to the -D switch.  This value can be computed
+	 * within tkgate, but it is unlikely that a correct value can be given accidentally.
+	 */
+	if (delete_on_load) {
+		for (Stringlist::iterator it = load_files.begin();
+		    it != load_files.end(); ++it) {
+			unsigned fileHash = computestrhash(*it);
+			if (fileHash == delete_hash_code)
+				unlink(*it);
+		}
+	}
 
-  /*
-   * If the -s switch was used, we are just doing a scan, so just do the scan
-   * and exit.
-   */
-  if (scan_mode) {
-    VGSim_displayModuleData(&vgsim);
-    exit(0);
-  }
+	/*
+	 * If the -s switch was used, we are just doing a scan, so just do the scan
+	 * and exit.
+	 */
+	if (scan_mode) {
+		VGSim_displayModuleData(&vgsim);
+		return (EXIT_SUCCESS);
+	}
 
-  /*
-   * If there are modules to display, display them and exit.
-   */
-  if (List_numElems(&show_modules) > 0) {
-    VGSim_printModules(&vgsim,&show_modules);
-    exit(0);
-  }
+	/*
+	 * If there are modules to display, display them and exit.
+	 */
+	if (List_numElems(&show_modules) > 0) {
+		VGSim_printModules(&vgsim,&show_modules);
+		return (EXIT_SUCCESS);
+	}
 
-  /*
-   * No explicit top-module was given, try the default top module.
-   */
-  if (!vgsim.vg_topModuleName)
-    vgsim.vg_topModuleName = vgsim.vg_defaultTopModuleName;
+	/*
+	 * No explicit top-module was given, try the default top module.
+	 */
+	if (!vgsim.vg_topModuleName)
+		vgsim.vg_topModuleName = vgsim.vg_defaultTopModuleName;
 
-  /*
-   * Either all modules must have a `timescale or none of them should have
-   * a `timescale.  Do this check here.
-   */
-  if (vgsim.vg_haveTScount != 0
-      && vgsim.vg_haveTScount != Hash_numElems(&vgsim.vg_modules)) {
-    errorFile(&curPlace,ERR_TIMESCALEAN);
-    exitIfError();
-    return (EXIT_FAILURE);
-  }
+	/*
+	 * Either all modules must have a `timescale or none of them should have
+	 * a `timescale.  Do this check here.
+	 */
+	if (vgsim.vg_haveTScount != 0
+	    && vgsim.vg_haveTScount != Hash_numElems(&vgsim.vg_modules)) {
+		errorFile(&curPlace,ERR_TIMESCALEAN);
+		exitIfError();
+		return (EXIT_FAILURE);
+	}
 
-  /*
-   * If we do not have a top module name, we must exit.
-   */
-  if (!vgsim.vg_topModuleName) {
-    errorFile(&curPlace,ERR_NOTOP, "<none>");
-    exitIfError();
-    return (EXIT_FAILURE);
-  }
+	/*
+	 * If we do not have a top module name, we must exit.
+	 */
+	if (!vgsim.vg_topModuleName) {
+		errorFile(&curPlace, ERR_NOTOP, "<none>");
+		exitIfError();
+		return (EXIT_FAILURE);
+	}
 
-  startSimulation(vgsim.vg_topModuleName,warning_mode,&load_scripts,initTimeSpec);
+	startSimulation(vgsim.vg_topModuleName, warning_mode, &load_scripts,
+	    initTimeSpec);
 
-  return (EXIT_SUCCESS);
+	return (EXIT_SUCCESS);
 }
 

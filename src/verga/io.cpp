@@ -53,41 +53,40 @@ void waitForExit(void)
  * Parameters
  *
  *****************************************************************************/
-void vgio_out(const char *prefix,const char *fmt,va_list ap)
+void
+vgio_out(const char *prefix, const char *fmt, va_list ap)
 {
-  char buf[2*STRMAX];
-  char *p;
-  int l;
+	char buf[2*STRMAX];
+	char *p;
+	int l;
 
-  p = buf;
-  if (vgsim.vg_interactive && prefix) {
-    p += sprintf(p,"%s",prefix);
-  }
+	p = buf;
+	if (vgsim.interactive() && prefix) {
+		p += sprintf(p,"%s",prefix);
+	}
 
+	vsprintf(p,fmt,ap);
+	l = strlen(buf);
 
-  vsprintf(p,fmt,ap);
-  l = strlen(buf);
+	if (vgsim.interactive()) {
+		p = buf;
+		while (l > 0) {
+			int c = write(1,p,l);
 
-  if (vgsim.vg_interactive) {
-    p = buf;
-    while (l > 0) {
-      int c = write(1,p,l);
+			if (c > 0) {
+				p += c;
+				l -= c;
+			}
+			if (l != 0) {
+				fd_set ws;
 
-      if (c > 0) {
-	p += c;
-	l -= c;
-      }
-      if (l != 0) {
-	fd_set ws;
-
-	FD_ZERO(&ws);
-	FD_SET(1,&ws);
-	select(2,0,&ws,0,0);
-      }
-    }
-  } else {
-    printf("%s",buf);
-  }
+				FD_ZERO(&ws);
+				FD_SET(1,&ws);
+				select(2,0,&ws,0,0);
+			}
+		}
+	} else
+		printf("%s",buf);
 }
 
 /*****************************************************************************
@@ -133,12 +132,13 @@ void vgio_comment(const char *fmt,...)
  * Returns:		s if we are in slave mode, empty string otherwise.
  *
  *****************************************************************************/
-const char *slaveStr(const char *s)
+const char*
+slaveStr(const char *s)
 {
-  if (vgsim.vg_interactive)
-    return s;
-  else
-    return "";
+	if (vgsim.interactive())
+		return (s);
+	else
+		return ("");
 }
 
 /*****************************************************************************

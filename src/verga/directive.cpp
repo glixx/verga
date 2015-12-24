@@ -25,7 +25,7 @@ Directive directive = {0};
 
 Timescale currentTimescale = {0,0};
 
-static char *unitCodes[] = {"s", "ms", "us", "ns", "ps", "fs"};
+static const char *unitCodes[] = {"s", "ms", "us", "ns", "ps", "fs"};
 static int numUnitCodes  = sizeof(unitCodes)/sizeof(unitCodes[0]);
 
 int Timescale_getUnitCode(const char *units)

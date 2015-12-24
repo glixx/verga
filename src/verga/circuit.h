@@ -25,7 +25,9 @@
  * Circuit - Class to represent final instantiated circuit
  *
  *****************************************************************************/
-struct Circuit_str {
+class Circuit
+{
+public:
   SHash/*Net*/		c_nets;			/* Global table of nets */
   NHash/*Trigger*/	c_triggers;		/* Triggers in this circuit */
   SHash/*Channel*/	c_channels;		/* Communication channels */

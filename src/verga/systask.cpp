@@ -765,7 +765,7 @@ static void SysTask_error(VGThread *t,Value *r,int numArgs,void **args,TaskConte
   simtime_t curTime = EvQueue_getCurTime(Q);
 
   p = buf;
-  if (vgsim.vg_interactive)
+  if (vgsim.interactive())
     p += sprintf(p,"error run %llu : ",curTime);
   else
     p += sprintf(p,"Runtime error: ");

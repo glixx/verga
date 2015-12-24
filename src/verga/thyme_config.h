@@ -91,7 +91,7 @@ typedef union StatDecl_union StatDecl;
 /*****************************************************************************
  * advance declarations from circuit.h
  *****************************************************************************/
-typedef struct Circuit_str Circuit;
+class Circuit;
 typedef struct DynamicModule_str DynamicModule;
 
 /*****************************************************************************

@@ -564,7 +564,7 @@ static int Circuit_buildHier_instance(Circuit *c,ModuleDecl *m,ModuleInst *mi,MI
   ModuleDecl *subM;
   ModuleInst *subM_ctx;
 
-  subM = VGSim_findModule(&vgsim, mid->mii_name);
+  subM = vgsim.findModule(mid->mii_name);
   if (!subM) {
     errorModule(mi->mc_mod,ModuleItem_getPlace(mid),ERR_MODUNDEF,mid->mii_name);
     return 1;
@@ -1033,12 +1033,13 @@ void Circuit_installScript(Circuit *c,ModuleDecl *m,DynamicModule *dm)
  *     c		Circuit to simulate
  *
  *****************************************************************************/
-void Circuit_run(Circuit *c)
+void
+Circuit_run(Circuit *c)
 {
-  if (vgsim.vg_interactive)
-    EvQueue_interactiveMainEventLoop(c->c_evQueue);
-  else
-    EvQueue_mainEventLoop(c->c_evQueue);
+	if (vgsim.interactive())
+		EvQueue_interactiveMainEventLoop(c->c_evQueue);
+	else
+		EvQueue_mainEventLoop(c->c_evQueue);
 }
 
 /*****************************************************************************
