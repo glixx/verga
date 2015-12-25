@@ -28,13 +28,17 @@
 class Circuit
 {
 public:
-  SHash/*Net*/		c_nets;			/* Global table of nets */
-  NHash/*Trigger*/	c_triggers;		/* Triggers in this circuit */
-  SHash/*Channel*/	c_channels;		/* Communication channels */
-  SHash/*ModuleInst*/	c_moduleInsts;		/* Module instances */
-  ModuleInst		*c_root;		/* Root module instance */
-  EvQueue		*c_evQueue;		/* Global event queue */
-  SHash/*DynamicModule*/ c_dynamicModules;	/* Dynamicly loaded modules */
+	Circuit();
+	
+	void init();
+	SHash/*Net*/		 c_nets;		/* Global table of nets */
+	NHash/*Trigger*/	 c_triggers;		/* Triggers in this circuit */
+	SHash/*Channel*/	 c_channels;		/* Communication channels */
+	SHash/*ModuleInst*/	 c_moduleInsts;		/* Module instances */
+	ModuleInst		*c_root;		/* Root module instance */
+	EvQueue			*c_evQueue;		/* Global event queue */
+	/* Dynamicly loaded modules */
+	SHash			 c_dynamicModules;
 };
 
 /*****************************************************************************
@@ -50,7 +54,7 @@ void DynamicModule_killNotify(DynamicModule*);
 /*****************************************************************************
  * Circuit member functions
  *****************************************************************************/
-void Circuit_init(Circuit *c);
+
 void Circuit_build(Circuit *c,ModuleDecl *m);
 void Circuit_buildPathDelayMod(Circuit *c,ModuleInst *mi,ModuleInst *parent,char *path);
 void Circuit_installScript(Circuit *c,ModuleDecl *m,DynamicModule *dm);

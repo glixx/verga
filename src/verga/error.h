@@ -160,19 +160,21 @@ typedef struct ErrorDescriptor_str {
  * information about the line number,
  *
  *****************************************************************************/
-typedef struct Place_str {
-  char		*p_fileName;		/* Name of file */
-  char		*p_moduleName;		/* Name of module */
-  int		p_mtag;			/* non-zero if in tagged module */
-  ModuleItem	*p_mitem;		/* Module item if appropriate */
-  int		p_lineNo;		/* Line number within file */
-  int		p_modLineNo;		/* Line number within module */
-} Place;
+class Place
+{
+public:
+	void init(const char *fileName);
+	char		*p_fileName;		/* Name of file */
+	char		*p_moduleName;		/* Name of module */
+	int		 p_mtag;			/* non-zero if in tagged module */
+	ModuleItem	*p_mitem;		/* Module item if appropriate */
+	int		 p_lineNo;		/* Line number within file */
+	int		 p_modLineNo;		/* Line number within module */
+};
 
 /*****************************************************************************
  * Place member functions
  *****************************************************************************/
-void Place_init(Place *p, const char *fileName);
 void Place_copy(Place *p, Place *srcP);
 void Place_incLineno(Place *p, int delta);
 void Place_startModule(Place *p, const char *modName);

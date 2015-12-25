@@ -98,7 +98,6 @@ VGSim::init()
 	this->vg_topModuleName = 0;
 	this->vg_defaultTopModuleName = 0;
 	SHash_init(&this->vg_modules);
-	Circuit_init(&this->vg_circuit);
 	VGSecurity_init(&this->vg_sec,0);
 	this->vg_timescale.ts_units = 0;
 	this->vg_timescale.ts_precision = 0;
@@ -353,9 +352,9 @@ int startSimulation(const char *topName,int warning_mode,List *load_scripts,cons
   /*
    * Build the circuit and sort threads for proper initialization.
    */
-  Circuit_build(&vgsim.vg_circuit,m);
-  Circuit_sortThreads(&vgsim.vg_circuit);
-  Circuit_check(&vgsim.vg_circuit);
+  Circuit_build(&vgsim._circuit,m);
+  Circuit_sortThreads(&vgsim._circuit);
+  Circuit_check(&vgsim._circuit);
 
   if (vgsim.interactive()) {
     exitIfError();
@@ -431,14 +430,14 @@ int startSimulation(const char *topName,int warning_mode,List *load_scripts,cons
     char *argv[3];
     argv[1] = "1";
     argv[2] = fileName;
-    Circuit_execScript(&vgsim.vg_circuit,argc,argv);
+    Circuit_execScript(&vgsim._circuit,argc,argv);
   }
 
 
   /*
    * Start the actual simulation.
    */
-  Circuit_run(&vgsim.vg_circuit);
+  Circuit_run(&vgsim._circuit);
 
   return 0;
 }

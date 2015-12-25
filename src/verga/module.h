@@ -25,9 +25,11 @@
  * ScopeDecl - Scope in which variables can be declared
  *
  *****************************************************************************/
-struct ScopeDecl_str {
-  ScopeDecl		*sd_parent;	/* Parent scope */
-  SHash/*NetDecl*/	sd_nets;	/* Net declarations */
+class ScopeDecl
+{
+public:
+	ScopeDecl	*sd_parent;	/* Parent scope */
+	SHash/*NetDecl*/ sd_nets;	/* Net declarations */
 };
 
 
@@ -36,13 +38,15 @@ struct ScopeDecl_str {
  * Scope - Scope in which instantiated variables are declared
  *
  *****************************************************************************/
-struct Scope_str {
-  char			*s_path;	/* Path name of scope */
-  ModuleInst		*s_instance;	/* Module instance this scope is in */
-  Scope			*s_parent;	/* Parent scope */
-  Scope			*s_peer;	/* "Peer" scope */
-  SHash/*Net*/		s_nets;		/* Local scope table of nets/parameters */
-  SHash/*UserTask*/	s_tasks;	/* User tasks */
+class Scope
+{
+public:
+	char		*s_path;	/* Path name of scope */
+	ModuleInst	*s_instance;	/* Module instance this scope is in */
+	Scope		*s_parent;	/* Parent scope */
+	Scope		*s_peer;	/* "Peer" scope */
+	SHash/*Net*/	 s_nets;	/* Local scope table of nets/parameters */
+	SHash/*UserTask*/s_tasks;	/* User tasks */
 };
 
 /*****************************************************************************
@@ -57,7 +61,7 @@ typedef struct FaninNode_str {
   char		**fn_in;	/* Names of fanins */
   Net		**fn_outNets;	/* Nets associated with outputs */
   Net		**fn_inNets;	/* Nets associated with inputs */
-  int		fn_flag;	/* Flag used in module generation */
+  int		  fn_flag;	/* Flag used in module generation */
 } FaninNode;
 
 
@@ -66,18 +70,20 @@ typedef struct FaninNode_str {
  * ModuleDecl - Declaration of a module
  *
  *****************************************************************************/
-struct ModuleDecl_str {
-  char			*m_name;	/* Module name */
-  Place			m_place;	/* Place of declarations */
-  List/*char**/		m_ports;	/* Port names */
-  List/*char**/		m_parmPorts;	/* Parameter ports */
-  ScopeDecl		m_scope;	/* Variable declaration scope */
-  SHash/*UserTaskDecl*/	m_tasks;	/* User tasks */
-  List			m_items;	/* Module "items" */
-  unsigned		m_errorsDone;	/* We are done doing error reporting */
-  Specify		*m_specify;	/* Specify block of module */
-  SHash/*FaninNode*/	*m_faninnodes;	/* Fanin nodes (only used for path-delay modules) */
-  Timescale		m_timescale;	/* Timescale of this module */
+class ModuleDecl
+{
+public:
+	char			*m_name;	/* Module name */
+	Place			 m_place;	/* Place of declarations */
+	List/*char**/		 m_ports;	/* Port names */
+	List/*char**/		 m_parmPorts;	/* Parameter ports */
+	ScopeDecl		 m_scope;	/* Variable declaration scope */
+	SHash/*UserTaskDecl*/	 m_tasks;	/* User tasks */
+	List			 m_items;	/* Module "items" */
+	unsigned		 m_errorsDone;	/* We are done doing error reporting */
+	Specify			*m_specify;	/* Specify block of module */
+	SHash/*FaninNode*/	*m_faninnodes;	/* Fanin nodes (only used for path-delay modules) */
+	Timescale		 m_timescale;	/* Timescale of this module */
 };
 
 /*****************************************************************************
@@ -85,15 +91,17 @@ struct ModuleDecl_str {
  * ModuleInst - Context information for current module being expanded
  *
  *****************************************************************************/
-struct ModuleInst_str {
-  char			*mc_path;	/* Path for this context */
-  ModuleInst		*mc_peer;	/* Peer module (used for simulation scripts) */
-  ModuleDecl		*mc_mod;	/* Module definition */
-  Circuit		*mc_circuit;	/* Circuit we are building */
-  ModuleInst		*mc_parent;	/* Parent instance */
-  List/*VGThread*/	mc_threads;	/* Threads in the module instance */
-  Scope			mc_scope;	/* Scope in which varaibles/tasks are defined */
-  CodeBlock		*mc_codeBlock;	/* Code block for this module instance */
+class ModuleInst
+{
+public:
+	char		*mc_path;	/* Path for this context */
+	ModuleInst	*mc_peer;	/* Peer module (used for simulation scripts) */
+	ModuleDecl	*mc_mod;	/* Module definition */
+	Circuit		*mc_circuit;	/* Circuit we are building */
+	ModuleInst	*mc_parent;	/* Parent instance */
+	List/*VGThread*/ mc_threads;	/* Threads in the module instance */
+	Scope		 mc_scope;	/* Scope in which varaibles/tasks are defined */
+	CodeBlock	*mc_codeBlock;	/* Code block for this module instance */
 };
 
 /*****************************************************************************
@@ -102,13 +110,15 @@ struct ModuleInst_str {
  * of a script or breakpoint so that it can be dynamically unloaded on request.
  *
  *****************************************************************************/
-struct DynamicModule_str {
-  char			*dm_name;		/* tag name of dynamic module */
-  List			dm_mitems;		/* MItems in the dynamc module */
+class DynamicModule
+{
+public:
+	char		*dm_name;		/* tag name of dynamic module */
+	List		 dm_mitems;		/* MItems in the dynamc module */
 
-  ModuleInst		*dm_moduleInst;		/* Module instance */
-  List			dm_threads;		/* Threads corresponding to module */
-  int			dm_aliveThreads;	/* Number of threads currently alive */
+	ModuleInst	*dm_moduleInst;		/* Module instance */
+	List		 dm_threads;		/* Threads corresponding to module */
+	int		 dm_aliveThreads;	/* Number of threads currently alive */
 };
 
 /*****************************************************************************

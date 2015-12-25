@@ -25,6 +25,11 @@
 static ModuleInst *Circuit_buildNets(Circuit *c,ModuleDecl *m,MIInstance *mi,ModuleInst *parent,char *path);
 static void Circuit_buildHier(Circuit *c,ModuleInst *mi,ModuleInst *parent,char *path);
 
+Circuit::Circuit()
+{
+	this->init();
+}
+
 /*****************************************************************************
  *
  * Initialize the circuit data structure
@@ -33,15 +38,16 @@ static void Circuit_buildHier(Circuit *c,ModuleInst *mi,ModuleInst *parent,char 
  *      c		Memory to initialize with circuit data structure.
  *
  *****************************************************************************/
-void Circuit_init(Circuit *c)
+void
+Circuit::init()
 {
-  SHash_init(&c->c_nets);
-  NHash_init(&c->c_triggers);
-  SHash_init(&c->c_channels);
-  SHash_init(&c->c_moduleInsts);
-  SHash_init(&c->c_dynamicModules);
-  c->c_evQueue = new_EvQueue(c);
-  c->c_root = 0;
+	SHash_init(&this->c_nets);
+	NHash_init(&this->c_triggers);
+	SHash_init(&this->c_channels);
+	SHash_init(&this->c_moduleInsts);
+	SHash_init(&this->c_dynamicModules);
+	this->c_evQueue = new_EvQueue(this);
+	this->c_root = 0;
 }
 
 /*****************************************************************************

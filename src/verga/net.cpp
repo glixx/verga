@@ -176,7 +176,7 @@ void Net_posedgeNotify(Net *n)
   ListElem *le;
 
   if ((n->n_flags & NA_CLOCK))
-    EvQueue_clockNotify(Circuit_getQueue(&vgsim.vg_circuit), n, TT_POSEDGE);
+    EvQueue_clockNotify(Circuit_getQueue(&vgsim._circuit), n, TT_POSEDGE);
 
   for (le = List_first(&n->n_posedgeNotify);le;le = List_next(&n->n_posedgeNotify,le)) {
     Trigger_fire((Trigger*)ListElem_obj(le));
@@ -196,7 +196,7 @@ void Net_negedgeNotify(Net *n)
   ListElem *le;
 
   if ((n->n_flags & NA_CLOCK))
-    EvQueue_clockNotify(Circuit_getQueue(&vgsim.vg_circuit), n, TT_NEGEDGE);
+    EvQueue_clockNotify(Circuit_getQueue(&vgsim._circuit), n, TT_NEGEDGE);
 
   for (le = List_first(&n->n_negedgeNotify);le;le = List_next(&n->n_negedgeNotify,le)) {
     Trigger_fire((Trigger*)ListElem_obj(le));
@@ -238,7 +238,7 @@ void Net_set(Net*n,Value*s)
       return;	/* Value not changed */
 
     if (n->n_numMonitors > 0) {
-      Q = Circuit_getQueue(&vgsim.vg_circuit);
+      Q = Circuit_getQueue(&vgsim._circuit);
       EvQueue_monitoredChangeNotify(Q);
     }
 
@@ -270,7 +270,7 @@ void Net_set(Net*n,Value*s)
   case TT_EDGE :
   case TT_POSEDGE :
     if (n->n_numMonitors > 0) {
-      Q = Circuit_getQueue(&vgsim.vg_circuit);
+      Q = Circuit_getQueue(&vgsim._circuit);
       EvQueue_monitoredChangeNotify(Q);
     }
     Value_copy(Net_getValue(n), s);
@@ -278,7 +278,7 @@ void Net_set(Net*n,Value*s)
     break;
   case TT_NEGEDGE :
     if (n->n_numMonitors > 0) {
-      Q = Circuit_getQueue(&vgsim.vg_circuit);
+      Q = Circuit_getQueue(&vgsim._circuit);
       EvQueue_monitoredChangeNotify(Q);
     }
     Value_copy(Net_getValue(n), s);
@@ -330,14 +330,14 @@ void Net_setRange(Net*n,int nlsb,Value*s,int smsb,int slsb)
   case TT_EDGE :
   case TT_POSEDGE :
     if (n->n_numMonitors > 0) {
-      Q = Circuit_getQueue(&vgsim.vg_circuit);
+      Q = Circuit_getQueue(&vgsim._circuit);
       EvQueue_monitoredChangeNotify(Q);
     }
     Net_posedgeNotify(n);
     break;
   case TT_NEGEDGE :
     if (n->n_numMonitors > 0) {
-      Q = Circuit_getQueue(&vgsim.vg_circuit);
+      Q = Circuit_getQueue(&vgsim._circuit);
       EvQueue_monitoredChangeNotify(Q);
     }
     Net_negedgeNotify(n);

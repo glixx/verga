@@ -247,7 +247,7 @@ void Trigger_print(Trigger *t,FILE *f)
  *****************************************************************************/
 void Trigger_fire(Trigger *t)
 {
-  EvQueue *Q = Circuit_getQueue(&vgsim.vg_circuit);
+  EvQueue *Q = Circuit_getQueue(&vgsim._circuit);
 
   while (t->t_events) {
     Event *e = t->t_events;

@@ -81,7 +81,7 @@ UserTask *new_UserTask(UserTaskDecl *utd,Scope *scope)
 void UserTask_generate(UserTask *ut,CodeBlock *cb)
 {
   UserTaskDecl *utd = ut->ut_decl;
-  Circuit *c = &vgsim.vg_circuit;
+  Circuit *c = &vgsim._circuit;
   SHash *decl_table = &ut->ut_decl->utd_scope.sd_nets;
   ModuleDecl *m = ut->ut_decl->utd_module;
   HashElem *he;
@@ -246,7 +246,7 @@ void UserTask_generateCall(UserTask *ut,void **sargs,CodeBlock *cb)
 void UserTask_generateInlineCall(UserTask *ut,void **sargs,CodeBlock *cb)
 {
   UserTaskDecl *utd = ut->ut_decl;
-  Circuit *c = &vgsim.vg_circuit;
+  Circuit *c = &vgsim._circuit;
   SHash *decl_table = &ut->ut_decl->utd_scope.sd_nets;
   ModuleDecl *m = ut->ut_decl->utd_module;
   HashElem *he;

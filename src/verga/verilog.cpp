@@ -62,19 +62,20 @@ static Current cur = {0};
  * is used for error reporting.
  *
  *****************************************************************************/
-static void cur_init(const char *fileName)
+static void
+cur_init(const char *fileName)
 {
-  static int is_first_init = 1;
+	static int is_first_init = 1;
 
-  flushErrors();
+	flushErrors();
 
-  if (is_first_init) {
-    List_init(&cur.modParms);
-    is_first_init = 0;
-  } else {
-    if (cur.instType) free(cur.instType);
-    List_flush(&cur.modParms);
-  }
+	if (is_first_init) {
+		List_init(&cur.modParms);
+		is_first_init = 0;
+	} else {
+		if (cur.instType) free(cur.instType);
+		List_flush(&cur.modParms);
+	}
 
   cur.mod = 0;
   cur.isRedef = 0;
@@ -84,7 +85,7 @@ static void cur_init(const char *fileName)
   cur.instType = 0;
   cur.gstrength = 0;
   
-  Place_init(&curPlace, fileName);
+  curPlace.init(fileName);
 }
 
 static int cur_getDeclContext()
@@ -623,7 +624,7 @@ void VerBeginScript()
 {
   cur.mod = new_ModuleDecl(0);
   cur.isRedef = 0;
-  cur.mod->m_timescale = *ModuleInst_getTimescale(Circuit_getRoot(&vgsim.vg_circuit));
+  cur.mod->m_timescale = *ModuleInst_getTimescale(Circuit_getRoot(&vgsim._circuit));
   cur.scope = ModuleDecl_getScope(cur.mod);
 }
 
@@ -637,7 +638,7 @@ void VerEndScript()
   extern int errCount;
 
   if (errCount == 0)
-    Circuit_installScript(&vgsim.vg_circuit,cur.mod,cur.dynmod);
+    Circuit_installScript(&vgsim._circuit,cur.mod,cur.dynmod);
   cur.mod = 0;
   cur.isRedef = 0;
   cur.scope = 0;

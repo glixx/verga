@@ -320,14 +320,15 @@ static ErrorDescriptor *findError(errorcode_t ecode)
  *      fileName		Name of file.
  *
  *****************************************************************************/
-void Place_init(Place *p, const char *fileName)
+void
+Place::init(const char *fileName)
 {
-  p->p_fileName = fileName ? strdup(fileName) : 0;
-  p->p_moduleName = 0;
-  p->p_mitem = 0;
-  p->p_lineNo = 1;
-  p->p_modLineNo = 0;
-  p->p_mtag = 0;
+	this->p_fileName = fileName ? strdup(fileName) : 0;
+	this->p_moduleName = 0;
+	this->p_mitem = 0;
+	this->p_lineNo = 1;
+	this->p_modLineNo = 0;
+	this->p_mtag = 0;
 }
 
 /*****************************************************************************
@@ -691,7 +692,7 @@ errorRun(errorcode_t ecode,...)
 	ErrorDescriptor *ed = findError(ecode);
 	char buf[STRMAX],*p;
 	va_list ap;
-	EvQueue *Q = Circuit_getQueue(&vgsim.vg_circuit);
+	EvQueue *Q = Circuit_getQueue(&vgsim._circuit);
 	simtime_t curTime = EvQueue_getCurTime(Q);
 
 	p = buf;

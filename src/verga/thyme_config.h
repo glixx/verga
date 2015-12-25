@@ -52,10 +52,10 @@ typedef union ModuleItem_uni ModuleItem;
 /*****************************************************************************
  * advance declarations from module.h
  *****************************************************************************/
-typedef struct ModuleInst_str ModuleInst;
-typedef struct ModuleDecl_str ModuleDecl;
-typedef struct ScopeDecl_str ScopeDecl;
-typedef struct Scope_str Scope;
+class ModuleInst;
+class ModuleDecl;
+class ScopeDecl;
+class Scope;
 
 /*****************************************************************************
  * advance declarations from bytecode.h
@@ -92,7 +92,7 @@ typedef union StatDecl_union StatDecl;
  * advance declarations from circuit.h
  *****************************************************************************/
 class Circuit;
-typedef struct DynamicModule_str DynamicModule;
+class DynamicModule;
 
 /*****************************************************************************
  * advance declarations from task.h

@@ -85,7 +85,7 @@ void Scope_setPeer(Scope *s,Scope *peer)
 
 Net *Scope_findNet(Scope *s,const char *name,unsigned flags)
 {
-  Circuit *c = &vgsim.vg_circuit;		/* Top-level circuit */
+  Circuit *c = &vgsim._circuit;		/* Top-level circuit */
   Net *n = 0;
 
   /*
@@ -131,7 +131,7 @@ Net *Scope_findNet(Scope *s,const char *name,unsigned flags)
 
 void Scope_defNet(Scope *s,const char *name,Net *n)
 {
-  Circuit *c = &vgsim.vg_circuit;		/* Top-level circuit */
+  Circuit *c = &vgsim._circuit;		/* Top-level circuit */
 
   SHash_insert(&s->s_nets,name,n);
   SHash_insert(&c->c_nets,n->n_name,n);
@@ -697,20 +697,22 @@ int ModuleInst_defineTask(ModuleInst *mi,const char *name,UserTask *ut)
  *     place		Place where net is declared
  *
  *****************************************************************************/
-NetDecl *new_NetDecl(const char *name,int wtype,VRange *range,VRange *addrRange,Place *place)
+NetDecl*
+new_NetDecl(const char *name, int wtype,VRange *range, VRange *addrRange,
+    Place *place)
 {
-  NetDecl *n = (NetDecl *) malloc(sizeof(NetDecl));
+	NetDecl *n = (NetDecl *) malloc(sizeof(NetDecl));
 
-  n->n_name = strdup(name);
-  n->n_type = wtype;
-  n->n_range = range;
-  n->n_addrRange = addrRange;
-  if (place)
-    Place_copy(&n->n_place, place);
-  else
-    Place_init(&n->n_place, "");
+	n->n_name = strdup(name);
+	n->n_type = wtype;
+	n->n_range = range;
+	n->n_addrRange = addrRange;
+	if (place)
+		Place_copy(&n->n_place, place);
+	else
+		n->n_place.init("");
 
-  return n;
+	return (n);
 }
 
 ModuleInst *new_ModuleInst(ModuleDecl *md,Circuit *c,ModuleInst *parent,const char *path)

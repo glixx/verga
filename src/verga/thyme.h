@@ -20,13 +20,14 @@
 #ifndef __thyme_h
 #define __thyme_h
 
+#include <sys/types.h>
+#include <sys/time.h>
+#include <unistd.h>
+
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
 #include <cstdarg>
-#include <sys/types.h>
-#include <sys/time.h>
-#include <unistd.h>
 
 #include <list>
 
@@ -71,7 +72,8 @@ typedef enum delay_type_en {
 #define DT_MAX DT_MAX		/* Use maximum delays */
 } DelayType;
 
-typedef enum verilog_std_en {
+typedef enum verilog_std_en
+{
 	VSTD_UNDEFINED = 0,
 	VSTD_1995 = 1995,
 	VSTD_2001 = 2001
@@ -132,7 +134,7 @@ public:
 	/* Table of modules */
 	SHash		 vg_modules;
 	/* Instantiated circuit to be simulated */
-	Circuit		 vg_circuit;
+	Circuit		 _circuit;
 
 	VGSecurity	 vg_sec;	/* Security options */
 

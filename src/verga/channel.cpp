@@ -47,7 +47,7 @@ Channel *new_Channel(const char *name)
  *****************************************************************************/
 static void Channel_reportWatched(Channel *c,Value *v)
 {
-  EvQueue *Q = vgsim.vg_circuit.c_evQueue;
+  EvQueue *Q = vgsim._circuit.c_evQueue;
   char buf[STRMAX];
 
   if (!c->c_format)
@@ -148,7 +148,7 @@ int Channel_write(Channel *c, Value *data)
 
   while (List_numElems(&c->c_wake) > 0) {
     Event *e = (Event*) List_popHead(&c->c_wake);
-    EvQueue_enqueueAfter(Circuit_getQueue(&vgsim.vg_circuit), e, 0);
+    EvQueue_enqueueAfter(Circuit_getQueue(&vgsim._circuit), e, 0);
   }
 
   return 0;
