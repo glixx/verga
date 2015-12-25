@@ -17,7 +17,9 @@
 
     Last edit by hansen on Sun Feb  8 19:30:29 2009
 ****************************************************************************/
-#include "thyme.h"
+#include <cstdlib>
+
+#include "verga.hpp"
 
 /*****************************************************************************
  *
@@ -310,6 +312,11 @@ static ErrorDescriptor *findError(errorcode_t ecode)
 
   return &unknownError;
 }
+/*
+Place::Place(const char *fileName)
+{
+	this->init(fileName);
+}*/
 
 /*****************************************************************************
  *
@@ -342,7 +349,7 @@ Place::init(const char *fileName)
  *****************************************************************************/
 void Place_copy(Place *dstP, Place *srcP)
 {
-  *dstP = *srcP;
+	*dstP = *srcP;
 }
 
 /*****************************************************************************
@@ -356,8 +363,8 @@ void Place_copy(Place *dstP, Place *srcP)
  *****************************************************************************/
 void Place_incLineno(Place *p, int delta)
 {
-  p->p_lineNo += delta;
-  p->p_modLineNo += delta;
+	p->p_lineNo += delta;
+	p->p_modLineNo += delta;
 }
 
 /*****************************************************************************
@@ -385,12 +392,13 @@ void Place_startModule(Place *p, const char *modName)
  *      p			Place to be updated
  *
  *****************************************************************************/
-void Place_endModule(Place *p)
+void
+Place::endModule()
 {
-  if (!p->p_mtag) {
-    p->p_moduleName = 0;
-    p->p_modLineNo = 1;
-  }
+	if (!this->p_mtag) {
+		this->p_moduleName = 0;
+		this->p_modLineNo = 1;
+	}
 }
 
 /*****************************************************************************
@@ -535,9 +543,10 @@ void Place_setCurrent(Place *p)
  * Get the "current" place.
  *
  *****************************************************************************/
-Place *Place_getCurrent()
+Place *
+Place::getCurrent()
 {
-  return &curPlace;
+	return (&curPlace);
 }
 
 /*****************************************************************************
@@ -553,14 +562,15 @@ Place *Place_getCurrent()
  * if necessary.
  *
  *****************************************************************************/
-int yyerror(char *err)
+int
+yyerror(char *err)
 {
-  if (strncmp(err,"syntax",6) == 0)
-    errorFile(Place_getCurrent(),ERR_SYNTAX);
-  else
-    errorFile(Place_getCurrent(),ERR_YYERROR,err);
+	if (strncmp(err,"syntax",6) == 0)
+		errorFile(Place::getCurrent(), ERR_SYNTAX);
+	else
+		errorFile(Place::getCurrent(), ERR_YYERROR,err);
 
-  return 0;
+	return (0);
 }
 
 /*****************************************************************************

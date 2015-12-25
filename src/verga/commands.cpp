@@ -23,7 +23,7 @@
  *
  *****************************************************************************/
 #include <ctype.h>
-#include "thyme.h"
+#include "verga.hpp"
 
 typedef void circexec_f(Circuit*c,int argc,char *argv[]);
 

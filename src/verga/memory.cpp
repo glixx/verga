@@ -15,10 +15,11 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ****************************************************************************/
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include "thyme.h"
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
+
+#include "verga.hpp"
 
 /*
 

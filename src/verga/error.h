@@ -21,13 +21,14 @@
 /*****************************************************************************
  * placemode_t - Type of place reporting
  *****************************************************************************/
-typedef enum {
-  PM_FILE = 0x1,
-  PM_LINE = 0x2,
-  PM_MODULE = 0x4,
-  PM_MODLINE = 0x8,
-  PM_PRETTY = 0x10
-} placemode_t;
+enum placemode_t
+{
+	PM_FILE = 0x1,
+	PM_LINE = 0x2,
+	PM_MODULE = 0x4,
+	PM_MODLINE = 0x8,
+	PM_PRETTY = 0x10
+};
 
 typedef enum {
   ERR_OK,
@@ -163,10 +164,16 @@ typedef struct ErrorDescriptor_str {
 class Place
 {
 public:
-	void init(const char *fileName);
+	
+	void init(const char*);
+	
+	void endModule();
+	
+	static Place *getCurrent();
+	
 	char		*p_fileName;		/* Name of file */
 	char		*p_moduleName;		/* Name of module */
-	int		 p_mtag;			/* non-zero if in tagged module */
+	int		 p_mtag;		/* non-zero if in tagged module */
 	ModuleItem	*p_mitem;		/* Module item if appropriate */
 	int		 p_lineNo;		/* Line number within file */
 	int		 p_modLineNo;		/* Line number within module */
@@ -178,14 +185,12 @@ public:
 void Place_copy(Place *p, Place *srcP);
 void Place_incLineno(Place *p, int delta);
 void Place_startModule(Place *p, const char *modName);
-void Place_endModule(Place *p);
 void Place_startMTag(Place *p, const char *modName);
 void Place_endMTag(Place *p);
 char *Place_report(Place *p, const char *etype, const char *netName,char *buf);
 void Place_setMode(placemode_t);
 void Place_setCurrent(Place*);
 void Place_resetModLine(Place*);
-Place *Place_getCurrent();
 
 /*****************************************************************************
  * Error reporting functions

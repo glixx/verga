@@ -17,7 +17,9 @@
 
     Last edit by hansen on Fri Feb 13 20:25:04 2009
 ****************************************************************************/
-#include "thyme.h"
+#include <cstdlib>
+
+#include "verga.hpp"
 
 extern const char *release_date;
 
@@ -188,9 +190,9 @@ void
 VGSim::addModule(ModuleDecl *m)
 {
 	if (!this->vg_defaultTopModuleName && List_numElems(&m->m_ports) == 0)
-		this->vg_defaultTopModuleName = m->m_name;
+		this->vg_defaultTopModuleName = m->name();
 
-	SHash_insert(&this->vg_modules, m->m_name, m);
+	SHash_insert(&this->vg_modules, m->name(), m);
 
 	/* Do post-definition processing of module */
 	if (m->m_specify && Specify_numStats(m->m_specify) > 0)

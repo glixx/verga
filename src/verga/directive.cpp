@@ -17,7 +17,9 @@
 
     Last edit by hansen on Fri Feb 13 20:25:50 2009
 ****************************************************************************/
-#include "thyme.h"
+#include <cstdlib>
+
+#include "verga.hpp"
 
 extern Place curPlace;			/* The current place */
 

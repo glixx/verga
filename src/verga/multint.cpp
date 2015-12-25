@@ -17,8 +17,10 @@
 
     Last edit by hansen on Wed Sep 14 23:00:33 2005
 ****************************************************************************/
-#include "thyme.h"
-#include <ctype.h>
+#include <cstdlib>
+#include <cctype>
+
+#include "verga.hpp"
 
 /*****************************************************************************
  *

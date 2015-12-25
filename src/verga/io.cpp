@@ -17,9 +17,11 @@
 
     Last edit by hansen on Wed Oct 25 10:50:09 2006
 ****************************************************************************/
-#include <signal.h>
-#include <errno.h>
-#include "thyme.h"
+#include <cstdlib>
+#include <csignal>
+#include <cerrno>
+
+#include "verga.hpp"
 
 int do_input_check = 0;			/* Flag to indicate it is time to check input */
 static char cmdin_buf[STRMAX];		/* Buffer for unread characters */
@@ -42,7 +44,7 @@ void waitForExit(void)
     if (strncmp(buf,"exit",4) == 0)
       break;
   }
-  exit(0);
+	std::exit(EXIT_SUCCESS);
 }
 
 /*****************************************************************************

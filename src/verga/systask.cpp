@@ -15,8 +15,10 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ****************************************************************************/
-#include <ctype.h>
-#include "thyme.h"
+#include <cstdlib>
+#include <cctype>
+
+#include "verga.hpp"
 
 static void SysTask_monitoroff(VGThread *t, Value *r, int numArgs, void **args, TaskContext *taskContext);
 static void SysTask_monitoron(VGThread *t, Value *r, int numArgs, void **args, TaskContext *taskContext);
@@ -288,7 +290,7 @@ static int SysTask_sprintfSSVec(VGThread *t,char *p,int numArgs, void **args)
       case 'M' :
 	{
 	  ModuleDecl *m = ModuleInst_getModDecl(VGThread_getModCtx(t));
-	  path = ModuleDecl_getName(m);
+	  path = m->name();
 	  p += sprintf(p,"%s",path);
 	  q = x + 1;
 	}
@@ -1595,7 +1597,7 @@ static void reportTimingViolation(const char *name,int *argTypes,VGThread *t, Va
   }
   p += sprintf(p,")");
 
-  errorRun(ERR_TIMING, ModuleInst_getPath(mi), ModuleDecl_getName(m), syscall);
+	errorRun(ERR_TIMING, ModuleInst_getPath(mi), m->name(), syscall);
 }
 
 

@@ -17,8 +17,10 @@
 
     Last edit by hansen on Sun Feb  1 15:02:21 2009
 ****************************************************************************/
-#include <ctype.h>
-#include "thyme.h"
+#include <cctype>
+#include <cstdlib>
+
+#include "verga.hpp"
 
 #define DEBUG 0
 
@@ -272,110 +274,125 @@ void Circuit_declareNet(Circuit *c,Scope *scope,NetDecl *nd,ModuleDecl *m,Place 
  * Returns:			Non-zero if succesful.
  *
  *****************************************************************************/
-static int Circuit_bindPorts(MIInstance *mi,ModuleInst *parent_ctx,ModuleDecl *subM,ModuleInst *subM_ctx,Net **iPorts,Expr **ePorts,int n)
+static int
+Circuit_bindPorts(MIInstance *mi, ModuleInst *parent_ctx, ModuleDecl *subM,
+    ModuleInst *subM_ctx, Net **iPorts, Expr **ePorts, int n)
 {
-  ListElem *le;
-  NameExpr *ne;
-  int pnum = 0;
-  int ok = 1;
-  int i;
+	ListElem *le;
+	NameExpr *ne;
+	int pnum = 0;
+	int ok = 1;
+	int i;
 
-  for (i = 0;i < n;i++) {
-    iPorts[i] = 0;
-    ePorts[i] = 0;
-  }
-
-  ne = (NameExpr*) ((List_numElems(mi->mii_ports) > 0) ? ListElem_obj(List_first(mi->mii_ports)) : 0);
-  if (ne && ne->ne_name) {
-    /*****************************************************************************
-     * Associate ports by name
-     *****************************************************************************/
-    SHash donePorts;
-
-    SHash_init(&donePorts);
-
-    for (le = List_first(mi->mii_ports);le;le = List_next(mi->mii_ports,le)) {
-      NetDecl *nd;
-      Net *net;
-
-      ne = (NameExpr*) ListElem_obj(le);
-      if (!ne->ne_name) {
-	errorModule(parent_ctx->mc_mod,ModuleItem_getPlace(mi),ERR_PORTMIX,mi->mii_instName,subM->m_name);
-	ok = 0;
-	continue;
-      }
-
-      nd = ModuleDecl_findNet(subM,ne->ne_name);
-      net = ModuleInst_findNet(subM_ctx,ne->ne_name);
-
-      if (!nd || !net) {
-	errorNet(parent_ctx->mc_mod,ne->ne_name,ModuleItem_getPlace(mi),ERR_PORTNOTDEF,ne->ne_name,
-		 mi->mii_instName,subM->m_name);
-	ok = 0;
-	continue;
-      }
-      if (SHash_find(&donePorts,ne->ne_name)) {
-	errorNet(parent_ctx->mc_mod,ne->ne_name,ModuleItem_getPlace(mi),ERR_MULTCONN,
-		 ne->ne_name,mi->mii_instName,subM->m_name);
-	ok = 0;
-	continue;
-      }
-
-      iPorts[pnum] = net;
-      ePorts[pnum] = ne->ne_expr;
-      pnum++;
-
-      SHash_insert(&donePorts,ne->ne_name, nd);
-    }
-
-    /*****************************************************************************
-     * Check for any unconnected ports left in the module
-     *****************************************************************************/
-    for (le = List_first(&subM->m_ports);le;le = List_next(&subM->m_ports,le)) {
-      const char *portName = (const char*)ListElem_obj(le);
-      if (!SHash_find(&donePorts,portName)) {
-	errorNet(parent_ctx->mc_mod,portName,ModuleItem_getPlace(mi),ERR_NOCONN,
-		 portName,mi->mii_instName,subM->m_name);
-	ok = 0;
-      }
-    }
-
-
-
-    SHash_uninit(&donePorts);
-  } else {
-    /*****************************************************************************
-     * Associate ports by position
-     *****************************************************************************/
-    if (List_numElems(mi->mii_ports) != List_numElems(&subM->m_ports)) {
-      errorModule(parent_ctx->mc_mod,ModuleItem_getPlace(mi),ERR_PORTCOUNT,mi->mii_instName,subM->m_name);
-      ok = 0;
-    } else {
-      ListElem *le2;
-      for (le = List_first(mi->mii_ports), le2 = List_first(&subM->m_ports);
-	   le && le2;
-	   le = List_next(mi->mii_ports,le), le2 = List_next(&subM->m_ports,le2)) {
-
-	const char *portName = (const char*)ListElem_obj(le2);
-	NetDecl *nd = ModuleDecl_findNet(subM,portName);
-	Net *n = ModuleInst_findNet(subM_ctx,portName);
-
-	ne = (NameExpr*) ListElem_obj(le);
-
-	if (!nd || !n) {
-	  errorNet(parent_ctx->mc_mod,portName,ModuleItem_getPlace(mi),ERR_NOCONN,portName,mi->mii_instName,subM->m_name);
-	  ok = 0;
-	  continue;
+	for (i = 0;i < n;i++) {
+		iPorts[i] = 0;
+		ePorts[i] = 0;
 	}
 
-	iPorts[pnum] = n;
-	ePorts[pnum] = ne->ne_expr;
-	pnum++;
-      }
-    }
-  }
+	ne = (NameExpr*) ((List_numElems(mi->mii_ports) > 0) ? ListElem_obj(
+	    List_first(mi->mii_ports)) : 0);
+	if (ne && ne->ne_name) {
+		/*****************************************************************************
+		 * Associate ports by name
+		 *****************************************************************************/
+		SHash donePorts;
 
-  return ok;
+		SHash_init(&donePorts);
+
+		for (le = List_first(mi->mii_ports); le; le = List_next(
+		    mi->mii_ports,le)) {
+			NetDecl *nd;
+			Net *net;
+
+			ne = (NameExpr*) ListElem_obj(le);
+			if (!ne->ne_name) {
+				errorModule(parent_ctx->mc_mod,
+				    ModuleItem_getPlace(mi), ERR_PORTMIX,
+				    mi->mii_instName, subM->name());
+				ok = 0;
+				continue;
+			}
+
+			nd = ModuleDecl_findNet(subM,ne->ne_name);
+			net = ModuleInst_findNet(subM_ctx,ne->ne_name);
+
+			if (!nd || !net) {
+				errorNet(parent_ctx->mc_mod, ne->ne_name,
+				    ModuleItem_getPlace(mi), ERR_PORTNOTDEF,
+				    ne->ne_name,
+				mi->mii_instName,subM->name());
+				ok = 0;
+				continue;
+			}
+			if (SHash_find(&donePorts,ne->ne_name)) {
+				errorNet(parent_ctx->mc_mod, ne->ne_name,
+				    ModuleItem_getPlace(mi), ERR_MULTCONN,
+				   ne->ne_name, mi->mii_instName, subM->name());
+				ok = 0;
+				continue;
+			}
+
+			iPorts[pnum] = net;
+			ePorts[pnum] = ne->ne_expr;
+			pnum++;
+
+			SHash_insert(&donePorts,ne->ne_name, nd);
+		}
+
+		/*****************************************************************************
+		 * Check for any unconnected ports left in the module
+		 *****************************************************************************/
+		for (le = List_first(&subM->m_ports); le;
+		    le = List_next(&subM->m_ports,le)) {
+			const char *portName = (const char*)ListElem_obj(le);
+			if (!SHash_find(&donePorts,portName)) {
+				errorNet(parent_ctx->mc_mod, portName,
+				    ModuleItem_getPlace(mi), ERR_NOCONN,
+				    portName, mi->mii_instName, subM->name());
+				ok = 0;
+			}
+		}
+		SHash_uninit(&donePorts);
+	} else {
+		/*****************************************************************************
+		 * Associate ports by position
+		 *****************************************************************************/
+		if (List_numElems(mi->mii_ports) != List_numElems(
+		    &subM->m_ports)) {
+			errorModule(parent_ctx->mc_mod, ModuleItem_getPlace(mi),
+			    ERR_PORTCOUNT, mi->mii_instName, subM->name());
+			ok = 0;
+		} else {
+			ListElem *le2;
+			for (le = List_first(mi->mii_ports), le2 = List_first(
+			    &subM->m_ports); le && le2; le = List_next(
+			    mi->mii_ports,le), le2 = List_next(&subM->m_ports,
+			    le2)) {
+
+				const char *portName = (const char*)
+				    ListElem_obj(le2);
+				NetDecl *nd = ModuleDecl_findNet(subM,portName);
+				Net *n = ModuleInst_findNet(subM_ctx,portName);
+
+				ne = (NameExpr*) ListElem_obj(le);
+
+				if (!nd || !n) {
+					errorNet(parent_ctx->mc_mod, portName,
+					    ModuleItem_getPlace(mi), ERR_NOCONN,
+					    portName, mi->mii_instName,
+					    subM->name());
+					ok = 0;
+					continue;
+				}
+
+				iPorts[pnum] = n;
+				ePorts[pnum] = ne->ne_expr;
+				++pnum;
+			}
+		}
+	}
+
+	return (ok);
 }
 
 /*****************************************************************************
@@ -508,7 +525,7 @@ static void Circuit_makeOutAssign(Circuit *c,Expr *expr,ModuleInst *eCtx,Net *iN
     int driver_id;
 
     if (Expr_lhsGenerate(lhs_e,ModuleInst_getScope(eCtx),codeBlock,&n,&nLsb,&lhs_size,0) < 0) {
-      errorModule(eCtx->mc_mod,Place_getCurrent(),ERR_BADOUT);
+      errorModule(eCtx->mc_mod, Place::getCurrent(), ERR_BADOUT);
       return;
     }
 
@@ -594,7 +611,7 @@ static int Circuit_buildHier_instance(Circuit *c,ModuleDecl *m,ModuleInst *mi,MI
 	ne = (NameExpr*) ListElem_obj(ple);
 	if (ne->ne_name) {
 	  errorModule(mi->mc_mod,ModuleItem_getPlace(mid),ERR_PARAMMIX,mid->mii_instName,
-		      subM->m_name);
+	    subM->name());
 	  break;
 	}
       }
@@ -615,7 +632,7 @@ static int Circuit_buildHier_instance(Circuit *c,ModuleDecl *m,ModuleInst *mi,MI
 	ne = (NameExpr*) ListElem_obj(ple);
 	if (!ne->ne_name) {
 	  errorModule(mi->mc_mod,ModuleItem_getPlace(mid),ERR_PARAMMIX,mid->mii_instName,
-		      subM->m_name);
+	    subM->name());
 	  break;
 	}
 	if (!ModuleDecl_isParm(subM,ne->ne_name))
@@ -881,13 +898,14 @@ static ModuleInst *Circuit_buildNets(Circuit *c,ModuleDecl *m,MIInstance *mid,Mo
  *     m		Top-level module to build
  *
  *****************************************************************************/
-void Circuit_build(Circuit *c,ModuleDecl *m)
+void
+Circuit_build(Circuit *c,ModuleDecl *m)
 {
-  char path[STRMAX*2];
+	char path[STRMAX*2];
 
-  strcpy(path,m->m_name);
-  c->c_root = Circuit_buildNets(c,m,0,0,path);
-  Circuit_buildHier(c,c->c_root,0,path);
+	std::strncpy(path, m->name(), STRMAX*2);
+	c->c_root = Circuit_buildNets(c,m,0,0,path);
+	Circuit_buildHier(c,c->c_root,0,path);
 }
 
 /*****************************************************************************
@@ -1017,7 +1035,7 @@ void Circuit_installScript(Circuit *c,ModuleDecl *m,DynamicModule *dm)
 	if (m) {
 	  char buf[STRMAX];
 
-	  sprintf(buf,"%s.%s",ModuleDecl_getName(m->mc_mod),localName);
+	  sprintf(buf,"%s.%s", m->mc_mod->name(), localName);
 	  if (!SHash_find(&reported,buf)) {
 	    m->mc_mod->m_errorsDone = 0;
 	    errorNet(m->mc_mod,n->n_name,&m->mc_mod->m_place,WRN_FLOATNET,localName);

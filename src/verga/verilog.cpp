@@ -15,7 +15,9 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ****************************************************************************/
-#include "thyme.h"
+#include <cstdlib>
+
+#include "verga.hpp"
 
 int yyparse();
 void BeginVR();
@@ -77,15 +79,15 @@ cur_init(const char *fileName)
 		List_flush(&cur.modParms);
 	}
 
-  cur.mod = 0;
-  cur.isRedef = 0;
-  cur.scope = 0;
-  cur.task = 0;
-  cur.range = 0;
-  cur.instType = 0;
-  cur.gstrength = 0;
+	cur.mod = 0;
+	cur.isRedef = 0;
+	cur.scope = 0;
+	cur.task = 0;
+	cur.range = 0;
+	cur.instType = 0;
+	cur.gstrength = 0;
   
-  curPlace.init(fileName);
+	curPlace.init(fileName);
 }
 
 static int cur_getDeclContext()
@@ -172,12 +174,12 @@ int VerilogLoad(const char *name)
 
 void VerNewModule(const char *name)
 {
-	Place *p = Place_getCurrent();
+	Place *p = Place::getCurrent();
 
 	cur.isRedef = 0;
 
 	if (vgsim.findModule(name)) {
-		errorFile(&curPlace,ERR_MODREDEF,name);
+		errorFile(&curPlace, ERR_MODREDEF,name);
 		cur.isRedef = 1;
 	}
 
@@ -205,7 +207,7 @@ void VerEndModule()
 	cur.isRedef = 0;
 	cur.scope = 0;
 
-	Place_endModule(Place_getCurrent());
+	Place::getCurrent()->endModule();
 }
 
 /*****************************************************************************
@@ -230,12 +232,12 @@ void VerBeginDecls(int dtype,VRange *range)
    */
   if (cur.task) {
     if (!(dtype & NT_P_REG)) {
-      errorModule(cur.mod,Place_getCurrent(),ERR_TASKBADTYPE);
+      errorModule(cur.mod,Place::getCurrent(),ERR_TASKBADTYPE);
     }
 
     if (UserTaskDecl_getType(cur.task) == UTT_FUNCTION) {
       if ((dtype & NT_P_IO_MASK) == NT_P_OUTPUT || (dtype & NT_P_IO_MASK) == NT_P_INOUT) {
-	errorModule(cur.mod,Place_getCurrent(),ERR_TASKBADPORT);
+	errorModule(cur.mod, Place::getCurrent(), ERR_TASKBADPORT);
       }
     }
   }
@@ -300,25 +302,25 @@ void VerDecl(const char *name,VRange *addrRange)
          && (NT_GETBASE(ntype) == NT_REG)) {
 
       if(addrRange)
-	errorModule(cur.mod,Place_getCurrent(),ERR_BADADDR,name);
+	errorModule(cur.mod,Place::getCurrent(),ERR_BADADDR,name);
 
       n->n_type &= ~NT_P_WIRE;
       n->n_type |= NT_P_REG;
       return;
     }
 
-    errorModule(cur.mod,Place_getCurrent(),ERR_NETREDEF,name);
+    errorModule(cur.mod,Place::getCurrent(),ERR_NETREDEF,name);
     return;
   }
 
   if(addrRange){
     if ( ((NT_GETIO(ntype) != 0) || (ntype & NT_WIRE)) && addrRange) {
-      errorModule(cur.mod,Place_getCurrent(),ERR_BADADDRSPEC,name);
+      errorModule(cur.mod,Place::getCurrent(),ERR_BADADDRSPEC,name);
     } else
       ntype |= NT_P_MEMORY;
   }
 
-  n = new_NetDecl(name,ntype,cur.range,addrRange,Place_getCurrent());
+  n = new_NetDecl(name,ntype,cur.range,addrRange,Place::getCurrent());
 
   switch (cur_getDeclContext()) {
   case MODULE :
@@ -403,7 +405,7 @@ void VerAutoAssign(int dtype,const char *lval,Expr *rval)
   MIAssign *a;
 
   if (dtype != NT_WIRE) {
-    errorModule(cur.mod,Place_getCurrent(),ERR_BADAUTORNG);
+    errorModule(cur.mod,Place::getCurrent(),ERR_BADAUTORNG);
   }
 
   VerBeginDecls(dtype,VerRange(RS_AUTO,rval,0));
@@ -558,11 +560,13 @@ StatDecl *VerCondStat(Expr *e,StatDecl *s)
  *      name		Name of module
  *
  *****************************************************************************/
-void VerModDecl(const char *name)
+void
+VerModDecl(const char *name)
 {
-  if (cur.instType) free(cur.instType);
-  cur.instType = strdup(name);
-  List_flush(&cur.modParms);
+	if (cur.instType)
+		std::free(cur.instType);
+	cur.instType = strdup(name);
+	List_flush(&cur.modParms);
 }
 
 /*****************************************************************************
@@ -576,7 +580,7 @@ void VerModDecl(const char *name)
  *****************************************************************************/
 void VerModDeclParm(const char *name, Expr *e)
 {
-  List_addToTail(&cur.modParms,new_NameExpr(name,e));
+  List_addToTail(&cur.modParms, new_NameExpr(name,e));
 }
 
 /*****************************************************************************
@@ -754,16 +758,16 @@ void VerSpecialTag(const char *tag)
 	     || strcmp(tag,"//: /buitinEnd") == 0) {
     *name = 0;
   } else if (strcmp(tag,"//: enddecls") == 0) {
-    Place_resetModLine(Place_getCurrent());
+    Place_resetModLine(Place::getCurrent());
     return;
   } else {
     return;	/* ignore */
   }
 
   if (*name)
-    Place_startMTag(Place_getCurrent(),name);
+    Place_startMTag(Place::getCurrent(),name);
   else
-    Place_endMTag(Place_getCurrent());
+    Place_endMTag(Place::getCurrent());
 }
 
 /*****************************************************************************
@@ -788,24 +792,26 @@ void VerTaskToFunc(VRange *range)
  *      isauto		Non-zero if this is an "automatic" function/task
  *
  *****************************************************************************/
-void VerBeginTask(const char *name,int isauto)
+void
+VerBeginTask(const char *name, int isauto)
 {
-  ModuleDecl *m = cur.mod;
+	ModuleDecl *m = cur.mod;
 
-  if (!m) {
-    errorModule(m,Place_getCurrent(),ERR_IE_TASK,name);
-    return;
-  }
+	if (!m) {
+		errorModule(m,Place::getCurrent(),ERR_IE_TASK,name);
+		return;
+	}
 
-  if (ModuleDecl_findTask(m,name)) {
-    errorModule(m,Place_getCurrent(),ERR_TASKREDEF,name,ModuleDecl_getName(cur.mod));
-    return;
-  }
+	if (ModuleDecl_findTask(m,name)) {
+		errorModule(m, Place::getCurrent(), ERR_TASKREDEF, name,
+		    cur.mod->name());
+		return;
+	}
 
-  cur.task = new_UserTaskDecl(name,m,UTT_TASK,isauto);
-  cur.scope = UserTaskDecl_getScope(cur.task);
+	cur.task = new_UserTaskDecl(name,m,UTT_TASK,isauto);
+	cur.scope = UserTaskDecl_getScope(cur.task);
 
-  ModuleDecl_defineTask(m,name,cur.task);
+	ModuleDecl_defineTask(m,name, cur.task);
 }
 
 /*****************************************************************************

@@ -61,7 +61,7 @@ class Scope;
  * advance declarations from bytecode.h
  *****************************************************************************/
 typedef union ByteCode_union ByteCode;
-typedef struct VGThread_str VGThread;
+class VGThread;
 typedef void BCfunc(ByteCode *bc,VGThread *t);
 typedef struct CodeBlock_str CodeBlock;
 

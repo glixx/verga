@@ -17,9 +17,10 @@
 
     Last edit by hansen on Mon Dec 22 20:06:49 2008
 ****************************************************************************/
-#include <assert.h>
-#include <ctype.h>
-#include "thyme.h"
+#include <cassert>
+#include <cctype>
+
+#include "verga.hpp"
 
 /*****************************************************************************
  *

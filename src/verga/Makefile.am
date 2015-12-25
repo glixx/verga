@@ -30,7 +30,7 @@ verga___SOURCES=bytecode.cpp channel.cpp circuit.cpp commands.cpp directive.cpp 
 	statement.cpp systask.cpp task.cpp verga.cpp trigger.cpp value.cpp \
 	verilog.cpp vgrammar.ypp luthor.lpp yywrap.c release.cpp bytecode.h \
 	directive.h evqueue.h memory.h multint.h specify.h task.h trigger.h \
-	channel.h dynitem.h expr.h mitem.h net.h  statement.h thyme.h value.h \
+	channel.h dynitem.h expr.h mitem.h net.h  statement.h verga.hpp value.h \
 	yybasic.h circuit.h error.h io.h module.h operators.h systask.h \
 	thyme_config.h verilog.h
 

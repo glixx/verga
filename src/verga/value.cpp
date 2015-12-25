@@ -15,9 +15,11 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ****************************************************************************/
+#include <cstdlib>
 #include <cassert>
 #include <cctype>
-#include "thyme.h"
+
+#include "verga.hpp"
 
 #define DEBUG_VALUE 0
 
@@ -1899,7 +1901,7 @@ void Value_w_shift(Value *R,Value *I,int n,int in1,int in0,int inZ)
   unsigned mask = LMASK(R->nbits);
 
   /* special case */
-  if (abs(n) >= R->nbits) {
+  if (std::abs(n) >= R->nbits) {
     Value_zero(R);
     return;
   }
@@ -1940,7 +1942,7 @@ void Value_w_shift(Value *R,Value *I,int n,int in1,int in0,int inZ)
  *
  *****************************************************************************/
 void Value_shift(Value *R,Value *I,int n,int in1,int in0,int inZ) {
-  int na = abs(n);
+  int na = std::abs(n);
   int shift = na & SSBITMASK;
   int ishift = SSWORDSIZE - shift;
   int wordshift = na >> SSWORDSHIFT;

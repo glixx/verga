@@ -64,8 +64,7 @@
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <flagsDictionary>
-        <element flagsID="0" commonFlags="-mtune=generic -march=i586 -O2"/>
-        <element flagsID="1" commonFlags="-mtune=generic -march=i586 -g -O2"/>
+        <element flagsID="0" commonFlags="-mtune=generic -march=i586"/>
       </flagsDictionary>
       <codeAssistance>
       </codeAssistance>
@@ -86,252 +85,323 @@
           <preBuildCommand>./configure CC=${IDE_CC} CXX=${IDE_CXX} CFLAGS="-g3 -gdwarf-2" CXXFLAGS="-g3 -gdwarf-2"</preBuildCommand>
         </preBuild>
       </makefileType>
-      <folder path="0/src/common">
-        <ccTool>
-          <incDir>
-            <pElem>src/common</pElem>
-          </incDir>
-        </ccTool>
-      </folder>
       <item path="src/common/hash.cpp" ex="false" tool="1" flavor2="0">
         <ccTool flags="0">
+          <incDir>
+            <pElem>.</pElem>
+            <pElem>src/common</pElem>
+          </incDir>
         </ccTool>
       </item>
       <item path="src/common/list.cpp" ex="false" tool="1" flavor2="0">
         <ccTool flags="0">
+          <incDir>
+            <pElem>src/common</pElem>
+          </incDir>
         </ccTool>
       </item>
       <item path="src/common/misc.cpp" ex="false" tool="1" flavor2="0">
         <ccTool flags="0">
+          <incDir>
+            <pElem>.</pElem>
+            <pElem>src/common</pElem>
+          </incDir>
         </ccTool>
       </item>
       <item path="src/common/ycmalloc.cpp" ex="false" tool="1" flavor2="0">
         <ccTool flags="0">
+          <incDir>
+            <pElem>src/common</pElem>
+          </incDir>
         </ccTool>
       </item>
-      <item path="src/verga/bytecode.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/verga/bytecode.cpp" ex="false" tool="1" flavor2="4">
         <ccTool flags="0">
           <incDir>
+            <pElem>src/common</pElem>
+            <pElem>.</pElem>
+            <pElem>src/verga</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>HAVE_CONFIG_H=1</Elem>
+            <Elem>__REGISTER_PREFIX__=</Elem>
+            <Elem>__USER_LABEL_PREFIX__=</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="src/verga/channel.cpp" ex="false" tool="1" flavor2="4">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>src/common</pElem>
+            <pElem>.</pElem>
+            <pElem>src/verga</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>HAVE_CONFIG_H=1</Elem>
+            <Elem>__REGISTER_PREFIX__=</Elem>
+            <Elem>__USER_LABEL_PREFIX__=</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="src/verga/circuit.cpp" ex="false" tool="1" flavor2="4">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>src/common</pElem>
+            <pElem>.</pElem>
+            <pElem>src/verga</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>HAVE_CONFIG_H=1</Elem>
+            <Elem>__REGISTER_PREFIX__=</Elem>
+            <Elem>__USER_LABEL_PREFIX__=</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="src/verga/commands.cpp" ex="false" tool="1" flavor2="4">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>src/common</pElem>
+            <pElem>.</pElem>
+            <pElem>src/verga</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>HAVE_CONFIG_H=1</Elem>
+            <Elem>__REGISTER_PREFIX__=</Elem>
+            <Elem>__USER_LABEL_PREFIX__=</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="src/verga/directive.cpp" ex="false" tool="1" flavor2="4">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>src/common</pElem>
+            <pElem>.</pElem>
+            <pElem>src/verga</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>HAVE_CONFIG_H=1</Elem>
+            <Elem>__REGISTER_PREFIX__=</Elem>
+            <Elem>__USER_LABEL_PREFIX__=</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="src/verga/error.cpp" ex="false" tool="1" flavor2="4">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>src/common</pElem>
+            <pElem>.</pElem>
+            <pElem>src/verga</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>HAVE_CONFIG_H=1</Elem>
+            <Elem>__REGISTER_PREFIX__=</Elem>
+            <Elem>__USER_LABEL_PREFIX__=</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="src/verga/evqueue.cpp" ex="false" tool="1" flavor2="4">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>src/common</pElem>
+            <pElem>.</pElem>
+            <pElem>src/verga</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>HAVE_CONFIG_H=1</Elem>
+            <Elem>__REGISTER_PREFIX__=</Elem>
+            <Elem>__USER_LABEL_PREFIX__=</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="src/verga/expr.cpp" ex="false" tool="1" flavor2="4">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>src/common</pElem>
+            <pElem>.</pElem>
+            <pElem>src/verga</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="src/verga/io.cpp" ex="false" tool="1" flavor2="4">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>src/common</pElem>
+            <pElem>.</pElem>
+            <pElem>src/verga</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="src/verga/luthor.cpp" ex="false" tool="1" flavor2="4">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>src/common</pElem>
+            <pElem>.</pElem>
+            <pElem>src/verga</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="src/verga/memory.cpp" ex="false" tool="1" flavor2="4">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>src/common</pElem>
+            <pElem>.</pElem>
+            <pElem>src/verga</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="src/verga/mitem.cpp" ex="false" tool="1" flavor2="4">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>src/common</pElem>
+            <pElem>.</pElem>
+            <pElem>src/verga</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="src/verga/module.cpp" ex="false" tool="1" flavor2="4">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>src/common</pElem>
+            <pElem>.</pElem>
+            <pElem>src/verga</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="src/verga/multint.cpp" ex="false" tool="1" flavor2="4">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>.</pElem>
             <pElem>src/common</pElem>
             <pElem>src/verga</pElem>
           </incDir>
         </ccTool>
       </item>
-      <item path="src/verga/channel.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/verga/net.cpp" ex="false" tool="1" flavor2="4">
         <ccTool flags="0">
           <incDir>
+            <pElem>src/common</pElem>
+            <pElem>.</pElem>
+            <pElem>src/verga</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="src/verga/operators.cpp" ex="false" tool="1" flavor2="4">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>.</pElem>
             <pElem>src/common</pElem>
             <pElem>src/verga</pElem>
           </incDir>
         </ccTool>
       </item>
-      <item path="src/verga/circuit.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/verga/pathmod.cpp" ex="false" tool="1" flavor2="4">
         <ccTool flags="0">
           <incDir>
             <pElem>src/common</pElem>
+            <pElem>.</pElem>
             <pElem>src/verga</pElem>
           </incDir>
         </ccTool>
       </item>
-      <item path="src/verga/commands.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/verga/paux.cpp" ex="false" tool="1" flavor2="4">
         <ccTool flags="0">
           <incDir>
             <pElem>src/common</pElem>
+            <pElem>.</pElem>
             <pElem>src/verga</pElem>
           </incDir>
         </ccTool>
       </item>
-      <item path="src/verga/directive.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/verga/release.cpp" ex="false" tool="1" flavor2="4">
+        <ccTool flags="0">
+          <incDir>
+            <pElem>src/verga</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="src/verga/specify.cpp" ex="false" tool="1" flavor2="4">
         <ccTool flags="0">
           <incDir>
             <pElem>src/common</pElem>
+            <pElem>.</pElem>
             <pElem>src/verga</pElem>
           </incDir>
         </ccTool>
       </item>
-      <item path="src/verga/error.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/verga/statement.cpp" ex="false" tool="1" flavor2="4">
         <ccTool flags="0">
           <incDir>
             <pElem>src/common</pElem>
+            <pElem>.</pElem>
             <pElem>src/verga</pElem>
           </incDir>
         </ccTool>
       </item>
-      <item path="src/verga/evqueue.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/verga/systask.cpp" ex="false" tool="1" flavor2="4">
         <ccTool flags="0">
           <incDir>
             <pElem>src/common</pElem>
+            <pElem>.</pElem>
             <pElem>src/verga</pElem>
           </incDir>
         </ccTool>
       </item>
-      <item path="src/verga/expr.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/verga/task.cpp" ex="false" tool="1" flavor2="4">
         <ccTool flags="0">
           <incDir>
             <pElem>src/common</pElem>
+            <pElem>.</pElem>
             <pElem>src/verga</pElem>
           </incDir>
         </ccTool>
       </item>
-      <item path="src/verga/io.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/verga/trigger.cpp" ex="false" tool="1" flavor2="4">
         <ccTool flags="0">
           <incDir>
             <pElem>src/common</pElem>
+            <pElem>.</pElem>
             <pElem>src/verga</pElem>
           </incDir>
         </ccTool>
       </item>
-      <item path="src/verga/luthor.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/verga/value.cpp" ex="false" tool="1" flavor2="4">
         <ccTool flags="0">
           <incDir>
             <pElem>src/common</pElem>
+            <pElem>.</pElem>
             <pElem>src/verga</pElem>
           </incDir>
         </ccTool>
       </item>
-      <item path="src/verga/memory.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/verga/verga.cpp" ex="false" tool="1" flavor2="4">
         <ccTool flags="0">
           <incDir>
             <pElem>src/common</pElem>
+            <pElem>.</pElem>
             <pElem>src/verga</pElem>
           </incDir>
         </ccTool>
       </item>
-      <item path="src/verga/mitem.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/verga/verilog.cpp" ex="false" tool="1" flavor2="4">
         <ccTool flags="0">
           <incDir>
             <pElem>src/common</pElem>
+            <pElem>.</pElem>
             <pElem>src/verga</pElem>
           </incDir>
         </ccTool>
       </item>
-      <item path="src/verga/module.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/verga/vgrammar.cpp" ex="false" tool="1" flavor2="4">
         <ccTool flags="0">
           <incDir>
             <pElem>src/common</pElem>
-            <pElem>src/verga</pElem>
-          </incDir>
-        </ccTool>
-      </item>
-      <item path="src/verga/multint.cpp" ex="false" tool="1" flavor2="0">
-        <ccTool flags="0">
-          <incDir>
-            <pElem>src/verga</pElem>
-          </incDir>
-        </ccTool>
-      </item>
-      <item path="src/verga/net.cpp" ex="false" tool="1" flavor2="0">
-        <ccTool flags="0">
-          <incDir>
-            <pElem>src/common</pElem>
-            <pElem>src/verga</pElem>
-          </incDir>
-        </ccTool>
-      </item>
-      <item path="src/verga/operators.cpp" ex="false" tool="1" flavor2="0">
-        <ccTool flags="0">
-          <incDir>
-            <pElem>src/verga</pElem>
-          </incDir>
-        </ccTool>
-      </item>
-      <item path="src/verga/pathmod.cpp" ex="false" tool="1" flavor2="0">
-        <ccTool flags="0">
-          <incDir>
-            <pElem>src/common</pElem>
-            <pElem>src/verga</pElem>
-          </incDir>
-        </ccTool>
-      </item>
-      <item path="src/verga/paux.cpp" ex="false" tool="1" flavor2="0">
-        <ccTool flags="0">
-          <incDir>
-            <pElem>src/common</pElem>
-            <pElem>src/verga</pElem>
-          </incDir>
-        </ccTool>
-      </item>
-      <item path="src/verga/release.cpp" ex="false" tool="1" flavor2="0">
-        <ccTool flags="0">
-          <incDir>
-            <pElem>src/verga</pElem>
-          </incDir>
-        </ccTool>
-      </item>
-      <item path="src/verga/specify.cpp" ex="false" tool="1" flavor2="0">
-        <ccTool flags="0">
-          <incDir>
-            <pElem>src/common</pElem>
-            <pElem>src/verga</pElem>
-          </incDir>
-        </ccTool>
-      </item>
-      <item path="src/verga/statement.cpp" ex="false" tool="1" flavor2="0">
-        <ccTool flags="0">
-          <incDir>
-            <pElem>src/common</pElem>
-            <pElem>src/verga</pElem>
-          </incDir>
-        </ccTool>
-      </item>
-      <item path="src/verga/systask.cpp" ex="false" tool="1" flavor2="0">
-        <ccTool flags="0">
-          <incDir>
-            <pElem>src/common</pElem>
-            <pElem>src/verga</pElem>
-          </incDir>
-        </ccTool>
-      </item>
-      <item path="src/verga/task.cpp" ex="false" tool="1" flavor2="0">
-        <ccTool flags="0">
-          <incDir>
-            <pElem>src/common</pElem>
-            <pElem>src/verga</pElem>
-          </incDir>
-        </ccTool>
-      </item>
-      <item path="src/verga/trigger.cpp" ex="false" tool="1" flavor2="0">
-        <ccTool flags="0">
-          <incDir>
-            <pElem>src/common</pElem>
-            <pElem>src/verga</pElem>
-          </incDir>
-        </ccTool>
-      </item>
-      <item path="src/verga/value.cpp" ex="false" tool="1" flavor2="0">
-        <ccTool flags="0">
-          <incDir>
-            <pElem>src/common</pElem>
-            <pElem>src/verga</pElem>
-          </incDir>
-        </ccTool>
-      </item>
-      <item path="src/verga/verga.cpp" ex="false" tool="1" flavor2="0">
-        <ccTool flags="0">
-          <incDir>
-            <pElem>src/common</pElem>
-            <pElem>src/verga</pElem>
-          </incDir>
-        </ccTool>
-      </item>
-      <item path="src/verga/verilog.cpp" ex="false" tool="1" flavor2="0">
-        <ccTool flags="0">
-          <incDir>
-            <pElem>src/common</pElem>
-            <pElem>src/verga</pElem>
-          </incDir>
-        </ccTool>
-      </item>
-      <item path="src/verga/vgrammar.cpp" ex="false" tool="1" flavor2="0">
-        <ccTool flags="0">
-          <incDir>
-            <pElem>src/common</pElem>
+            <pElem>.</pElem>
             <pElem>src/verga</pElem>
           </incDir>
         </ccTool>
       </item>
       <item path="src/verga/yywrap.c" ex="false" tool="0" flavor2="2">
-        <cTool flags="1">
+        <cTool flags="0">
         </cTool>
       </item>
     </conf>

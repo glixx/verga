@@ -17,7 +17,9 @@
 
     Last edit by hansen on Thu Jan 29 12:49:46 2009
 ****************************************************************************/
-#include "thyme.h"
+#include <cstdlib>
+
+#include "verga.hpp"
 
 /*****************************************************************************
  *
@@ -94,7 +96,7 @@ ModuleItem *new_ModuleItem(itemcode_t mitype)
   ModuleItem *mi = (ModuleItem*) malloc(sizeof(ModuleItem));
 
   mi->mi_base.mb_type = mitype;
-  Place_copy(&mi->mi_base.mb_place, Place_getCurrent());
+  Place_copy(&mi->mi_base.mb_place, Place::getCurrent());
   mi->mi_base.mb_place.p_mitem = mi;
   mi->mi_base.mb_dynMod = 0;
   mi->mi_base.mb_flags = 0;

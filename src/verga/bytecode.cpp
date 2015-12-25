@@ -17,7 +17,9 @@
 
     Last edit by hansen on Mon Feb  2 13:45:47 2009
 ****************************************************************************/
-#include "thyme.h"
+#include <cstdlib>
+
+#include "verga.hpp"
 
 #ifndef DEBUG
 #define DEBUG 0

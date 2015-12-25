@@ -17,7 +17,9 @@
 
     Last edit by hansen on Mon Feb  2 16:54:46 2009
 ****************************************************************************/
-#include "thyme.h"
+#include <cstdlib>
+
+#include "verga.hpp"
 
 static char lastExprError[STRMAX] = "";
 
@@ -300,7 +302,7 @@ Expr *new_Expr_hex(const char *spec)
   e->e_type = E_HEX;
   e->e.snum = new_Value(0);
   if (Value_convert(e->e.snum,spec) != 0)
-    errorFile(Place_getCurrent(),ERR_BADVALUE,spec);
+    errorFile(Place::getCurrent(),ERR_BADVALUE,spec);
 
   return e;
 }
@@ -991,7 +993,7 @@ Value *Expr_parmEval(Expr *e,Scope *scope,parmevflags_t flags)
       int maxsize = 1;
 
       if (!od) {
-	errorFile(Place_getCurrent(),ERR_IE_NOOP);
+	errorFile(Place::getCurrent(),ERR_IE_NOOP);
 	goto abortEval;
       }
 
@@ -1019,7 +1021,7 @@ Value *Expr_parmEval(Expr *e,Scope *scope,parmevflags_t flags)
       }
 
       if ((*od->od_opfunc)(r,t[0],t[1],t[2]) != 0) {
-	errorFile(Place_getCurrent(),ERR_BADOP,od->od_text);
+	errorFile(Place::getCurrent(),ERR_BADOP,od->od_text);
 	goto abortEval;
       }
 
@@ -1038,7 +1040,7 @@ Value *Expr_parmEval(Expr *e,Scope *scope,parmevflags_t flags)
   case E_VECTORP :
   case E_VECTORN :
   case E_RANGE :
-    errorFile(Place_getCurrent(),ERR_BADCONSTOP);
+    errorFile(Place::getCurrent(),ERR_BADCONSTOP);
     goto abortEval;
     break;
   case E_LITERAL :		/* Look up as parameter */
@@ -1069,7 +1071,7 @@ Value *Expr_parmEval(Expr *e,Scope *scope,parmevflags_t flags)
 	Value_reinit(r,Value_nbits(v));
 	Value_copy(r,v);
       } else {
-	errorFile(Place_getCurrent(),ERR_NOTPARM,Expr_getLitName(e));
+	errorFile(Place::getCurrent(),ERR_NOTPARM,Expr_getLitName(e));
 	goto abortEval;
       }
     }
@@ -1231,7 +1233,7 @@ int Expr_getBitSize(Expr *e,Scope *scope)
       OpDesc *od = OpDesc_find(e->e_type);
 
       if (!od) {
-	errorFile(Place_getCurrent(),ERR_IE_NOOP);
+	errorFile(Place::getCurrent(),ERR_IE_NOOP);
 	return 0;
       }
 
@@ -1252,7 +1254,7 @@ int Expr_getBitSize(Expr *e,Scope *scope)
       OpDesc *od = OpDesc_find(e->e_type);
 
       if (!od) {
-	errorFile(Place_getCurrent(),ERR_IE_NOOP);
+	errorFile(Place::getCurrent(),ERR_IE_NOOP);
 	return 0;
       }
 
@@ -1282,7 +1284,7 @@ int Expr_getBitSize(Expr *e,Scope *scope)
   case E_POSEDGE :
   case E_NEGEDGE :
   case E_EVENTOR :
-    errorFile(Place_getCurrent(),ERR_BADXOP);
+    errorFile(Place::getCurrent(),ERR_BADXOP);
     return 0;
     break;
   case E_RANGE :
@@ -1295,7 +1297,7 @@ int Expr_getBitSize(Expr *e,Scope *scope)
       if (n) {
 	return Value_nbits(Net_getValue(n));
       } else {
-	errorFile(Place_getCurrent(),ERR_NOTDEF,Expr_getLitName(e));
+	errorFile(Place::getCurrent(),ERR_NOTDEF,Expr_getLitName(e));
 	return 0;
       }
     }
@@ -1375,7 +1377,7 @@ int Expr_getCollapsedBitSize(Expr *e,Scope *scope)
       OpDesc *od = OpDesc_find(e->e_type);
 
       if (!od) {
-	errorFile(Place_getCurrent(),ERR_IE_NOOP);
+	errorFile(Place::getCurrent(),ERR_IE_NOOP);
 	return 0;
       }
 
@@ -1396,7 +1398,7 @@ int Expr_getCollapsedBitSize(Expr *e,Scope *scope)
       OpDesc *od = OpDesc_find(e->e_type);
 
       if (!od) {
-	errorFile(Place_getCurrent(),ERR_IE_NOOP);
+	errorFile(Place::getCurrent(),ERR_IE_NOOP);
 	return 0;
       }
 
@@ -1426,7 +1428,7 @@ int Expr_getCollapsedBitSize(Expr *e,Scope *scope)
   case E_POSEDGE :
   case E_NEGEDGE :
   case E_EVENTOR :
-    errorFile(Place_getCurrent(),ERR_BADXOP);
+    errorFile(Place::getCurrent(),ERR_BADXOP);
     return 0;
     break;
   case E_RANGE :
@@ -1439,7 +1441,7 @@ int Expr_getCollapsedBitSize(Expr *e,Scope *scope)
       if (n) {
 	return Value_nbits(Net_getValue(n));
       } else {
-	errorFile(Place_getCurrent(),ERR_NOTDEF,Expr_getLitName(e));
+	errorFile(Place::getCurrent(),ERR_NOTDEF,Expr_getLitName(e));
 	return 0;
       }
     }
@@ -1616,7 +1618,7 @@ Value *Expr_generate(Expr *e,int nbits,Scope *scope,CodeBlock *cb)
   case E_POSEDGE :
   case E_NEGEDGE :
   case E_EVENTOR :
-    errorFile(Place_getCurrent(),ERR_BADXOP);
+    errorFile(Place::getCurrent(),ERR_BADXOP);
     return 0;
   case E_LITERAL :				/* Look up as parameter */
     {
@@ -1626,7 +1628,7 @@ Value *Expr_generate(Expr *e,int nbits,Scope *scope,CodeBlock *cb)
       if (!n) return 0;
 
       if ((Net_getType(n) & NT_P_MEMORY)) {
-	errorFile(Place_getCurrent(),ERR_BADARRAYUSG,Expr_getLitName(e));
+	errorFile(Place::getCurrent(),ERR_BADARRAYUSG,Expr_getLitName(e));
 	return 0;
       }
 
@@ -1661,7 +1663,7 @@ Value *Expr_generate(Expr *e,int nbits,Scope *scope,CodeBlock *cb)
 
       if (ut) {
 	if (UserTask_getType(ut) != UTT_FUNCTION) {
-	  errorFile(Place_getCurrent(),ERR_TASKASFUNC,Expr_getLitName(e));
+	  errorFile(Place::getCurrent(),ERR_TASKASFUNC,Expr_getLitName(e));
 	  return 0;
 	}
 	sargs[0] = lhs = new_Value(UserTask_nbits(ut));
@@ -1672,14 +1674,14 @@ Value *Expr_generate(Expr *e,int nbits,Scope *scope,CodeBlock *cb)
       } else if (func) {
 
 	if (e->e.task.argc < func->st_minArgs || e->e.task.argc > func->st_maxArgs) {
-	  errorFile(Place_getCurrent(),ERR_TASKARGS,e->e.task.name);
+	  errorFile(Place::getCurrent(),ERR_TASKARGS,e->e.task.name);
 	  return 0;
 	}
 
 	lhs = new_Value(nbits);
 	BCTask_init(CodeBlock_nextEmpty(cb),func->st_func,0,lhs,e->e.task.argc,sargs);
       } else {
-	errorFile(Place_getCurrent(),ERR_NOTASK,e->e.task.name);
+	errorFile(Place::getCurrent(),ERR_NOTASK,e->e.task.name);
 	lhs = 0;
       }
       return lhs;
@@ -1900,7 +1902,7 @@ void Expr_getStaticReaders(Expr*e, SHash *H)
     break;
   case E_LITERAL :				/* Look up as parameter */
     if (e->e.literal.ishlit) {
-      errorFile(Place_getCurrent(),ERR_BADHIER,e->e.literal.name);
+      errorFile(Place::getCurrent(),ERR_BADHIER,e->e.literal.name);
       break;
     }
     SHash_insert(H, e->e.literal.name, e);
@@ -2027,7 +2029,7 @@ Trigger *Expr_getDefaultTrigger(Expr *e,Scope *scope)
   Trigger *t;
 
   if (!e) {
-    errorFile(Place_getCurrent(),ERR_NONEXPCTL);
+    errorFile(Place::getCurrent(),ERR_NONEXPCTL);
     return 0;
   }
 
@@ -2068,7 +2070,7 @@ Trigger *Expr_getTrigger(Expr *trigger,Scope *scope, StatDecl *stat)
     HashElem *he;
 
     if (!stat) {
-      errorFile(Place_getCurrent(),ERR_NONSTATCTL);
+      errorFile(Place::getCurrent(),ERR_NONSTATCTL);
       return 0;
     }
 
@@ -2118,13 +2120,13 @@ Trigger *Expr_getTrigger(Expr *trigger,Scope *scope, StatDecl *stat)
       transition = TT_NEGEDGE;
       name = Expr_getLitName(e->e.opr[1]);
     } else {
-      errorFile(Place_getCurrent(),ERR_BADEVENT);
+      errorFile(Place::getCurrent(),ERR_BADEVENT);
       goto abortGen;
     }
 
     n = Scope_findNet(scope,name,0);
     if (!n) {
-      errorFile(Place_getCurrent(),ERR_BADEVENTNET,name);
+      errorFile(Place::getCurrent(),ERR_BADEVENTNET,name);
       goto abortGen;
     }
 
@@ -2139,7 +2141,7 @@ Trigger *Expr_getTrigger(Expr *trigger,Scope *scope, StatDecl *stat)
        * for all transitions.
        */
       if (transition != TT_EDGE) {
-	errorFile(Place_getCurrent(),ERR_BADEDGEEVENT,name);
+	errorFile(Place::getCurrent(),ERR_BADEDGEEVENT,name);
 	goto abortGen;
       }
       List_addToTail(&posedges,n);
@@ -2290,7 +2292,7 @@ int Expr_decodeVector(Expr *e,Scope *scope,Net **n,VRange **addr,VRange **bits)
     *n =  Scope_findNet(scope, name,0);
 
     if (*n && (Net_getType(*n) & NT_P_MEMORY)) {
-      errorFile(Place_getCurrent(),ERR_BADARRAYLHS,Expr_getLitName(e));
+      errorFile(Place::getCurrent(),ERR_BADARRAYLHS,Expr_getLitName(e));
     }
 
     break;
@@ -2317,7 +2319,7 @@ int Expr_decodeVector(Expr *e,Scope *scope,Net **n,VRange **addr,VRange **bits)
        */
       if ((Net_getType(*n) & NT_P_MEMORY)) {
 	if (e->e.opr[2]) {
-	  errorFile(Place_getCurrent(),ERR_BADARRAYRNG,name);
+	  errorFile(Place::getCurrent(),ERR_BADARRAYRNG,name);
 	  return -1;
 	}
 
@@ -2353,7 +2355,7 @@ int Expr_decodeVector(Expr *e,Scope *scope,Net **n,VRange **addr,VRange **bits)
     {
       char buf[STRMAX];
       sprintf(buf,"%d",Expr_type(e));
-      errorFile(Place_getCurrent(),ERR_IE_BADEXP,buf);
+      errorFile(Place::getCurrent(),ERR_IE_BADEXP,buf);
     }
     return -1;
   }
@@ -2365,10 +2367,10 @@ int Expr_decodeVector(Expr *e,Scope *scope,Net **n,VRange **addr,VRange **bits)
    */
   if (!*n) {
     if (name) {
-      errorFile(Place_getCurrent(),ERR_NOTDEF,name);
+      errorFile(Place::getCurrent(),ERR_NOTDEF,name);
       return -1;
     } else {
-      errorFile(Place_getCurrent(),ERR_IE_BADVAR,name);
+      errorFile(Place::getCurrent(),ERR_IE_BADVAR,name);
       return -1;
     }
   }

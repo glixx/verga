@@ -87,9 +87,11 @@ struct VGFrame_str {
 /*****************************************************************************
  *
  * VGThread - Thread state
- *
- *****************************************************************************/
-struct VGThread_str {
+ * 
+ */
+class VGThread
+{
+public:
   Event		*t_pending;	/* Pointer to event if pending, null otherwise */
   ThreadState_t	 t_state;	/* State of the thread (active, blocked, paused, etc.)  */
   int		 t_isLive;	/* Non-zero if this thread is live */

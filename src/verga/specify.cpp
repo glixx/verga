@@ -17,7 +17,9 @@
 
     Last edit by hansen on Thu Jan 29 14:53:50 2009
 ****************************************************************************/
-#include "thyme.h"
+#include <cstdlib>
+
+#include "verga.hpp"
 
 #define SPECIFY_DEBUG 0
 
@@ -394,7 +396,7 @@ SpecifyStat *new_SpecifyStat(Expr *cond,spectype_t ptype,Expr *lhs,Expr *rhs,Exp
 
   if (ptype == SPT_DPATH) {
     if (!direct_conn) {
-      errorFile(Place_getCurrent(),WRN_DIRECTCONN);
+      errorFile(Place::getCurrent(), WRN_DIRECTCONN);
       direct_conn = 1;
     }
   }
@@ -420,7 +422,7 @@ SpecifyStat *new_SpecifyStat(Expr *cond,spectype_t ptype,Expr *lhs,Expr *rhs,Exp
   }
 
   if (!lit_only)
-    errorFile(Place_getCurrent(),ERR_BADSPECLVAL);
+    errorFile(Place::getCurrent(), ERR_BADSPECLVAL);
 
 #if SPECIFY_DEBUG
   printf("specify");

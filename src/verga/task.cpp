@@ -17,7 +17,9 @@
 
     Last edit by hansen on Sat May 20 19:09:35 2006
 ****************************************************************************/
-#include "thyme.h"
+#include <cstdlib>
+
+#include "verga.hpp"
 
 UserTaskDecl *new_UserTaskDecl(const char *name,ModuleDecl *m,unsigned ttype,int isauto)
 {

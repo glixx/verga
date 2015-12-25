@@ -180,7 +180,7 @@
 %left UNEG UPLUS NOT UINV
 
 %{
-#include "thyme.h"
+#include "verga.hpp"
 
 /*#include <sys/cdefs.h>
 

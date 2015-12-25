@@ -73,7 +73,16 @@ typedef struct FaninNode_str {
 class ModuleDecl
 {
 public:
-	char			*m_name;	/* Module name */
+	char *name() const
+	{
+		return (_name);
+	}
+	
+	void setName(char *newVal)
+	{
+		_name = newVal;
+	}
+	
 	Place			 m_place;	/* Place of declarations */
 	List/*char**/		 m_ports;	/* Port names */
 	List/*char**/		 m_parmPorts;	/* Parameter ports */
@@ -84,6 +93,8 @@ public:
 	Specify			*m_specify;	/* Specify block of module */
 	SHash/*FaninNode*/	*m_faninnodes;	/* Fanin nodes (only used for path-delay modules) */
 	Timescale		 m_timescale;	/* Timescale of this module */
+private:
+	char	*_name;	/* Module name */
 };
 
 /*****************************************************************************
@@ -159,7 +170,6 @@ int ModuleDecl_isParm(ModuleDecl *m,const char *name);
 void ModuleDecl_print(ModuleDecl*,FILE*);
 NetDecl *ModuleDecl_findNet(ModuleDecl *m,const char *name);
 void ModuleDecl_defNet(ModuleDecl *m,NetDecl*n);
-#define ModuleDecl_getName(m) (m)->m_name
 void ModuleDecl_printData(ModuleDecl*);
 #define ModuleDecl_getSpecify(m) (m)->m_specify
 #define ModuleDecl_getPlace(m) (&(m)->m_place)

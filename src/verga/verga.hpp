@@ -24,7 +24,6 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-#include <cstdlib>
 #include <cstdio>
 #include <cstring>
 #include <cstdarg>

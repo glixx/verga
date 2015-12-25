@@ -15,7 +15,9 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ****************************************************************************/
-#include "thyme.h"
+#include <cstdlib>
+
+#include "verga.hpp"
 
 /*****************************************************************************
  *
@@ -215,7 +217,7 @@ ModuleDecl *new_ModuleDecl(const char *name)
 {
   ModuleDecl *m = (ModuleDecl*) malloc(sizeof(ModuleDecl));
 
-  m->m_name = name ? strdup(name) : 0;
+  m->setName(name ? strdup(name) : NULL);
   m->m_errorsDone = 0;
   m->m_specify = 0;
   List_init(&m->m_ports);
@@ -240,7 +242,7 @@ ModuleDecl *new_ModuleDecl(const char *name)
  *****************************************************************************/
 void delete_ModuleDecl(ModuleDecl *m)
 {
-  free(m->m_name);
+  free(m->name());
   List_uninit(&m->m_ports);
   List_uninit(&m->m_parmPorts);
   ScopeDecl_uninit(&m->m_scope);
@@ -309,7 +311,7 @@ void ModuleDecl_printData(ModuleDecl *m)
 {
   ListElem *le;
 
-  printf("module %s\n",ModuleDecl_getName(m));
+  printf("module %s\n", m->name());
   printf("  line %d\n",m->m_place.p_lineNo);
 
   for (le = List_first(&m->m_items);le;le = List_next(&m->m_items,le)) {
@@ -372,7 +374,7 @@ void ModuleDecl_printData(ModuleDecl *m)
     }
   }
 
-  printf("endmodule %s\n",ModuleDecl_getName(m));
+	printf("endmodule %s\n", m->name());
 }
 
 /*****************************************************************************
@@ -386,7 +388,7 @@ void ModuleDecl_printData(ModuleDecl *m)
  *****************************************************************************/
 void ModuleDecl_print(ModuleDecl *m,FILE *f)
 {
-  fprintf(f,"module %s",m->m_name);
+	fprintf(f, "module %s", m->name());
 
   /*
    * Display the parameter ports

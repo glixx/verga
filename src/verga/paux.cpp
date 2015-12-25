@@ -16,9 +16,10 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ****************************************************************************/
 #include <unistd.h>
-#include <string.h>
-#include <ctype.h>
-#include "thyme.h"
+#include <cstring>
+#include <cctype>
+
+#include "verga.hpp"
 
 extern Place curPlace;			/* The current place */
 

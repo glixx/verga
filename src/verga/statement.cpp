@@ -22,7 +22,9 @@
  * in a "always" or "initial" item in a module.
  *
  *****************************************************************************/
-#include "thyme.h"
+#include <cstdlib>
+
+#include "verga.hpp"
 
 static StatDeclVTable vtable_SDNull = {
   (StatPrint_f*) SDNull_print,
@@ -124,15 +126,16 @@ static StatDeclVTable *SDvtables[] = {
   &vtable_SDRaise,
 };
 
-static StatDecl *new_StatDecl(statcode_t stype)
+static StatDecl*
+new_StatDecl(statcode_t stype)
 {
-  StatDecl *sd = (StatDecl*) malloc(sizeof(StatDecl));
+	StatDecl *sd = (StatDecl*) malloc(sizeof(StatDecl));
 
-  sd->sd_common.sdc_type = stype;
-  sd->sd_common.sdc_vtable = SDvtables[stype];
-  Place_copy(&sd->sd_common.sdc_place, Place_getCurrent());
+	sd->sd_common.sdc_type = stype;
+	sd->sd_common.sdc_vtable = SDvtables[stype];
+	Place_copy(&sd->sd_common.sdc_place, Place::getCurrent());
 
-  return sd;
+	return (sd);
 }
 
 
