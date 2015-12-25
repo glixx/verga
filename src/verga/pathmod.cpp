@@ -88,14 +88,14 @@ static int Circuit_dpath_checkPorts(Circuit *c,
   ModuleDecl *m = mi->mc_mod;
   HashElem *he;
 
-  /*
-   * Generate all of the input handlers
-   */
-  for (he = Hash_first(ModuleDecl_getNets(m));he;he = Hash_next(ModuleDecl_getNets(m),he)) {
-    NetDecl *netdecl = (NetDecl*)HashElem_obj(he);
-    Net *net = ModuleInst_findNet(mi, NetDecl_getName(netdecl));
+	/*
+	 * Generate all of the input handlers
+	 */
+	for (he = Hash_first(m->getNets()); he; he = Hash_next(m->getNets(), he)) {
+		NetDecl *netdecl = (NetDecl*)HashElem_obj(he);
+		Net *net = ModuleInst_findNet(mi, NetDecl_getName(netdecl));
 
-    if (!net) continue;	/* not an I/O net */
+		if (!net) continue;	/* not an I/O net */
 
     net->n_flags = (NetAttrlags)(net->n_flags | NA_INPATHDMOD);
 
@@ -228,21 +228,22 @@ static void Circuit_dpath_makePortNets(Circuit *c, ModuleDecl *m, Scope *scope,
     fn->fn_inNets = (Net**) malloc(sizeof(Net*)*(i+1));
   }
 
-  /*
-   * Create nets for outputs
-   */
-  for (i = 0;fn->fn_out[i];i++) {
-    NetDecl *nd = ModuleDecl_findNet(m, fn->fn_out[i]);
-    fn->fn_outNets[i] = Circuit_dpath_findAddNet(c, port_scope,nd,m,outName);
-  }
+	/*
+	 * Create nets for outputs
+	 */
+	for (i = 0; fn->fn_out[i]; ++i) {
+		NetDecl *nd = m->findNet(fn->fn_out[i]);
+		fn->fn_outNets[i] = Circuit_dpath_findAddNet(c,port_scope, nd,
+		    m,outName);
+	}
 
-  /*
-   * Create nets for inputs
-   */
-  for (i = 0;fn->fn_in[i];i++) {
-    NetDecl *nd = ModuleDecl_findNet(m, fn->fn_in[i]);
-    fn->fn_inNets[i] = Circuit_dpath_findAddNet(c, port_scope,nd,m,outName);
-  }
+	/*
+	 * Create nets for inputs
+	 */
+	for (i = 0;fn->fn_in[i];i++) {
+		NetDecl *nd = m->findNet(fn->fn_in[i]);
+		fn->fn_inNets[i] = Circuit_dpath_findAddNet(c, port_scope,nd,m,outName);
+	}
 }
 
 static int Circuit_dpath_generate_gate(Circuit *c, ModuleInst *mi, Scope *port_scope, CodeBlock *codeBlock, MIGate *mig)
@@ -363,7 +364,7 @@ static int Circuit_dpath_outputtree(Circuit *c,
 {
   ModuleDecl *m = ModuleInst_getModDecl(mi);
   FaninNode *fn = ModuleDecl_findFanin(m,netName);
-  NetDecl *net = ModuleDecl_findNet(m, netName);
+  NetDecl *net = m->findNet(netName);
   int ok = 0;
   int i;
 

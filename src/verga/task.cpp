@@ -21,23 +21,24 @@
 
 #include "verga.hpp"
 
-UserTaskDecl *new_UserTaskDecl(const char *name,ModuleDecl *m,unsigned ttype,int isauto)
+UserTaskDecl*
+new_UserTaskDecl(const char *name,ModuleDecl *m,unsigned ttype,int isauto)
 {
-  UserTaskDecl *utd = (UserTaskDecl*) malloc(sizeof(UserTaskDecl));
+	UserTaskDecl *utd = (UserTaskDecl*) malloc(sizeof(UserTaskDecl));
 
-  utd->utd_type = ttype;
-  utd->utd_name = strdup(name);
-  utd->utd_range = 0;
-  utd->utd_module = m;
-  utd->utd_stat = 0;
-  utd->utd_isauto = isauto;
-  ScopeDecl_init(&utd->utd_scope,ModuleDecl_getScope(m));
-  //  List_init(&utd->utd_inputs);
-  //  List_init(&utd->utd_outputs);
-  //  List_init(&utd->utd_inouts);
-  List_init(&utd->utd_parms);
+	utd->utd_type = ttype;
+	utd->utd_name = strdup(name);
+	utd->utd_range = 0;
+	utd->utd_module = m;
+	utd->utd_stat = 0;
+	utd->utd_isauto = isauto;
+	ScopeDecl_init(&utd->utd_scope, &m->getScope());
+	//  List_init(&utd->utd_inputs);
+	//  List_init(&utd->utd_outputs);
+	//  List_init(&utd->utd_inouts);
+	List_init(&utd->utd_parms);
 
-  return utd;
+	return (utd);
 }
 
 
@@ -83,7 +84,7 @@ UserTask *new_UserTask(UserTaskDecl *utd,Scope *scope)
 void UserTask_generate(UserTask *ut,CodeBlock *cb)
 {
   UserTaskDecl *utd = ut->ut_decl;
-  Circuit *c = &vgsim._circuit;
+  Circuit *c = &vgsim.circuit();
   SHash *decl_table = &ut->ut_decl->utd_scope.sd_nets;
   ModuleDecl *m = ut->ut_decl->utd_module;
   HashElem *he;
@@ -248,7 +249,7 @@ void UserTask_generateCall(UserTask *ut,void **sargs,CodeBlock *cb)
 void UserTask_generateInlineCall(UserTask *ut,void **sargs,CodeBlock *cb)
 {
   UserTaskDecl *utd = ut->ut_decl;
-  Circuit *c = &vgsim._circuit;
+  Circuit *c = &vgsim.circuit();
   SHash *decl_table = &ut->ut_decl->utd_scope.sd_nets;
   ModuleDecl *m = ut->ut_decl->utd_module;
   HashElem *he;

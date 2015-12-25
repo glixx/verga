@@ -174,7 +174,7 @@ static void Memory_monitorWrite(Memory *M,unsigned A)
  ******************************************************************************/
 void Memory_accessNotify(Memory *m, unsigned addr,int isWrite)
 {
-  EvQueue *Q = vgsim._circuit.c_evQueue;
+  EvQueue *Q = vgsim.circuit().c_evQueue;
   char sdata[STRMAX];
   Value *data = 0;
 

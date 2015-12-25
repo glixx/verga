@@ -174,25 +174,25 @@ int VerilogLoad(const char *name)
 
 void VerNewModule(const char *name)
 {
+#if DEBUG
+	printf("%s(%s)\n",__PRETTY_FUNCTION__, name);
+#endif
 	Place *p = Place::getCurrent();
 
 	cur.isRedef = 0;
 
 	if (vgsim.findModule(name)) {
-		errorFile(&curPlace, ERR_MODREDEF,name);
+		errorFile(&curPlace, ERR_MODREDEF, name);
 		cur.isRedef = 1;
 	}
 
-#if DEBUG
-	printf("%s(%s)\n",__PRETTY_FUNCTION__,name);
-#endif
-	cur.mod = new_ModuleDecl(name);
-	cur.scope = ModuleDecl_getScope(cur.mod);
+	cur.mod = new ModuleDecl(name);
+	cur.scope = &cur.mod->getScope();
 	Place_startModule(p, name);
 	Place_copy(&cur.mod->m_place,p);
 
-	if (strcmp(p->p_moduleName,name) != 0)
-		errorModule(cur.mod,p,ERR_WRONGMOD,name,p->p_moduleName);
+	if (strcmp(p->p_moduleName, name) != 0)
+		errorModule(cur.mod, p,ERR_WRONGMOD, name, p->p_moduleName);
 }
 
 void VerEndModule()
@@ -324,7 +324,7 @@ void VerDecl(const char *name,VRange *addrRange)
 
   switch (cur_getDeclContext()) {
   case MODULE :
-    ModuleDecl_defNet(cur.mod, n);
+    cur.mod->defNet(n);
     break;
   case TASK :
   default :
@@ -441,12 +441,13 @@ VRange *VerRange(rangestyle_t rs, Expr *left,Expr *right)
  *      name			Name of the port to add
  *
  *****************************************************************************/
-void VerPort(const char *name)
+void
+VerPort(const char *name)
 {
 #if DEBUG
-  printf("VerPort(%s)\n",name);
+	printf("VerPort(%s)\n",name);
 #endif
-  ModuleDecl_addPort(cur.mod,name);
+	cur.mod->addPort(name);
 }
 
 /*****************************************************************************
@@ -624,12 +625,14 @@ void VerBreakpoint(int n,Expr *e)
  * Begin declaration of a script
  *
  *****************************************************************************/
-void VerBeginScript()
+void
+VerBeginScript()
 {
-  cur.mod = new_ModuleDecl(0);
-  cur.isRedef = 0;
-  cur.mod->m_timescale = *ModuleInst_getTimescale(Circuit_getRoot(&vgsim._circuit));
-  cur.scope = ModuleDecl_getScope(cur.mod);
+	cur.mod = new ModuleDecl();
+	cur.isRedef = 0;
+	cur.mod->m_timescale = *ModuleInst_getTimescale(Circuit_getRoot(
+	    &vgsim.circuit()));
+	cur.scope = &cur.mod->getScope();
 }
 
 /*****************************************************************************
@@ -639,13 +642,13 @@ void VerBeginScript()
  *****************************************************************************/
 void VerEndScript()
 {
-  extern int errCount;
+	extern int errCount;
 
-  if (errCount == 0)
-    Circuit_installScript(&vgsim._circuit,cur.mod,cur.dynmod);
-  cur.mod = 0;
-  cur.isRedef = 0;
-  cur.scope = 0;
+	if (errCount == 0)
+		Circuit_installScript(&vgsim.circuit(),cur.mod,cur.dynmod);
+	cur.mod = NULL;
+	cur.isRedef = 0;
+	cur.scope = NULL;
 }
 
 /*****************************************************************************

@@ -29,6 +29,7 @@
 #include <cstdarg>
 
 #include <list>
+#include <map>
 
 #include "config.h"		/* Tkgate global configuration parameters */
 #include "thyme_config.h"	/* thyme-specific configuration parameters */
@@ -60,16 +61,25 @@
 #include "yybasic.h"		/* Basic parser functions */
 #include "vgrammar.hpp"		/* Symbols definitions for tokens */
 
+class StringCompare
+{
+public:
+	bool operator() (const char *x, const char *y) const
+	{
+		return (std::strncmp(x, y, STRMAX) < 0);
+	}
+};
+
 typedef std::list<const char*>	Stringlist;
 
-typedef enum delay_type_en {
+enum DelayType {
+	/* Use minimum delays */
 	DT_MIN = 0,
-#define DT_MIN DT_MIN		/* Use minimum delays */
+	/* Use typical delays */	
 	DT_TYP = 1,
-#define DT_TYP DT_TYP		/* Use typical delays */
+	/* Use maximum delays */
 	DT_MAX = 2
-#define DT_MAX DT_MAX		/* Use maximum delays */
-} DelayType;
+};
 
 typedef enum verilog_std_en
 {
@@ -100,18 +110,27 @@ typedef struct {
 class VGSim
 {
 public:
+	
 	VGSim();
+	
 	void init();
 	
 	void loadFiles(Stringlist&);
 	
 	ModuleDecl *findModule(const char*);
+	
 	void addModule(ModuleDecl*);
+	
+	size_t numberOfModules() const
+	{
+		return (_modules.size());
+	}
 	
 	void setBaseDirectory(char *newVal)
 	{
 		_baseDirectory = newVal;
 	}
+	
 	char *baseDirectory()
 	{
 		return (_baseDirectory);
@@ -126,14 +145,26 @@ public:
 		_interactive = newVal;
 	}
 	
+	void printModules(List *show_modules);
+	
+	void displayModuleData();
+	
+	void useDefaultTimescale();
+	
+	const Circuit	&circuit() const
+	{
+		return (_circuit);
+	}
+	
+	Circuit		&circuit()
+	{
+		return (_circuit);
+	}
+	
 	/* Name of top-level module */
 	char		*vg_topModuleName;
 	/* Default name of top-level module */
 	char		*vg_defaultTopModuleName;
-	/* Table of modules */
-	SHash		 vg_modules;
-	/* Instantiated circuit to be simulated */
-	Circuit		 _circuit;
 
 	VGSecurity	 vg_sec;	/* Security options */
 
@@ -146,10 +177,17 @@ public:
 	DelayType vg_delayType;	/* Type of delays to use */
 	VerilogStd vg_std;
 private:
+	/* Table of modules type*/
+	typedef std::map<const char*, ModuleDecl*, StringCompare>
+			 ModulesDict;
+	/* Table of modules */
+	ModulesDict	 _modules;
+	/* Instantiated circuit to be simulated */
+	Circuit		 _circuit;
 	/* Base directory for input files */
-	char	*_baseDirectory;
+	char		*_baseDirectory;
 	/* Non-zero if we are in interactive mode */
-	bool	 _interactive;
+	bool		 _interactive;
 };
 
 void VGSecurity_init(VGSecurity *, int trusted);

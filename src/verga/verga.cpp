@@ -18,6 +18,7 @@
     Last edit by hansen on Fri Feb 13 20:25:04 2009
 ****************************************************************************/
 #include <cstdlib>
+#include <cassert>
 
 #include "verga.hpp"
 
@@ -99,7 +100,6 @@ VGSim::init()
 	this->_interactive = false;
 	this->vg_topModuleName = 0;
 	this->vg_defaultTopModuleName = 0;
-	SHash_init(&this->vg_modules);
 	VGSecurity_init(&this->vg_sec,0);
 	this->vg_timescale.ts_units = 0;
 	this->vg_timescale.ts_precision = 0;
@@ -189,10 +189,13 @@ FILE *openInPath(const char *name)
 void
 VGSim::addModule(ModuleDecl *m)
 {
+	std::pair<ModulesDict::iterator, bool> result;
+	
 	if (!this->vg_defaultTopModuleName && List_numElems(&m->m_ports) == 0)
 		this->vg_defaultTopModuleName = m->name();
 
-	SHash_insert(&this->vg_modules, m->name(), m);
+	result = this->_modules.insert(ModulesDict::value_type(m->name(), m));
+	assert(result.second);
 
 	/* Do post-definition processing of module */
 	if (m->m_specify && Specify_numStats(m->m_specify) > 0)
@@ -228,8 +231,13 @@ VGSim::addModule(ModuleDecl *m)
 ModuleDecl*
 VGSim::findModule(const char *name)
 {
-	return (reinterpret_cast<ModuleDecl*>(SHash_find(&this->vg_modules,
-	    name)));
+	ModuleDecl *result = NULL;
+	ModulesDict::iterator it;
+	
+	if ((it = this->_modules.find(name)) != this->_modules.end())
+		result = it->second;
+	
+	return (result);
 }
 
 /*****************************************************************************
@@ -258,7 +266,8 @@ VGSim::loadFiles(Stringlist &load_files)
  *     show_modules	List of modules to be printed
  *
  *****************************************************************************/
-void VGSim_printModules(VGSim *vg, List *show_modules)
+void
+VGSim::printModules(List *show_modules)
 {
   ListElem *E;
 
@@ -266,17 +275,17 @@ void VGSim_printModules(VGSim *vg, List *show_modules)
     const char *modName = (const char*)ListElem_obj(E);
 
     if (strcmp(modName,"-") == 0) {
-      HashElem *HE;
-      for (HE = Hash_first(&vg->vg_modules);HE;HE = Hash_next(&vg->vg_modules,HE)) {
-	ModuleDecl *m = (ModuleDecl *) HashElem_obj(HE);
+      for (ModulesDict::iterator it = this->_modules.begin();
+	  it != this->_modules.end(); ++it) {
+	ModuleDecl *m = it->second;
 	printf("\n");
-	ModuleDecl_print(m, stdout);
+	m->print( stdout);
       }
     } else {
-      ModuleDecl *m = vg->findModule(modName);
+      ModuleDecl *m = this->findModule(modName);
       if (m) {
 	printf("\n");
-	ModuleDecl_print(m, stdout);
+	m->print(stdout);
       }
     }
   }
@@ -293,15 +302,14 @@ void VGSim_printModules(VGSim *vg, List *show_modules)
  * check the integrety of text modules.
  *
  *****************************************************************************/
-void VGSim_displayModuleData(VGSim *vg)
+void
+VGSim::displayModuleData()
 {
-  HashElem *he;
-
-  for (he = Hash_first(&vg->vg_modules);he;he = Hash_next(&vg->vg_modules,he)) {
-    ModuleDecl *m = (ModuleDecl *) HashElem_obj(he);
-
-    ModuleDecl_printData(m);
-  }
+	for (ModulesDict::iterator it = this->_modules.begin();
+	    it != this->_modules.end(); ++it) {
+		ModuleDecl *m = it->second;
+		m->printData();
+	}
 }
 
 /*****************************************************************************
@@ -312,19 +320,20 @@ void VGSim_displayModuleData(VGSim *vg)
  *     vg		The vgsim object
  *
  *****************************************************************************/
-void VGSim_useDefaultTimescale(VGSim *vg)
+void
+VGSim::useDefaultTimescale()
 {
-  HashElem *he;
-  Timescale ts;
+	Timescale ts;
 
-  ts.ts_units = ts.ts_precision = Directive_parseTimescale(1,"ns");
+	ts.ts_units = ts.ts_precision = Directive_parseTimescale(1,"ns");
 
-  vg->vg_timescale = ts;
+	this->vg_timescale = ts;
 
-  for (he = Hash_first(&vg->vg_modules);he;he = Hash_next(&vg->vg_modules,he)) {
-    ModuleDecl *m = (ModuleDecl *) HashElem_obj(he);
-    m->m_timescale = ts;
-  }
+	for (ModulesDict::iterator it = this->_modules.begin();
+	    it != this->_modules.end(); ++it) {
+		ModuleDecl *m = it->second;
+		m->m_timescale = ts;
+	}
 }
 
 void exitIfError()
@@ -354,9 +363,9 @@ int startSimulation(const char *topName,int warning_mode,List *load_scripts,cons
   /*
    * Build the circuit and sort threads for proper initialization.
    */
-  Circuit_build(&vgsim._circuit,m);
-  Circuit_sortThreads(&vgsim._circuit);
-  Circuit_check(&vgsim._circuit);
+  Circuit_build(&vgsim.circuit(),m);
+  Circuit_sortThreads(&vgsim.circuit());
+  Circuit_check(&vgsim.circuit());
 
   if (vgsim.interactive()) {
     exitIfError();
@@ -432,16 +441,16 @@ int startSimulation(const char *topName,int warning_mode,List *load_scripts,cons
     char *argv[3];
     argv[1] = "1";
     argv[2] = fileName;
-    Circuit_execScript(&vgsim._circuit,argc,argv);
+    Circuit_execScript(&vgsim.circuit(), argc, argv);
   }
 
 
-  /*
-   * Start the actual simulation.
-   */
-  Circuit_run(&vgsim._circuit);
+	/*
+	 * Start the actual simulation.
+	 */
+	Circuit_run(&vgsim.circuit());
 
-  return 0;
+	return (0);
 }
 
 /*****************************************************************************
@@ -606,7 +615,7 @@ main(int argc, char *argv[])
 	 * If no timescale specified, assume a default.
 	 */
 	if (vgsim.vg_timescale.ts_units == 0)
-		VGSim_useDefaultTimescale(&vgsim);
+		vgsim.useDefaultTimescale();
 
 
 	/*
@@ -631,7 +640,7 @@ main(int argc, char *argv[])
 	 * and exit.
 	 */
 	if (scan_mode) {
-		VGSim_displayModuleData(&vgsim);
+		vgsim.displayModuleData();
 		return (EXIT_SUCCESS);
 	}
 
@@ -639,7 +648,7 @@ main(int argc, char *argv[])
 	 * If there are modules to display, display them and exit.
 	 */
 	if (List_numElems(&show_modules) > 0) {
-		VGSim_printModules(&vgsim,&show_modules);
+		vgsim.printModules(&show_modules);
 		return (EXIT_SUCCESS);
 	}
 
@@ -653,8 +662,8 @@ main(int argc, char *argv[])
 	 * Either all modules must have a `timescale or none of them should have
 	 * a `timescale.  Do this check here.
 	 */
-	if (vgsim.vg_haveTScount != 0
-	    && vgsim.vg_haveTScount != Hash_numElems(&vgsim.vg_modules)) {
+	if ((vgsim.vg_haveTScount != 0) &&
+	    (vgsim.vg_haveTScount != vgsim.numberOfModules())) {
 		errorFile(&curPlace,ERR_TIMESCALEAN);
 		exitIfError();
 		return (EXIT_FAILURE);
@@ -674,4 +683,3 @@ main(int argc, char *argv[])
 
 	return (EXIT_SUCCESS);
 }
-

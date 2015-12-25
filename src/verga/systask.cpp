@@ -763,7 +763,7 @@ static void SysTask_display(VGThread *t,Value *r,int numArgs,void **args,TaskCon
 static void SysTask_error(VGThread *t,Value *r,int numArgs,void **args,TaskContext *tc)
 {
   char buf[STRMAX],*p;
-  EvQueue *Q = Circuit_getQueue(&vgsim._circuit);
+  EvQueue *Q = Circuit_getQueue(&vgsim.circuit());
   simtime_t curTime = EvQueue_getCurTime(Q);
 
   p = buf;

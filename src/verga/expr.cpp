@@ -2035,7 +2035,7 @@ Trigger *Expr_getDefaultTrigger(Expr *e,Scope *scope)
 
   PHash_init(&P);
   Expr_getReaders(e, scope, &P);
-  t = Expr_getDefaultTriggerFromSet(&P, &vgsim._circuit);
+  t = Expr_getDefaultTriggerFromSet(&P, &vgsim.circuit());
   PHash_uninit(&P);
 
   return t;
@@ -2087,7 +2087,7 @@ Trigger *Expr_getTrigger(Expr *trigger,Scope *scope, StatDecl *stat)
 	List_addToTail(&negedges, n);
     }
 
-    t = Circuit_getTrigger(&vgsim._circuit,&posedges,&negedges);
+    t = Circuit_getTrigger(&vgsim.circuit(), &posedges, &negedges);
 
     PHash_uninit(&P);
     List_uninit(&posedges);
@@ -2148,7 +2148,7 @@ Trigger *Expr_getTrigger(Expr *trigger,Scope *scope, StatDecl *stat)
     }
   }
 
-  t = Circuit_getTrigger(&vgsim._circuit,&posedges,&negedges);
+  t = Circuit_getTrigger(&vgsim.circuit(), &posedges, &negedges);
 
  abortGen:
   List_uninit(&triggerList);

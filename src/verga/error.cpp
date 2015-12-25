@@ -702,7 +702,7 @@ errorRun(errorcode_t ecode,...)
 	ErrorDescriptor *ed = findError(ecode);
 	char buf[STRMAX],*p;
 	va_list ap;
-	EvQueue *Q = Circuit_getQueue(&vgsim._circuit);
+	EvQueue *Q = Circuit_getQueue(&vgsim.circuit());
 	simtime_t curTime = EvQueue_getCurTime(Q);
 
 	p = buf;

@@ -313,7 +313,7 @@ Circuit_bindPorts(MIInstance *mi, ModuleInst *parent_ctx, ModuleDecl *subM,
 				continue;
 			}
 
-			nd = ModuleDecl_findNet(subM,ne->ne_name);
+			nd = subM->findNet(ne->ne_name);
 			net = ModuleInst_findNet(subM_ctx,ne->ne_name);
 
 			if (!nd || !net) {
@@ -371,7 +371,7 @@ Circuit_bindPorts(MIInstance *mi, ModuleInst *parent_ctx, ModuleDecl *subM,
 
 				const char *portName = (const char*)
 				    ListElem_obj(le2);
-				NetDecl *nd = ModuleDecl_findNet(subM,portName);
+				NetDecl *nd = subM->findNet(portName);
 				Net *n = ModuleInst_findNet(subM_ctx,portName);
 
 				ne = (NameExpr*) ListElem_obj(le);

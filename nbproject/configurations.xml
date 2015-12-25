@@ -73,12 +73,24 @@
           <buildCommandWorkingDir>.</buildCommandWorkingDir>
           <buildCommand>${MAKE} -f Makefile</buildCommand>
           <cleanCommand>${MAKE} -f Makefile clean</cleanCommand>
-          <executablePath></executablePath>
+          <executablePath>src/verga/verga++</executablePath>
           <cTool>
             <incDir>
               <pElem>src/verga</pElem>
             </incDir>
+            <preprocessorList>
+              <Elem>HAVE_CONFIG_H=1</Elem>
+              <Elem>__REGISTER_PREFIX__=</Elem>
+              <Elem>__USER_LABEL_PREFIX__=</Elem>
+            </preprocessorList>
           </cTool>
+          <ccTool>
+            <preprocessorList>
+              <Elem>HAVE_CONFIG_H=1</Elem>
+              <Elem>__REGISTER_PREFIX__=</Elem>
+              <Elem>__USER_LABEL_PREFIX__=</Elem>
+            </preprocessorList>
+          </ccTool>
         </makeTool>
         <preBuild>
           <preBuildCommandWorkingDir>.</preBuildCommandWorkingDir>
@@ -122,11 +134,6 @@
             <pElem>.</pElem>
             <pElem>src/verga</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>HAVE_CONFIG_H=1</Elem>
-            <Elem>__REGISTER_PREFIX__=</Elem>
-            <Elem>__USER_LABEL_PREFIX__=</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="src/verga/channel.cpp" ex="false" tool="1" flavor2="4">
@@ -136,11 +143,6 @@
             <pElem>.</pElem>
             <pElem>src/verga</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>HAVE_CONFIG_H=1</Elem>
-            <Elem>__REGISTER_PREFIX__=</Elem>
-            <Elem>__USER_LABEL_PREFIX__=</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="src/verga/circuit.cpp" ex="false" tool="1" flavor2="4">
@@ -150,11 +152,6 @@
             <pElem>.</pElem>
             <pElem>src/verga</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>HAVE_CONFIG_H=1</Elem>
-            <Elem>__REGISTER_PREFIX__=</Elem>
-            <Elem>__USER_LABEL_PREFIX__=</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="src/verga/commands.cpp" ex="false" tool="1" flavor2="4">
@@ -164,11 +161,6 @@
             <pElem>.</pElem>
             <pElem>src/verga</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>HAVE_CONFIG_H=1</Elem>
-            <Elem>__REGISTER_PREFIX__=</Elem>
-            <Elem>__USER_LABEL_PREFIX__=</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="src/verga/directive.cpp" ex="false" tool="1" flavor2="4">
@@ -178,11 +170,6 @@
             <pElem>.</pElem>
             <pElem>src/verga</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>HAVE_CONFIG_H=1</Elem>
-            <Elem>__REGISTER_PREFIX__=</Elem>
-            <Elem>__USER_LABEL_PREFIX__=</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="src/verga/error.cpp" ex="false" tool="1" flavor2="4">
@@ -192,11 +179,6 @@
             <pElem>.</pElem>
             <pElem>src/verga</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>HAVE_CONFIG_H=1</Elem>
-            <Elem>__REGISTER_PREFIX__=</Elem>
-            <Elem>__USER_LABEL_PREFIX__=</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="src/verga/evqueue.cpp" ex="false" tool="1" flavor2="4">
@@ -206,11 +188,6 @@
             <pElem>.</pElem>
             <pElem>src/verga</pElem>
           </incDir>
-          <preprocessorList>
-            <Elem>HAVE_CONFIG_H=1</Elem>
-            <Elem>__REGISTER_PREFIX__=</Elem>
-            <Elem>__USER_LABEL_PREFIX__=</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
       <item path="src/verga/expr.cpp" ex="false" tool="1" flavor2="4">
@@ -263,6 +240,7 @@
           <incDir>
             <pElem>src/common</pElem>
             <pElem>.</pElem>
+            <pElem>/usr/include/unistd.h</pElem>
             <pElem>src/verga</pElem>
           </incDir>
         </ccTool>
@@ -360,6 +338,7 @@
           <incDir>
             <pElem>src/common</pElem>
             <pElem>.</pElem>
+            <pElem>/usr/lib/gcc/i586-linux-gnu/4.9/include/stdarg.h</pElem>
             <pElem>src/verga</pElem>
           </incDir>
         </ccTool>

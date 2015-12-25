@@ -73,6 +73,9 @@ typedef struct FaninNode_str {
 class ModuleDecl
 {
 public:
+	ModuleDecl(const char *name = NULL);
+	~ModuleDecl();
+	
 	char *name() const
 	{
 		return (_name);
@@ -83,10 +86,29 @@ public:
 		_name = newVal;
 	}
 	
+	void addPort(const char*);
+	
+	void printData();
+	
+	void print(FILE*);
+	
+	ScopeDecl &getScope()
+	{
+		return (_scope);
+	}
+	
+	void defNet(NetDecl*);
+	
+	NetDecl *findNet(const char*);
+	
+	SHash *getNets()
+	{
+		return (&this->_scope.sd_nets);
+	}
+	
 	Place			 m_place;	/* Place of declarations */
 	List/*char**/		 m_ports;	/* Port names */
 	List/*char**/		 m_parmPorts;	/* Parameter ports */
-	ScopeDecl		 m_scope;	/* Variable declaration scope */
 	SHash/*UserTaskDecl*/	 m_tasks;	/* User tasks */
 	List			 m_items;	/* Module "items" */
 	unsigned		 m_errorsDone;	/* We are done doing error reporting */
@@ -94,7 +116,10 @@ public:
 	SHash/*FaninNode*/	*m_faninnodes;	/* Fanin nodes (only used for path-delay modules) */
 	Timescale		 m_timescale;	/* Timescale of this module */
 private:
-	char	*_name;	/* Module name */
+	/* Module name */
+	char		*_name;
+	/* Variable declaration scope */
+	ScopeDecl	 _scope;	
 };
 
 /*****************************************************************************
@@ -162,23 +187,14 @@ Value *Scope_findParm(Scope *scope,const char *name);
 /*****************************************************************************
  * ModuleDecl methods
  *****************************************************************************/
-ModuleDecl *new_ModuleDecl(const char *);
-void delete_ModuleDecl(ModuleDecl*);
-void ModuleDecl_addPort(ModuleDecl*,const char*);
 void ModuleDecl_defineParm(ModuleDecl *m,const char *name,Expr *e,int isPort);
 int ModuleDecl_isParm(ModuleDecl *m,const char *name);
-void ModuleDecl_print(ModuleDecl*,FILE*);
-NetDecl *ModuleDecl_findNet(ModuleDecl *m,const char *name);
-void ModuleDecl_defNet(ModuleDecl *m,NetDecl*n);
-void ModuleDecl_printData(ModuleDecl*);
 #define ModuleDecl_getSpecify(m) (m)->m_specify
 #define ModuleDecl_getPlace(m) (&(m)->m_place)
 void ModuleDecl_startSpecify(ModuleDecl*m);
 int ModuleDecl_numPorts(ModuleDecl *m,nettype_t ptype);
 UserTaskDecl *ModuleDecl_findTask(ModuleDecl *m,const char *name);
 int ModuleDecl_defineTask(ModuleDecl *m,const char *name,UserTaskDecl *utd);
-#define ModuleDecl_getNets(m) (&(m)->m_scope.sd_nets)
-#define ModuleDecl_getScope(m) (&(m)->m_scope)
 int ModuleDecl_makeFaninTree(ModuleDecl *m);
 void ModuleDecl_clearFaninFlags(ModuleDecl *m);
 #define ModuleDecl_findFanin(m,name) ((FaninNode*)SHash_find((m)->m_faninnodes, name))

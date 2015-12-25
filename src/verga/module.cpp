@@ -87,7 +87,7 @@ void Scope_setPeer(Scope *s,Scope *peer)
 
 Net *Scope_findNet(Scope *s,const char *name,unsigned flags)
 {
-  Circuit *c = &vgsim._circuit;		/* Top-level circuit */
+  Circuit *c = &vgsim.circuit();		/* Top-level circuit */
   Net *n = 0;
 
   /*
@@ -133,10 +133,11 @@ Net *Scope_findNet(Scope *s,const char *name,unsigned flags)
 
 void Scope_defNet(Scope *s,const char *name,Net *n)
 {
-  Circuit *c = &vgsim._circuit;		/* Top-level circuit */
+	/* Top-level circuit */
+	Circuit *c = &vgsim.circuit();
 
-  SHash_insert(&s->s_nets,name,n);
-  SHash_insert(&c->c_nets,n->n_name,n);
+	SHash_insert(&s->s_nets,name,n);
+	SHash_insert(&c->c_nets,n->n_name,n);
 }
 
 void Scope_replaceLocalNet(Scope *s,const char *name,Net *n)
@@ -204,51 +205,35 @@ void ScopeDecl_defNet(ScopeDecl *s,NetDecl*n)
 }
 
 /*****************************************************************************
- *
- * Create a new module declaration object
- *
+ * 
  * Parameter:
  *      name		Name of the module
- *
- * Returns:		Newly create module object.
- *
+ * 
  *****************************************************************************/
-ModuleDecl *new_ModuleDecl(const char *name)
+ModuleDecl::ModuleDecl(const char *name) :
+m_errorsDone(0),
+m_specify(NULL),
+m_faninnodes(NULL)
 {
-  ModuleDecl *m = (ModuleDecl*) malloc(sizeof(ModuleDecl));
+	this->_name = name ? strdup(name) : NULL;
+	List_init(&this->m_ports);
+	List_init(&this->m_parmPorts);
+	List_init(&this->m_items);
+	ScopeDecl_init(&this->_scope, NULL);
+	SHash_init(&this->m_tasks);
 
-  m->setName(name ? strdup(name) : NULL);
-  m->m_errorsDone = 0;
-  m->m_specify = 0;
-  List_init(&m->m_ports);
-  List_init(&m->m_parmPorts);
-  List_init(&m->m_items);
-  ScopeDecl_init(&m->m_scope,0);
-  SHash_init(&m->m_tasks);
-  m->m_faninnodes = 0;
-
-  m->m_timescale = currentTimescale;
-
-  return m;
+	this->m_timescale = currentTimescale;
 }
 
-/*****************************************************************************
- *
- * Delete a module declaration object and reclaim all memory.
- *
- * Parameter:
- *      m		Module declaration to be destroyed.
- *
- *****************************************************************************/
-void delete_ModuleDecl(ModuleDecl *m)
+ModuleDecl::~ModuleDecl()
 {
-  free(m->name());
-  List_uninit(&m->m_ports);
-  List_uninit(&m->m_parmPorts);
-  ScopeDecl_uninit(&m->m_scope);
-  SHash_uninit(&m->m_tasks);
-  if (m->m_specify) delete_Specify(m->m_specify);
-  free(m);
+	std::free(this->name());
+	List_uninit(&this->m_ports);
+	List_uninit(&this->m_parmPorts);
+	ScopeDecl_uninit(&this->_scope);
+	SHash_uninit(&this->m_tasks);
+	if (this->m_specify)
+		delete_Specify(this->m_specify);
 }
 
 /*****************************************************************************
@@ -260,9 +245,10 @@ void delete_ModuleDecl(ModuleDecl *m)
  *      name		Name of port to add
  *
  *****************************************************************************/
-void ModuleDecl_addPort(ModuleDecl *m,const char *name)
+void
+ModuleDecl::addPort(const char *name)
 {
-  List_addToTail(&m->m_ports,strdup(name));
+	List_addToTail(&this->m_ports, strndup(name, STRMAX));
 }
 
 /*****************************************************************************
@@ -307,14 +293,15 @@ int ModuleDecl_isParm(ModuleDecl *m,const char *name)
  *     m		Module to display.
  *
  *****************************************************************************/
-void ModuleDecl_printData(ModuleDecl *m)
+void
+ModuleDecl::printData()
 {
   ListElem *le;
 
-  printf("module %s\n", m->name());
-  printf("  line %d\n",m->m_place.p_lineNo);
+  printf("module %s\n", this->name());
+  printf("  line %d\n", this->m_place.p_lineNo);
 
-  for (le = List_first(&m->m_items);le;le = List_next(&m->m_items,le)) {
+  for (le = List_first(&this->m_items);le;le = List_next(&this->m_items,le)) {
     ModuleItem *mi = (ModuleItem*) ListElem_obj(le);
 
     switch (mi->mi_type) {
@@ -322,7 +309,7 @@ void ModuleDecl_printData(ModuleDecl *m)
       {
 	MIParameter *mip = (MIParameter*) mi;
 	ListElem *le2;
-	for (le2 = List_first(&m->m_parmPorts);le2;le2 = List_next(&m->m_parmPorts,le2)) {
+	for (le2 = List_first(&this->m_parmPorts);le2;le2 = List_next(&this->m_parmPorts,le2)) {
 	  char *parmPort = (char*) ListElem_obj(le2);
 	  if (strcmp(parmPort,mip->mip_name) == 0) break;
 	}
@@ -374,7 +361,7 @@ void ModuleDecl_printData(ModuleDecl *m)
     }
   }
 
-	printf("endmodule %s\n", m->name());
+	std::printf("endmodule %s\n", this->name());
 }
 
 /*****************************************************************************
@@ -386,19 +373,20 @@ void ModuleDecl_printData(ModuleDecl *m)
  *      f		File in which to print declaration
  *
  *****************************************************************************/
-void ModuleDecl_print(ModuleDecl *m,FILE *f)
+void
+ModuleDecl::print(FILE *f)
 {
-	fprintf(f, "module %s", m->name());
+	std::fprintf(f, "module %s", this->name());
 
-  /*
-   * Display the parameter ports
-   */
-  if (List_numElems(&m->m_parmPorts) > 0) {
-    ListElem *E;
-    int notFirst = 0;
+	/*
+	 * Display the parameter ports
+	 */
+	if (List_numElems(&this->m_parmPorts) > 0) {
+		ListElem *E;
+		int notFirst = 0;
 
     fprintf(f," #(");
-    for (E = List_first(&m->m_parmPorts);E;E = List_next(&m->m_parmPorts,E)) {
+    for (E = List_first(&this->m_parmPorts);E;E = List_next(&this->m_parmPorts,E)) {
       const char *name = (const char*) ListElem_obj(E);
       if (notFirst) fprintf(f,", ");
       notFirst = 1;
@@ -410,12 +398,12 @@ void ModuleDecl_print(ModuleDecl *m,FILE *f)
   /*
    * Display the ports
    */
-  if (List_numElems(&m->m_ports) > 0) {
+  if (List_numElems(&this->m_ports) > 0) {
     ListElem *E;
     int notFirst = 0;
 
     fprintf(f," (");
-    for (E = List_first(&m->m_ports);E;E = List_next(&m->m_ports,E)) {
+    for (E = List_first(&this->m_ports);E;E = List_next(&this->m_ports,E)) {
       const char *name = (const char*) ListElem_obj(E);
       if (notFirst) fprintf(f,", ");
       notFirst = 1;
@@ -429,10 +417,10 @@ void ModuleDecl_print(ModuleDecl *m,FILE *f)
   /*
    * Display the items.
    */
-  if (List_numElems(&m->m_items) > 0) {
+  if (List_numElems(&this->m_items) > 0) {
     ListElem *E;
 
-    for (E = List_first(&m->m_items);E;E = List_next(&m->m_items,E)) {
+    for (E = List_first(&this->m_items);E;E = List_next(&this->m_items,E)) {
       ModuleItem *mi = (ModuleItem*) ListElem_obj(E);
 
       if (mi->mi_type != IC_NETDECL && mi->mi_type != IC_PARAMETER)
@@ -446,9 +434,10 @@ void ModuleDecl_print(ModuleDecl *m,FILE *f)
   fprintf(f,"endmodule\n");
 }
 
-NetDecl *ModuleDecl_findNet(ModuleDecl *m,const char *name)
+NetDecl*
+ModuleDecl::findNet(const char *name)
 {
-  return ScopeDecl_findNet(&m->m_scope,name,0);
+	return ScopeDecl_findNet(&this->_scope, name, 0);
 }
 
 /*****************************************************************************
@@ -460,10 +449,11 @@ NetDecl *ModuleDecl_findNet(ModuleDecl *m,const char *name)
  *     n		Net declaration object
  *
  *****************************************************************************/
-void ModuleDecl_defNet(ModuleDecl *m,NetDecl*n)
+void
+ModuleDecl::defNet(NetDecl *n)
 {
-  ScopeDecl_defNet(&m->m_scope,n);
-  List_addToTail(&m->m_items, new_MINetDecl(n));
+	ScopeDecl_defNet(&this->_scope, n);
+	List_addToTail(&this->m_items, new_MINetDecl(n));
 }
 
 /*****************************************************************************
@@ -489,7 +479,7 @@ int ModuleDecl_numPorts(ModuleDecl *m,nettype_t ptype)
 
   for (le = List_first(&m->m_ports);le;le = List_next(&m->m_ports,le)) {
     char *name = (char*)ListElem_obj(le);
-    NetDecl *nd = (NetDecl*)ModuleDecl_findNet(m,name);
+    NetDecl *nd = m->findNet(name);
     if (nd && ((NetDecl_getType(nd) & NT_P_IO_MASK) == ptype))
       n++;
   }
