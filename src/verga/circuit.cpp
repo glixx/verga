@@ -1383,11 +1383,11 @@ Channel *Circuit_getChannel(Circuit *c, const char *name)
 
   channel = (Channel*) SHash_find(&c->c_channels,name);
   if (!channel) {
-    channel = new_Channel(name);
+    channel = new Channel(name);
     SHash_insert(&c->c_channels,name,channel);
   }
 
-  return channel;
+  return (channel);
 }
 
 

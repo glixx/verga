@@ -29,17 +29,13 @@
  * Returns:		Newly created channel
  *
  *****************************************************************************/
-Channel *new_Channel(const char *name)
+Channel::Channel(const char *name)
 {
-  Channel *c = (Channel*) malloc(sizeof(Channel));
-
-  c->c_name = strdup(name);
-  List_init(&c->c_queue);
-  List_init(&c->c_wake);
-  c->c_isWatched = 0;
-  c->c_format = 0;
-
-  return c;
+	this->c_name = strndup(name, STRMAX);
+	List_init(&this->c_queue);
+	List_init(&this->c_wake);
+	this->c_isWatched = 0;
+	this->c_format = NULL;
 }
 
 /*****************************************************************************

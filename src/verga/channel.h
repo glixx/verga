@@ -27,15 +27,19 @@
  *
  *****************************************************************************/
 
-struct Channel_str {
-  char			*c_name;	/* Name of channel */
-  List/*Value*/		c_queue;	/* Queue of channel */
-  List/*Event*/		c_wake;		/* Events to be executed on wake up */
-  int			c_isWatched;	/* Flag to indicated if this is a "watched" channel */
-  char			*c_format;	/* Format for watched data */
+class Channel
+{
+public:
+	
+	Channel(const char *name);
+	
+	char		*c_name;	/* Name of channel */
+	List/*Value*/	 c_queue;	/* Queue of channel */
+	List/*Event*/	 c_wake;		/* Events to be executed on wake up */
+	int		 c_isWatched;	/* Flag to indicated if this is a "watched" channel */
+	char		*c_format;	/* Format for watched data */
 };
 
-Channel *new_Channel(const char *name);
 int Channel_queueLen(Channel *c);
 void Channel_wait(Channel *c, VGThread *thread);
 int Channel_read(Channel *c, Value *data);

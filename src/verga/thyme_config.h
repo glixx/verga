@@ -109,7 +109,7 @@ typedef struct Net_str Net;
 /*****************************************************************************
  * advance declarations from channel.h
  *****************************************************************************/
-typedef struct Channel_str Channel;
+class Channel;
 
 /*****************************************************************************
  * advance declarations from directive.h
