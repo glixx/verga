@@ -31,7 +31,6 @@
 void ScopeDecl_init(ScopeDecl *s,ScopeDecl *parent)
 {
   s->sd_parent = parent;
-  SHash_init(&s->sd_nets);
 }
 
 /*****************************************************************************
@@ -44,7 +43,6 @@ void ScopeDecl_init(ScopeDecl *s,ScopeDecl *parent)
  *****************************************************************************/
 void ScopeDecl_uninit(ScopeDecl *s)
 {
-  SHash_uninit(&s->sd_nets);
 }
 
 
@@ -179,15 +177,22 @@ Value *Scope_findParm(Scope *scope,const char *name)
  *      flags		Flags modifying net lookup
  *
  *****************************************************************************/
-NetDecl *ScopeDecl_findNet(ScopeDecl *s,const char *name,unsigned flags)
+NetDecl *ScopeDecl_findNet(ScopeDecl *s, const char *name, unsigned flags)
 {
-  NetDecl *n;
+	NetDeclHash::iterator n;
+	NetDecl *result;
 
-  n = (NetDecl*) SHash_find(&s->sd_nets,name);
-  if (!n && s->sd_parent && !(flags & SDF_LOCAL_ONLY))
-    n = ScopeDecl_findNet(s->sd_parent,name,flags);
+	n = s->sd_nets.find(name);
+	if (n != s->sd_nets.end())
+		result = n->second;
+	else {
+		if (s->sd_parent && !(flags & SDF_LOCAL_ONLY))
+			result = ScopeDecl_findNet(s->sd_parent, name, flags);
+		else
+			result = NULL;
+	}
 
-  return n;
+	return (result);
 }
 
 /*****************************************************************************
@@ -199,9 +204,9 @@ NetDecl *ScopeDecl_findNet(ScopeDecl *s,const char *name,unsigned flags)
  *      n		Net declaration object to add
  *
  *****************************************************************************/
-void ScopeDecl_defNet(ScopeDecl *s,NetDecl*n)
+void ScopeDecl_defNet(ScopeDecl *s, NetDecl *n)
 {
-  SHash_insert(&s->sd_nets,n->n_name,n);
+	s->sd_nets.insert(NetDeclHashElement(n->n_name, n));
 }
 
 /*****************************************************************************

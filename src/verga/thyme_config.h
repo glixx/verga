@@ -97,7 +97,7 @@ class DynamicModule;
 /*****************************************************************************
  * advance declarations from task.h
  *****************************************************************************/
-typedef struct UserTaskDecl_str UserTaskDecl;
+class UserTaskDecl;
 typedef struct UserTask_str UserTask;
 
 /*****************************************************************************

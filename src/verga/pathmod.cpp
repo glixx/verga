@@ -80,41 +80,42 @@ static int Circuit_dpath_computeDelays(Circuit *c,ModuleInst *mi)
  *      outset		Return for output ports
  *
  *****************************************************************************/
-static int Circuit_dpath_checkPorts(Circuit *c,
-						ModuleInst *mi,
-						SHash *inset,
-						SHash *outset)
+static int Circuit_dpath_checkPorts(Circuit *c, ModuleInst *mi, SHash *inset,
+    SHash *outset)
 {
-  ModuleDecl *m = mi->mc_mod;
-  HashElem *he;
+	ModuleDecl *m = mi->mc_mod;
+	NetDeclHash::iterator he;
 
 	/*
 	 * Generate all of the input handlers
 	 */
-	for (he = Hash_first(m->getNets()); he; he = Hash_next(m->getNets(), he)) {
-		NetDecl *netdecl = (NetDecl*)HashElem_obj(he);
+	for (he = m->getNets()->begin(); he != m->getNets()->end();
+	    ++he) {
+		NetDecl *netdecl = he->second;
 		Net *net = ModuleInst_findNet(mi, NetDecl_getName(netdecl));
 
-		if (!net) continue;	/* not an I/O net */
+		if (!net)
+			/* not an I/O net */
+			continue;
 
-    net->n_flags = (NetAttrlags)(net->n_flags | NA_INPATHDMOD);
+		net->n_flags = (NetAttrlags)(net->n_flags | NA_INPATHDMOD);
 
-    switch (NetDecl_getType(netdecl) & NT_P_IO_MASK) {
-    case NT_P_INPUT :
-      SHash_insert(inset, NetDecl_getName(netdecl), net);
-      break;
-    case NT_P_OUTPUT :
-      SHash_insert(outset, NetDecl_getName(netdecl), net);
-      break;
-    case NT_P_INOUT :
-      errorModule(mi->mc_mod,NetDecl_getPlace(netdecl),ERR_PATHDINOUT);
-      return -1;
-    default :
-      break;
-    }
-  }
+		switch (NetDecl_getType(netdecl) & NT_P_IO_MASK) {
+		case NT_P_INPUT :
+			SHash_insert(inset, NetDecl_getName(netdecl), net);
+			break;
+		case NT_P_OUTPUT :
+			SHash_insert(outset, NetDecl_getName(netdecl), net);
+			break;
+		case NT_P_INOUT :
+			errorModule(mi->mc_mod,NetDecl_getPlace(netdecl),ERR_PATHDINOUT);
+			return (-1);
+		default :
+			break;
+		}
+	}
 
-  return 0;
+	return (0);
 }
 
 /*****************************************************************************

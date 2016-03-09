@@ -26,7 +26,10 @@
  * Object representing a task declaration.
  *
  *****************************************************************************/
-struct UserTaskDecl_str {
+class UserTaskDecl
+{
+public:
+	UserTaskDecl(const char*, ModuleDecl*, unsigned, int);
   char			*utd_name;		/* Name of user task */
   unsigned		utd_type;		/* task or function */
   int			utd_isauto;		/* Is this an automatic task/function */
@@ -50,7 +53,6 @@ struct UserTask_str {
   unsigned		ut_nbits;		/* Number of output bits if this is a function */
 };
 
-UserTaskDecl *new_UserTaskDecl(const char *name,ModuleDecl *m,unsigned ttype,int isauto);
 void UserTaskDecl_setStat(UserTaskDecl *utd, StatDecl *sd);
 void UserTaskDecl_addParm(UserTaskDecl *utd,NetDecl *netd);
 #define UserTaskDecl_getName(utd) (utd)->utd_name

@@ -18,7 +18,15 @@
 #ifndef __module_h
 #define __module_h
 
+#include <map>
+#include <string>
+
+#include "mitem.h"
+
 #define SDF_LOCAL_ONLY		0x1	/* Lookup variable only in the local scope */
+
+typedef std::map<std::string, NetDecl*> NetDeclHash;
+typedef std::pair<std::string, NetDecl*> NetDeclHashElement;
 
 /*****************************************************************************
  *
@@ -28,8 +36,13 @@
 class ScopeDecl
 {
 public:
+	ScopeDecl()
+	{
+		sd_parent = NULL;
+	}
 	ScopeDecl	*sd_parent;	/* Parent scope */
-	SHash/*NetDecl*/ sd_nets;	/* Net declarations */
+	//SHash/*NetDecl*/ sd_nets;	/* Net declarations */
+	NetDeclHash sd_nets;
 };
 
 
@@ -101,7 +114,7 @@ public:
 	
 	NetDecl *findNet(const char*);
 	
-	SHash *getNets()
+	NetDeclHash *getNets()
 	{
 		return (&this->_scope.sd_nets);
 	}

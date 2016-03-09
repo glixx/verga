@@ -757,7 +757,7 @@ void Circuit_execWrite(Circuit*c,int argc,char *argv[])
 void Circuit_execQWatch(Circuit*c,int argc,char *argv[])
 {
   Channel *channel;
-  char *format = "%h";
+  const char *format = "%h";
 
   if (argc == 2) {
   } else if (argc == 4) {

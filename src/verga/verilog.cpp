@@ -81,7 +81,7 @@ cur_init(const char *fileName)
 
 	cur.mod = 0;
 	cur.isRedef = 0;
-	cur.scope = 0;
+	cur.scope = NULL;
 	cur.task = 0;
 	cur.range = 0;
 	cur.instType = 0;
@@ -205,7 +205,7 @@ void VerEndModule()
 		vgsim.addModule(cur.mod);
 	cur.mod = 0;
 	cur.isRedef = 0;
-	cur.scope = 0;
+	cur.scope = NULL;
 
 	Place::getCurrent()->endModule();
 }
@@ -811,7 +811,7 @@ VerBeginTask(const char *name, int isauto)
 		return;
 	}
 
-	cur.task = new_UserTaskDecl(name,m,UTT_TASK,isauto);
+	cur.task = new UserTaskDecl(name,m,UTT_TASK,isauto);
 	cur.scope = UserTaskDecl_getScope(cur.task);
 
 	ModuleDecl_defineTask(m,name, cur.task);

@@ -21,26 +21,21 @@
 
 #include "verga.hpp"
 
-UserTaskDecl*
-new_UserTaskDecl(const char *name,ModuleDecl *m,unsigned ttype,int isauto)
+UserTaskDecl::UserTaskDecl(const char *name, ModuleDecl *m, unsigned ttype,
+    int isauto)
 {
-	UserTaskDecl *utd = (UserTaskDecl*) malloc(sizeof(UserTaskDecl));
-
-	utd->utd_type = ttype;
-	utd->utd_name = strdup(name);
-	utd->utd_range = 0;
-	utd->utd_module = m;
-	utd->utd_stat = 0;
-	utd->utd_isauto = isauto;
-	ScopeDecl_init(&utd->utd_scope, &m->getScope());
+	this->utd_type = ttype;
+	this->utd_name = strdup(name);
+	this->utd_range = 0;
+	this->utd_module = m;
+	this->utd_stat = 0;
+	this->utd_isauto = isauto;
+	ScopeDecl_init(&this->utd_scope, &m->getScope());
 	//  List_init(&utd->utd_inputs);
 	//  List_init(&utd->utd_outputs);
 	//  List_init(&utd->utd_inouts);
-	List_init(&utd->utd_parms);
-
-	return (utd);
+	List_init(&this->utd_parms);
 }
-
 
 void UserTaskDecl_addParm(UserTaskDecl *utd,NetDecl *netd)
 {
@@ -85,15 +80,15 @@ void UserTask_generate(UserTask *ut,CodeBlock *cb)
 {
   UserTaskDecl *utd = ut->ut_decl;
   Circuit *c = &vgsim.circuit();
-  SHash *decl_table = &ut->ut_decl->utd_scope.sd_nets;
+  NetDeclHash &decl_table = ut->ut_decl->utd_scope.sd_nets;
   ModuleDecl *m = ut->ut_decl->utd_module;
-  HashElem *he;
+  NetDeclHash::iterator he;
 
   /*
    * Declare nets used in the user task
    */
-  for (he = Hash_first(decl_table);he;he = Hash_next(decl_table,he)) {
-    NetDecl *nd = (NetDecl*) HashElem_obj(he);
+  for (he = decl_table.begin(); he != decl_table.end(); ++he) {
+    NetDecl *nd = he->second;
     Circuit_declareNet(c, &ut->ut_scope, nd, m, &nd->n_place);
   }
 
@@ -250,9 +245,9 @@ void UserTask_generateInlineCall(UserTask *ut,void **sargs,CodeBlock *cb)
 {
   UserTaskDecl *utd = ut->ut_decl;
   Circuit *c = &vgsim.circuit();
-  SHash *decl_table = &ut->ut_decl->utd_scope.sd_nets;
+  NetDeclHash &decl_table = ut->ut_decl->utd_scope.sd_nets;
   ModuleDecl *m = ut->ut_decl->utd_module;
-  HashElem *he;
+  NetDeclHash::iterator he;
   Scope *parent_scope = ut->ut_scope.s_parent;
   Scope *scope;
   char path[STRMAX];
@@ -267,8 +262,8 @@ void UserTask_generateInlineCall(UserTask *ut,void **sargs,CodeBlock *cb)
   /*
    * Declare nets used in the user task
    */
-  for (he = Hash_first(decl_table);he;he = Hash_next(decl_table,he)) {
-    NetDecl *nd = (NetDecl*) HashElem_obj(he);
+  for (he = decl_table.begin(); he != decl_table.end(); ++he) {
+    NetDecl *nd = he->second;
     Circuit_declareNet(c, scope, nd, m, &nd->n_place);
   }
 
