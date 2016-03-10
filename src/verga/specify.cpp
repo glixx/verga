@@ -277,7 +277,7 @@ void Specify_generateTasks(Specify *s,ModuleInst *mi,CodeBlock *codeBlock)
     const char *name = SHashElem_key(he);
     Expr *e = (Expr*)HashElem_obj(he);
     Value *value = (Value *) Expr_parmEval(e, scope, PEF_NONE);
-    Net *n = new_Net(name, NT_PARAMETER, Value_nbits(value)-1,0);
+    Net *n = new Net(name, NT_PARAMETER, Value_nbits(value)-1,0);
     Scope_defNet(scope, name, n);
   }
 

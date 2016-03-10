@@ -247,7 +247,7 @@ void Circuit_declareNet(Circuit *c,Scope *scope,NetDecl *nd,ModuleDecl *m,Place 
   if (has_mem)
     n = new_Net_memory(buf,msb,lsb,beginAddr,endAddr);
   else
-    n = new_Net(buf,nd->n_type,msb,lsb);
+    n = new Net(buf,nd->n_type,msb,lsb);
 
   /*
    * Define it.
@@ -419,7 +419,7 @@ static void Circuit_mergeNets(Circuit *c,Net *eNet,ModuleInst *eCtx,Net *iNet,Mo
 	c->c_nets[iNet->n_name] = eNet;
   Scope_replaceLocalNet(ModuleInst_getScope(iCtx),shortName,eNet);
 
-  delete_Net(iNet);
+	delete iNet;
 }
 
 /*****************************************************************************

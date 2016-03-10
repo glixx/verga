@@ -104,7 +104,7 @@ typedef struct UserTask_str UserTask;
  * advance declarations from net.h
  *****************************************************************************/
 typedef unsigned nettype_t;
-typedef struct Net_str Net;
+class Net;
 
 /*****************************************************************************
  * advance declarations from channel.h

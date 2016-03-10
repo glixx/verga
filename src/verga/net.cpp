@@ -46,13 +46,6 @@ Net *new_Net_memory(const char *name,unsigned msb,unsigned lsb,
   return n;
 }
 
-void delete_Net(Net *n)
-{
-  Value_uninit(Net_getValue(n));
-  free(n->n_name);
-  free(n);
-}
-
 /*****************************************************************************
  *
  * Create a new Net
@@ -64,61 +57,67 @@ void delete_Net(Net *n)
  *     lsb		LSB of net
  *
  *****************************************************************************/
-Net *new_Net(const char *name,nettype_t ntype,unsigned msb,unsigned lsb)
+
+Net::Net(const char* name, nettype_t ntype, unsigned msb, unsigned lsb)
 {
-  Net *n = (Net*) malloc(sizeof(Net));
-  Value *value = Net_getValue(n);
+	Value *value = Net_getValue(this);
 
-  n->n_name = strdup(name);
-  n->n_msb = msb;
-  n->n_lsb = lsb;
-  n->n_nbits = iabs(msb-lsb) + 1;
-  n->n_drivers = 0;
-  n->n_type = ntype;
-  n->n_flags = NA_NONE;
-  n->n_numMonitors = 0;
-  n->n_numDrivers = 0;
-  List_init(&n->n_posedgeNotify);
-  List_init(&n->n_negedgeNotify);
-  Value_init(Net_getValue(n),n->n_nbits);
+	this->n_name = strdup(name);
+	this->n_msb = msb;
+	this->n_lsb = lsb;
+	this->n_nbits = iabs(msb-lsb) + 1;
+	this->n_drivers = 0;
+	this->n_type = ntype;
+	this->n_flags = NA_NONE;
+	this->n_numMonitors = 0;
+	this->n_numDrivers = 0;
+	List_init(&this->n_posedgeNotify);
+	List_init(&this->n_negedgeNotify);
+	Value_init(Net_getValue(this), this->n_nbits);
 
-  if ((n->n_type & NT_P_AND))
-    n->n_wfunc = Value_wand;
-  else if ((n->n_type & NT_P_OR))
-    n->n_wfunc = Value_wor;
-  else if ((n->n_type & NT_P_PULL0))
-    n->n_wfunc = Value_tri0;
-  else if ((n->n_type & NT_P_PULL1))
-    n->n_wfunc = Value_tri1;
-  else
-    n->n_wfunc = Value_wire;
+	if ((this->n_type & NT_P_AND))
+		this->n_wfunc = Value_wand;
+	else if ((this->n_type & NT_P_OR))
+		this->n_wfunc = Value_wor;
+	else if ((this->n_type & NT_P_PULL0))
+		this->n_wfunc = Value_tri0;
+	else if ((this->n_type & NT_P_PULL1))
+		this->n_wfunc = Value_tri1;
+	else
+		this->n_wfunc = Value_wire;
 
-  switch ((n->n_type & NT_P_REGTYPE_MASK)) {
-  case NT_P_REAL :
-    value->flags = SF_REAL;
-    break;
-  case NT_P_INTEGER :
-  case NT_P_TIME :
-    value->flags = SF_INT;
-    break;
-  }
+	switch ((this->n_type & NT_P_REGTYPE_MASK)) {
+	case NT_P_REAL :
+		value->flags = SF_REAL;
+		break;
+	case NT_P_INTEGER :
+	case NT_P_TIME :
+		value->flags = SF_INT;
+		break;
+	}
 
-  if (NT_GET_0STR(ntype) && !NT_GET_1STR(ntype)) {
-    Value_zero(value);
-    if (NT_GET_0STR(ntype) == NT_P_SUPPLY0) n->n_flags = NA_FIXED;
-  } else if (NT_GET_1STR(ntype) && !NT_GET_0STR(ntype)) {
-    Value_one(value);
-    if (NT_GET_1STR(ntype) == NT_P_SUPPLY1) n->n_flags = NA_FIXED;
-  } else if ((ntype & NT_P_WIRE)) {
-    Value_float(value);
-  } else {
-    Value_unknown(value);
-  }
+	if (NT_GET_0STR(ntype) && !NT_GET_1STR(ntype)) {
+		Value_zero(value);
+	if (NT_GET_0STR(ntype) == NT_P_SUPPLY0)
+		this->n_flags = NA_FIXED;
+	} else if (NT_GET_1STR(ntype) && !NT_GET_0STR(ntype)) {
+		Value_one(value);
+		if (NT_GET_1STR(ntype) == NT_P_SUPPLY1) this->n_flags = NA_FIXED;
+	} else if ((ntype & NT_P_WIRE)) {
+		Value_float(value);
+	} else {
+		Value_unknown(value);
+	}
 
-  value->permFlags = (ValueFlags)(SF_NETVAL | value->flags);
-
-  return n;
+	value->permFlags = (ValueFlags)(SF_NETVAL | value->flags);
 }
+
+Net::~Net()
+{
+	Value_uninit(Net_getValue(this));
+	std::free(this->n_name);
+}
+
 
 /*****************************************************************************
  *
