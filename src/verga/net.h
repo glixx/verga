@@ -51,7 +51,8 @@
  * Propery table for generating net/reg types.
  *
  *****************************************************************************/
-typedef enum net_type_prop_en {
+enum NetTypeProp
+{
   NT_NONE = 0,
 #define NT_NONE		NT_NONE	/* Base type is wire */
   NT_P_WIRE = 0x1,
@@ -128,7 +129,7 @@ typedef enum net_type_prop_en {
 #define NT_P_SCALAR		NT_P_SCALAR	/* Net designated as scalar */
   NT_P_VECTORED = 0x80000000
 #define NT_P_VECTORED		NT_P_VECTORED	/* Net designated as vectored */
-} NetTypeProp;
+};
 
 /*****************************************************************************
  *

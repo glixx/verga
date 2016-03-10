@@ -67,11 +67,12 @@
  * Thread states
  *
  *****************************************************************************/
-typedef enum _ThreadState_t {
-  TS_ACTIVE = 0x0, /**< Thread is actively executing */
-  TS_BLOCKED = 0x1, /**< Thread is blocked waiting for event */
-  TS_DISABLED = 0x2, /**< Thread is disabled */
-} ThreadState_t;
+enum ThreadState_t
+{
+	TS_ACTIVE = 0x0, /**< Thread is actively executing */
+	TS_BLOCKED = 0x1, /**< Thread is blocked waiting for event */
+	TS_DISABLED = 0x2 /**< Thread is disabled */
+};
 
 /*****************************************************************************
  *

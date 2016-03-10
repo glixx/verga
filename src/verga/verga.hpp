@@ -72,26 +72,27 @@ enum DelayType {
 	DT_MAX = 2
 };
 
-typedef enum verilog_std_en
+enum VerilogStd
 {
 	VSTD_UNDEFINED = 0,
 	VSTD_1995 = 1995,
 	VSTD_2001 = 2001
-} VerilogStd;
+};
 
 /*****************************************************************************
  *
  * GVSecurity - Security settings.
  *
  *****************************************************************************/
-typedef struct {
-  int		vgs_send;		/* Enable $tkg$send() */
-  int		vgs_fopen;		/* Enable $fopen() */
-  int		vgs_writemem;	/* Enable $writememb() and $writememh() */
-  int		vgs_queue;		/* Enable $tkg$read() and $tkg$write() */
-  int		vgs_exec;		/* 0=disabled, 1=registered, 2=enabled */
-  int		vgs_handling;	/* 0=ignore, 1=warn, 2=stop */
-} VGSecurity;
+struct VGSecurity
+{
+	int vgs_send;		/* Enable $tkg$send() */
+	int vgs_fopen;		/* Enable $fopen() */
+	int vgs_writemem;	/* Enable $writememb() and $writememh() */
+	int vgs_queue;		/* Enable $tkg$read() and $tkg$write() */
+	int vgs_exec;		/* 0=disabled, 1=registered, 2=enabled */
+	int vgs_handling;	/* 0=ignore, 1=warn, 2=stop */
+};
 
 /*****************************************************************************
  *

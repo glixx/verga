@@ -34,7 +34,8 @@
  * itemcode_t - code for module item type
  *
  *****************************************************************************/
-typedef enum {
+enum itemcode_t
+{
   IC_ASSIGN,		/* assign statement */
   IC_ALWAYS,		/* always statement */
   IC_INITIAL,		/* initial statement */
@@ -42,19 +43,20 @@ typedef enum {
   IC_PARAMETER,		/* module parameter */
   IC_REGINIT,		/* register initialization */
   IC_NETDECL,		/* net declaration */
-  IC_GATE,		/* gate instantiation */
-} itemcode_t;
+  IC_GATE		/* gate instantiation */
+};
 
 /*****************************************************************************
  *
  * gateargcode_t - code for primitive gate argument handling
  *
  *****************************************************************************/
-typedef enum {
-  GAC_MULTIN,		/* Multiple inputs */
-  GAC_MULTOUT,		/* Multiple outputs */
-  GAC_FIXED,		/* Fixed number of ports */
-} gateargcode_t;
+enum gateargcode_t
+{
+	GAC_MULTIN,		/* Multiple inputs */
+	GAC_MULTOUT,		/* Multiple outputs */
+	GAC_FIXED		/* Fixed number of ports */
+};
 
 typedef struct GateDesc_str {
   int		gd_code;	/* Code for this gate type */

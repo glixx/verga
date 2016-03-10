@@ -131,12 +131,13 @@ typedef void wirefunc_f(Value *R,Value *A,Value *B);
  * transtype_t - transition type
  *
  *****************************************************************************/
-typedef enum {
-  TT_NONE,		/* No transition */
-  TT_POSEDGE,		/* Rising edge transition */
-  TT_NEGEDGE,		/* Falling edge transition */
-  TT_EDGE,		/* Generic transition */
-} transtype_t;
+enum transtype_t
+{
+	TT_NONE,		/* No transition */
+	TT_POSEDGE,		/* Rising edge transition */
+	TT_NEGEDGE,		/* Falling edge transition */
+	TT_EDGE			/* Generic transition */
+};
 
 /*
          Logic values

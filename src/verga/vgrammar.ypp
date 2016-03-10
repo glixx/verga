@@ -152,7 +152,8 @@
 %type <S> dlit decltail dlits
 %type <I> casekw cmos_gtype mos_gtype inx_gtype outx_gtype bif_gtype tran_gtype trif_gtype
 
-%type <I> net_type reg_type xreg_type port_type capsize netattrs netattr drstrength size0 size1 ptype oautomatic
+%type <U> net_type netattrs netattr
+%type <I> reg_type xreg_type port_type capsize drstrength size0 size1 ptype oautomatic
 %type <E> expr bval lval lvals catexprs delay dexpr odelay econd trigger triggers event catexpr starg
 %type <R> orange range
 %type <L> caseents stats miports miexprs miasgns exprs oexprs otgparms tgparms

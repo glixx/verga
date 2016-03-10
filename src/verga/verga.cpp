@@ -89,9 +89,9 @@ void VGSecurity_handleException(VGSecurity *vgs,VGThread *t,const char *name)
 }
 
 VGSim::VGSim() :
-_baseDirectory(NULL)
+_baseDirectory(NULL),
+_interactive(false)
 {
-	this->_interactive = false;
 	this->vg_topModuleName = 0;
 	this->vg_defaultTopModuleName = 0;
 	VGSecurity_init(&this->vg_sec,0);
@@ -496,7 +496,6 @@ main(int argc, char *argv[])
 	int		 quiet = 0;
 	int		 delete_on_load = 0;
 	unsigned	 delete_hash_code = 0;
-	ListElem	*le;
 	const char	*initTimeSpec = 0;
 
 	initErrorMessages();

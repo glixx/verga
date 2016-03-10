@@ -23,12 +23,14 @@
 
 #if __cplusplus >= 201103
 #include <unordered_map>
-typedef std::unordered_map<const char*, NetDecl*, StringCompare> NetDeclHash;
+#include <string>
+typedef std::unordered_map<std::string, NetDecl*> NetDeclHash;
+typedef std::pair<std::string, NetDecl*> NetDeclHashElement;
 #else
 #include <map>
 typedef std::map<const char*, NetDecl*, StringCompare> NetDeclHash;
-#endif
 typedef std::pair<const char*, NetDecl*> NetDeclHashElement;
+#endif
 
 #define SDF_LOCAL_ONLY	0x1	/* Lookup variable only in the local scope */
 

@@ -46,11 +46,12 @@ typedef enum {
  * Task action code
  *
  *****************************************************************************/
-typedef enum {
-  TA_SETUP,					/* This is the setup call of the task */
-  TA_STROBE,					/* This is a strobed call of the task */
-  TA_REMOVE,					/* This is a remove call of the task */
-} taskact_t;
+enum taskact_t
+{
+	TA_SETUP,					/* This is the setup call of the task */
+	TA_STROBE,					/* This is a strobed call of the task */
+	TA_REMOVE					/* This is a remove call of the task */
+};
 
 
 /*****************************************************************************
@@ -58,12 +59,13 @@ typedef enum {
  * System task flags
  *
  *****************************************************************************/
-typedef enum {
-  STF_NONE = 0,
-  STF_NEEDCTX = 0x1,
-  STF_NEEDNETS = 0x2,
-  STF_SPECIFY = 0x4,
-} taskflag_t;
+enum taskflag_t
+{
+	STF_NONE = 0,
+	STF_NEEDCTX = 0x1,
+	STF_NEEDNETS = 0x2,
+	STF_SPECIFY = 0x4
+};
 
 /*****************************************************************************
  *

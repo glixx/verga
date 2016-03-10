@@ -29,30 +29,33 @@
 /*****************************************************************************
  * evtype_t - Event type code
  *****************************************************************************/
-typedef enum {
-  EV_UNKNOWN = 0,	/* An unknown event type */
-  EV_THREAD = 1,	/* A thread becomes ready for execution */
-  EV_NET = 2,		/* A net value change */
-  EV_CONTROL = 3,	/* A control event occured */
-  EV_DRIVER = 4,	/* A wire driver change event occured */
-  EV_STROBE = 5,	/* A strobe display */
-  EV_PROBE = 6,		/* A probe display */
-  EV_MEM = 7,		/* A memory assignment */
-} evtype_t;
+enum evtype_t
+{
+	EV_UNKNOWN = 0,	/* An unknown event type */
+	EV_THREAD = 1,	/* A thread becomes ready for execution */
+	EV_NET = 2,	/* A net value change */
+	EV_CONTROL = 3,	/* A control event occured */
+	EV_DRIVER = 4,	/* A wire driver change event occured */
+	EV_STROBE = 5,	/* A strobe display */
+	EV_PROBE = 6,	/* A probe display */
+	EV_MEM = 7	/* A memory assignment */
+};
 
 /*****************************************************************************
  * evstatus_t - Event status
  *****************************************************************************/
-typedef enum {
-  ES_MACTIVE = 1,		/* Active event allocated by malloc() */
-  ES_FACTIVE = 2,		/* Active event allocated from freelist */
-  ES_FREELIST = 3,		/* Event is on free list */
-} evstatus_t;
+enum evstatus_t
+{
+	ES_MACTIVE = 1,		/* Active event allocated by malloc() */
+	ES_FACTIVE = 2,		/* Active event allocated from freelist */
+	ES_FREELIST = 3		/* Event is on free list */
+};
 
 /*****************************************************************************
  *   Event queue flags
  *****************************************************************************/
-typedef enum {
+enum eqflag_t
+{
   EVF_NONE =		0x0,
   EVF_RUN =		0x1,	/* Event queue is free running */
   EVF_POSCLOCK =	0x2,	/* Wait for a clock posedge transition */
@@ -60,16 +63,17 @@ typedef enum {
   EVF_HASCLOCK =	0x8,	/* The circuit contains at least one clock */
   EVF_LIMIT =		0x10,	/* Limit simulation time until pause */
   EVF_NOCMD =		0x20,	/* Do not process commands */
-  EVF_CLKWATCH =	0x40,	/* Check for clock signals */
-} eqflag_t;
+  EVF_CLKWATCH =	0x40	/* Check for clock signals */
+};
 
-typedef enum {
+enum ckwatchcmd_t
+{
   WC_NONE =		0,	/* No clock checking */
   WC_ANYPOS = 		1,	/* Any clock posedge */
   WC_ANYNEG = 		2,	/* Any clock negedge */
   WC_ACTIVEPOS =	3,	/* Active clock posedge */
-  WC_ACTIVENEG =	4,	/* Active clock negedge */
-} ckwatchcmd_t;
+  WC_ACTIVENEG =	4	/* Active clock negedge */
+};
 
 /*****************************************************************************
  *

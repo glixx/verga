@@ -25,7 +25,8 @@
  * Table of expression codes.
  *
  *****************************************************************************/
-typedef enum {
+enum exprcode_t
+{
   E_NOT		= 0,
   E_UINV	= 1,
   E_UNEG	= 2,
@@ -77,39 +78,42 @@ typedef enum {
   E_NUMBER	= 1002,
   E_EVENTOR	= 1005,
   E_TASK	= 1006,
-  E_REAL	= 1007,
-} exprcode_t;
+  E_REAL	= 1007
+};
 
 /*****************************************************************************
  *
  * Operator output bit size.
  *
  *****************************************************************************/
-typedef enum {
-  OS_NONE,		/* Output size is not applicable */
-  OS_ONE,		/* Output is always 1-bit */
-  OS_MAX,		/* Output is size of largest operand */
-  OS_SUM,		/* Output size is sum of operands */
-  OS_SPECIAL,		/* Special handling for output size */
-} outsize_t;
+enum outsize_t
+{
+	OS_NONE,	/* Output size is not applicable */
+	OS_ONE,		/* Output is always 1-bit */
+	OS_MAX,		/* Output is size of largest operand */
+	OS_SUM,		/* Output size is sum of operands */
+	OS_SPECIAL	/* Special handling for output size */
+};
 
 /*****************************************************************************
  *
  * Range styles
  *
  *****************************************************************************/
-typedef enum {
-  RS_SINGLE,		/* This is the [expr] form */
-  RS_MAXMIN,		/* This is the [max:min] form */
-  RS_BASEUP,		/* This is the [base+:width] form */
-  RS_BASEDN,		/* This is the [base-:width] form */
-  RS_AUTO,		/* This is the [*] form */
-} rangestyle_t;
+enum rangestyle_t
+{
+	RS_SINGLE,		/* This is the [expr] form */
+	RS_MAXMIN,		/* This is the [max:min] form */
+	RS_BASEUP,		/* This is the [base+:width] form */
+	RS_BASEDN,		/* This is the [base-:width] form */
+	RS_AUTO		/* This is the [*] form */
+};
 
-typedef enum {
-  PEF_NONE = 0x0,	/* Normal processing */
-  PEF_SPECPARM = 0x1,	/* Lookup specify parameters */
-} parmevflags_t;
+enum parmevflags_t
+{
+	PEF_NONE = 0x0,		/* Normal processing */
+	PEF_SPECPARM = 0x1	/* Lookup specify parameters */
+};
 
 /*****************************************************************************
  *

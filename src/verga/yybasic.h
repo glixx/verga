@@ -33,6 +33,7 @@ struct lex_keywordentry {
 
 typedef union {
   int I;			/* Used for integers */
+  unsigned U;			/* Used for unsigned integers */
   float F;			/* Used for floats */
   char *S;			/* Used for strings */
   void *P;			/* Generic pointer */

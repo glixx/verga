@@ -690,7 +690,7 @@ void VerSpecify(Expr *cond,spectype_t ptype,Expr *lhs,Expr *rhs,Expr *value)
   ModuleDecl_makeSpecify(cur.mod);
   s = ModuleDecl_getSpecify(cur.mod);
 
-  Specify_addStat(ModuleDecl_getSpecify(cur.mod), specstat);
+  Specify_addStat(s, specstat);
 }
 
 /*****************************************************************************
