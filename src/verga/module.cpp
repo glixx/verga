@@ -151,7 +151,7 @@ void Scope_defNet(Scope *s,const char *name,Net *n)
 	Circuit *c = &vgsim.circuit();
 
 	SHash_insert(&s->s_nets,name,n);
-	SHash_insert(&c->c_nets,n->n_name,n);
+	c->c_nets.insert(NetHashElement(n->n_name, n));
 }
 
 void Scope_replaceLocalNet(Scope *s,const char *name,Net *n)

@@ -90,7 +90,8 @@ void VGSecurity_handleException(VGSecurity *vgs,VGThread *t,const char *name)
 
 VGSim::VGSim() :
 _baseDirectory(NULL),
-_interactive(false)
+_interactive(false),
+_std(VSTD_1995)
 {
 	this->vg_topModuleName = 0;
 	this->vg_defaultTopModuleName = 0;
@@ -101,15 +102,14 @@ _interactive(false)
 	this->vg_noTimeViolations = 0;
 	this->vg_initTime = 0;
 	this->vg_delayType = DT_TYP;
-	this->vg_std = VSTD_1995;
 }
 
 static void usage()
 {
-  errorCmd(ERR_USAGE);
-  if (errCount) {
-    waitForExit();
-  }
+	errorCmd(ERR_USAGE);
+	if (errCount) {
+		waitForExit();
+	}
 }
 
 /*****************************************************************************
@@ -528,9 +528,9 @@ main(int argc, char *argv[])
 				break;
 			case 'V' :
 				if (strncmp(optarg, "v1995", strlen("v1995")) == 0)
-					vgsim.vg_std = VSTD_1995;
+					vgsim.setStd(VSTD_1995);
 				else if (strncmp(optarg, "v2001", strlen("v2001")) == 0)
-					vgsim.vg_std = VSTD_2001;
+					vgsim.setStd(VSTD_2001);
 				break;
 			case 'W' :
 				sscanf(optarg,"%d",&warning_mode);

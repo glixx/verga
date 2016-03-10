@@ -29,9 +29,7 @@ static void Circuit_buildHier(Circuit *c,ModuleInst *mi,ModuleInst *parent,char 
 
 Circuit::Circuit()
 {
-	SHash_init(&this->c_nets);
 	NHash_init(&this->c_triggers);
-	SHash_init(&this->c_channels);
 	SHash_init(&this->c_moduleInsts);
 	SHash_init(&this->c_dynamicModules);
 	this->c_evQueue = new_EvQueue(this);
@@ -418,7 +416,7 @@ static void Circuit_mergeNets(Circuit *c,Net *eNet,ModuleInst *eCtx,Net *iNet,Mo
   else
     shortName = iNet->n_name;
 
-  SHash_replace(&c->c_nets,iNet->n_name,eNet);
+	c->c_nets[iNet->n_name] = eNet;
   Scope_replaceLocalNet(ModuleInst_getScope(iCtx),shortName,eNet);
 
   delete_Net(iNet);
@@ -998,54 +996,52 @@ void Circuit_installScript(Circuit *c,ModuleDecl *m,DynamicModule *dm)
  *****************************************************************************/
  void Circuit_check(Circuit *c)
 {
-  HashElem *he;
-  SHash reported;
+	NetHash::iterator he;
+	SHash reported;
 
-  SHash_init(&reported);
+	SHash_init(&reported);
 
-  for (he = Hash_first(&c->c_nets);he;he = Hash_next(&c->c_nets, he)) {
-    Net *n = (Net*) HashElem_obj(he);
+	for (he = c->c_nets.begin(); he != c->c_nets.end(); ++he) {
+		Net *n = he->second;
 
-    //
-    // Ignore entries that are parameters, or not the primary name for a net.
-    //
-    if ((Net_getType(n) & NT_P_PARAMETER)) continue;
-    if (strcmp(SHashElem_key(he), n->n_name) != 0) continue;
+		// Ignore entries that are parameters, or not the primary name for a net.
+		if ((Net_getType(n) & NT_P_PARAMETER))
+			continue;
+		if (strcmp(he->first.c_str(), n->n_name) != 0)
+			continue;
 
+		// Check for floaters only on nets
+		if ((Net_getType(n) & NT_P_WIRE)) {
+			if ((n->n_flags & NA_INPATHDMOD))
+				continue;
 
-    //
-    // Check for floaters only on nets
-    //
-    if ((Net_getType(n) & NT_P_WIRE)) {
-      if ( (n->n_flags & NA_INPATHDMOD) ) continue;
+			if (n->n_numDrivers == 0) {
+				char instname[STRMAX];
+				ModuleInst *m;
+				char *localName;
 
+				strcpy(instname,n->n_name);
+				localName = strrchr(instname,'.');
+				if (localName)
+					*localName++ = 0;
 
-      if (n->n_numDrivers == 0) {
-	char instname[STRMAX];
-	ModuleInst *m;
-	char *localName;
+				m = Circuit_findModuleInst(c,instname);
 
-	strcpy(instname,n->n_name);
-	localName = strrchr(instname,'.');
-	if (localName) *localName++ = 0;
+				if (m) {
+					char buf[STRMAX];
 
-	m = Circuit_findModuleInst(c,instname);
-
-	if (m) {
-	  char buf[STRMAX];
-
-	  sprintf(buf,"%s.%s", m->mc_mod->name(), localName);
-	  if (!SHash_find(&reported,buf)) {
-	    m->mc_mod->m_errorsDone = 0;
-	    errorNet(m->mc_mod,n->n_name,&m->mc_mod->m_place,WRN_FLOATNET,localName);
-	    SHash_insert(&reported,buf,n);
-	  }
+					sprintf(buf,"%s.%s", m->mc_mod->name(), localName);
+					if (!SHash_find(&reported,buf)) {
+						m->mc_mod->m_errorsDone = 0;
+						errorNet(m->mc_mod,n->n_name,&m->mc_mod->m_place,WRN_FLOATNET,localName);
+						SHash_insert(&reported,buf,n);
+					}
+				}
+			}
+		}
 	}
-      }
-    }
-  }
 
-  SHash_uninit(&reported);
+	SHash_uninit(&reported);
 }
 
 /*****************************************************************************
@@ -1158,7 +1154,11 @@ ModuleInst *Circuit_findModuleInst(Circuit *c, const char *name)
  *****************************************************************************/
 Net *Circuit_findNet(Circuit *c,const char *name)
 {
-  return (Net*) SHash_find(&c->c_nets,name);
+	NetHash::iterator it = c->c_nets.find(name);
+	if (it != c->c_nets.end())
+		return (it->second);
+	else
+		return (NULL);
 }
 
 /*****************************************************************************
@@ -1345,13 +1345,13 @@ int Circuit_writeMemory(Circuit *c, const char *fileName, Net *net, unsigned sta
      */
     Memory_dump(m,f,flags,start,stop);
   } else {
-    HashElem *he;
+    NetHash::iterator he;
 
     /*
      * Dump all memories.
      */
-    for (he = Hash_first(&c->c_nets);he;he = Hash_next(&c->c_nets,he)) {
-      Net *n = (Net*)HashElem_obj(he);
+    for (he = c->c_nets.begin(); he != c->c_nets.end(); ++he) {
+      Net *n = he->second;
 
       m = Net_getMemory(n);
 
@@ -1363,7 +1363,7 @@ int Circuit_writeMemory(Circuit *c, const char *fileName, Net *net, unsigned sta
   }
 
   fclose(f);
-  return 0;
+  return (0);
 }
 
 
@@ -1378,15 +1378,18 @@ int Circuit_writeMemory(Circuit *c, const char *fileName, Net *net, unsigned sta
  *****************************************************************************/
 Channel *Circuit_getChannel(Circuit *c, const char *name)
 {
-  Channel *channel;
+	Channel *channel;
+	ChannelHash::iterator it;
 
-  channel = (Channel*) SHash_find(&c->c_channels,name);
-  if (!channel) {
-    channel = new Channel(name);
-    SHash_insert(&c->c_channels,name,channel);
-  }
+	it = c->c_channels.find(name);
+	if (it != c->c_channels.end()) 
+		channel = it->second;
+	else {
+		channel = new Channel(name);
+		c->c_channels.insert(ChannelHashElement(name, channel));
+	}
 
-  return (channel);
+	return (channel);
 }
 
 

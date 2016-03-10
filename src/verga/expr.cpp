@@ -661,30 +661,29 @@ void Expr_print(Expr*e,FILE *f)
 }
 
 /*****************************************************************************
- *
- * Return a range
- *
  * Parameters:
  *     msb		Most significant bit expression.
  *     lsb		Least significant bit expression.
  *
  *****************************************************************************/
-VRange *new_VRange(rangestyle_t rs,Expr *left,Expr *right)
+VRange::VRange(rangestyle_t rs, Expr *msb, Expr *lsb)
 {
-  VRange *r = (VRange*) malloc(sizeof(VRange));
+	this->vr_style = rs;
+	this->vr_left = msb;
+	this->vr_right = lsb;
+}
 
-  r->vr_style = rs;
-  r->vr_left = left;
-  r->vr_right = right;
-
-  return r;
+VRange::~VRange()
+{
 }
 
 void delete_VRange(VRange *r, int recursive)
 {
   if (recursive) {
-    if (r->vr_left) delete_Expr(r->vr_left);
-    if (r->vr_right) delete_Expr(r->vr_right);
+    if (r->vr_left)
+	    delete_Expr(r->vr_left);
+    if (r->vr_right)
+	    delete_Expr(r->vr_right);
   }
   free(r);
 }
@@ -1123,8 +1122,10 @@ static int Expr_vectorGetSize(Expr *e, Scope *scope)
     size = Net_nbits(n);
 
 
-  if (addr) delete_VRange(addr, 0);
-  if (bits) delete_VRange(bits, 0);
+  if (addr)
+	  delete addr;
+  if (bits)
+	  delete bits;
 
   return size;
 }
@@ -1171,10 +1172,12 @@ static Value *Expr_vectorGenerate(Expr *e, int nbits, Scope *scope, CodeBlock *c
 
   BCCopyRange_init(CodeBlock_nextEmpty(cb),ret_value,0,src_value,nLsb,width);
 
-  if (bits) delete_VRange(bits, 0);
-  if (addr) delete_VRange(addr, 0);
+  if (bits)
+	  delete bits;
+  if (addr)
+	  delete addr;
 
-  return ret_value;
+  return (ret_value);
 }
 
 
@@ -2323,7 +2326,7 @@ int Expr_decodeVector(Expr *e,Scope *scope,Net **n,VRange **addr,VRange **bits)
 	  return -1;
 	}
 
-	*addr = new_VRange(RS_SINGLE,e->e.opr[1],0);
+	*addr = new VRange(RS_SINGLE,e->e.opr[1],0);
 	break;
       }
     }
@@ -2335,15 +2338,15 @@ int Expr_decodeVector(Expr *e,Scope *scope,Net **n,VRange **addr,VRange **bits)
       switch (Expr_type(e)) {
       case E_VECTORP :
 	if (!e->e.opr[2])
-	  *bits = new_VRange(RS_SINGLE,e->e.opr[1],0);
+	  *bits = new VRange(RS_SINGLE,e->e.opr[1],0);
 	else
-	  *bits = new_VRange(RS_BASEUP,e->e.opr[1],e->e.opr[2]);
+	  *bits = new VRange(RS_BASEUP,e->e.opr[1],e->e.opr[2]);
 	break;
       case E_VECTORN :
-	*bits = new_VRange(RS_BASEDN,e->e.opr[1],e->e.opr[2]);
+	*bits = new VRange(RS_BASEDN,e->e.opr[1],e->e.opr[2]);
 	break;
       case E_RANGE :
-	*bits = new_VRange(RS_MAXMIN,e->e.opr[1],e->e.opr[2]);
+	*bits = new VRange(RS_MAXMIN,e->e.opr[1],e->e.opr[2]);
 	break;
       default :
 	*bits = 0;
@@ -2407,9 +2410,11 @@ int Expr_lhsGenerate(Expr *e,Scope *scope, CodeBlock *cb,Net **n,Value **nLsb,un
   } else
     *nLsb = 0;
 
-  if (bits) delete_VRange(bits, 0);
-  if (addr) delete_VRange(addr, 0);
+	if (bits)
+		delete bits;
+	if (addr)
+		delete addr;
 
-  return 0;
+	return (0);
 }
 

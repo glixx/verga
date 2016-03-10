@@ -21,6 +21,20 @@
 #define __circuit_h
 
 #include "module.h"
+#include "channel.h"
+
+#include <string>
+
+#if __cplusplus >= 201103
+#include <unordered_map>
+typedef std::unordered_map<std::string, Net*> NetDeclHash;
+#else
+#include <map>
+typedef std::map<std::string, Net*> NetHash;
+typedef std::map<const char*, Channel*, StringCompare> ChannelHash;
+#endif
+typedef std::pair<std::string, Net*> NetHashElement;
+typedef std::pair<const char*, Channel*> ChannelHashElement;
 
 /*****************************************************************************
  *
@@ -35,9 +49,9 @@ public:
 	
 	void build(ModuleDecl*);
 	
-	SHash/*Net*/		 c_nets;		/* Global table of nets */
+	NetHash		 c_nets;	/* Global table of nets */
 	NHash/*Trigger*/	 c_triggers;		/* Triggers in this circuit */
-	SHash/*Channel*/	 c_channels;		/* Communication channels */
+	ChannelHash	 c_channels;		/* Communication channels */
 	SHash/*ModuleInst*/	 c_moduleInsts;		/* Module instances */
 	ModuleInst		*c_root;		/* Root module instance */
 	EvQueue			*c_evQueue;		/* Global event queue */

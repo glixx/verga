@@ -174,9 +174,6 @@ int VerilogLoad(const char *name)
 
 void VerNewModule(const char *name)
 {
-#if DEBUG
-	printf("%s(%s)\n",__PRETTY_FUNCTION__, name);
-#endif
 	Place *p = Place::getCurrent();
 
 	cur.isRedef = 0;
@@ -189,18 +186,14 @@ void VerNewModule(const char *name)
 	cur.mod = new ModuleDecl(name);
 	cur.scope = &cur.mod->getScope();
 	Place_startModule(p, name);
-	Place_copy(&cur.mod->m_place,p);
+	Place_copy(&cur.mod->m_place, p);
 
-	if (strcmp(p->p_moduleName, name) != 0)
-		errorModule(cur.mod, p,ERR_WRONGMOD, name, p->p_moduleName);
+	if (strncmp(p->p_moduleName, name, STRMAX) != 0)
+		errorModule(cur.mod, p, ERR_WRONGMOD, name, p->p_moduleName);
 }
 
 void VerEndModule()
 {
-#if DEBUG
-	std::puts (__PRETTY_FUNCTION__);
-#endif
-
 	if (!cur.isRedef)
 		vgsim.addModule(cur.mod);
 	cur.mod = 0;
@@ -245,19 +238,21 @@ void VerBeginDecls(int dtype,VRange *range)
   switch ((dtype & NT_P_REGTYPE_MASK)) {
   case NT_P_INTEGER :
     dtype |= NT_P_SIGNED;
-    range = new_VRange(RS_MAXMIN,new_Expr_num(SSWORDSIZE-1),new_Expr_num(0));
+    range = new VRange(RS_MAXMIN,new_Expr_num(SSWORDSIZE-1),new_Expr_num(0));
     break;
   case NT_P_TIME :
-    range = new_VRange(RS_MAXMIN,new_Expr_num(63),new_Expr_num(0));
+    range = new VRange(RS_MAXMIN,new_Expr_num(63),new_Expr_num(0));
     break;
   case NT_P_EVENT :
-    range = new_VRange(RS_MAXMIN,new_Expr_num(0),new_Expr_num(0));
+    range = new VRange(RS_MAXMIN,new_Expr_num(0),new_Expr_num(0));
     break;
   default :
     break;
   }
 
-  if (!range) range = new_VRange(RS_MAXMIN,new_Expr_num(SSWORDSIZE-1),new_Expr_num(0));
+  if (!range)
+	  range = new VRange(RS_MAXMIN, new_Expr_num(SSWORDSIZE-1),
+	      new_Expr_num(0));
 
   cur.dtype = dtype;
   cur.range = range;
@@ -430,7 +425,7 @@ void VerAutoAssign(int dtype,const char *lval,Expr *rval)
  *****************************************************************************/
 VRange *VerRange(rangestyle_t rs, Expr *left,Expr *right)
 {
-  return new_VRange(rs, left, right);
+	return (new VRange(rs, left, right));
 }
 
 /*****************************************************************************

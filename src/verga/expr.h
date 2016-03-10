@@ -27,58 +27,58 @@
  *****************************************************************************/
 enum exprcode_t
 {
-  E_NOT		= 0,
-  E_UINV	= 1,
-  E_UNEG	= 2,
-  E_POSEDGE	= 3,
-  E_NEGEDGE	= 4,
-  E_MUL		= 5,
-  E_DIV		= 6,
-  E_MOD		= 7,
-  E_ADD		= 8,
-  E_SUB		= 9,
-  E_RSHIFT	= 10,
-  E_LSHIFT	= 11,
-  E_ARSHIFT	= 12,
-  E_ALSHIFT	= 13,
-  E_GT		= 14,
-  E_LT		= 15,
-  E_GE		= 16,
-  E_LE		= 17,
-  E_EQ		= 18,
-  E_NE		= 19,
-  E_BAND	= 20,
-  E_BNAND	= 21,
-  E_BXOR	= 22,
-  E_BNXOR	= 23,
-  E_BOR		= 24,
-  E_BNOR	= 25,
-  E_AND		= 26,
-  E_OR		= 27,
-  E_QUEST	= 28,
-  E_AT		= 29,
-  E_DELAY	= 30,
-  E_CONCAT	= 31,
-  E_REPCAT	= 32,
-  E_EQZ		= 33,
-  E_NEZ		= 34,
-  E_VECTORP	= 35,
-  E_VECTORN	= 36,
-  E_RANGE	= 37,
-  E_UAND	= 38,
-  E_UOR		= 39,
-  E_UXOR	= 40,
-  E_UNAND	= 41,
-  E_UNOR	= 42,
-  E_UNXOR	= 43,
-  E_COND	= 44,
+	E_NOT		= 0,
+	E_UINV		= 1,
+	E_UNEG		= 2,
+	E_POSEDGE	= 3,
+	E_NEGEDGE	= 4,
+	E_MUL		= 5,
+	E_DIV		= 6,
+	E_MOD		= 7,
+	E_ADD		= 8,
+	E_SUB		= 9,
+	E_RSHIFT	= 10,
+	E_LSHIFT	= 11,
+	E_ARSHIFT	= 12,
+	E_ALSHIFT	= 13,
+	E_GT		= 14,
+	E_LT		= 15,
+	E_GE		= 16,
+	E_LE		= 17,
+	E_EQ		= 18,
+	E_NE		= 19,
+	E_BAND		= 20,
+	E_BNAND		= 21,
+	E_BXOR		= 22,
+	E_BNXOR		= 23,
+	E_BOR		= 24,
+	E_BNOR		= 25,
+	E_AND		= 26,
+	E_OR		= 27,
+	E_QUEST		= 28,
+	E_AT		= 29,
+	E_DELAY		= 30,
+	E_CONCAT	= 31,
+	E_REPCAT	= 32,
+	E_EQZ		= 33,
+	E_NEZ		= 34,
+	E_VECTORP	= 35,
+	E_VECTORN	= 36,
+	E_RANGE		= 37,
+	E_UAND		= 38,
+	E_UOR		= 39,
+	E_UXOR		= 40,
+	E_UNAND		= 41,
+	E_UNOR		= 42,
+	E_UNXOR		= 43,
+	E_COND		= 44,
 
-  E_LITERAL	= 1000,
-  E_HEX		= 1001,
-  E_NUMBER	= 1002,
-  E_EVENTOR	= 1005,
-  E_TASK	= 1006,
-  E_REAL	= 1007
+	E_LITERAL	= 1000,
+	E_HEX		= 1001,
+	E_NUMBER	= 1002,
+	E_EVENTOR	= 1005,
+	E_TASK		= 1006,
+	E_REAL		= 1007
 };
 
 /*****************************************************************************
@@ -106,7 +106,7 @@ enum rangestyle_t
 	RS_MAXMIN,		/* This is the [max:min] form */
 	RS_BASEUP,		/* This is the [base+:width] form */
 	RS_BASEDN,		/* This is the [base-:width] form */
-	RS_AUTO		/* This is the [*] form */
+	RS_AUTO			/* This is the [*] form */
 };
 
 enum parmevflags_t
@@ -145,17 +145,19 @@ struct Expr_str {
  * NameExpr - Name/Expr pair
  *
  *****************************************************************************/
-typedef struct {
-  char		*ne_name;	/* Name */
-  Expr		*ne_expr;	/* Expression */
-} NameExpr;
+struct NameExpr
+{
+	char	*ne_name;	/* Name */
+	Expr	*ne_expr;	/* Expression */
+};
 
 /*****************************************************************************
  *
  * OpDesc - Operator description
  *
  *****************************************************************************/
-typedef struct {
+struct OpDesc
+{
   exprcode_t	od_type;	/* Type code for operand */
   int		od_plev;	/* Precidence level */
   int 		od_nopr;	/* Number of operands */
@@ -164,7 +166,7 @@ typedef struct {
   valueop_f	*od_opfunc;	/* Function implementing operator */
   valueop_f	*od_w_opfunc;	/* Function implementing operator when operands <32 bits */
   valueop_f	*od_f_opfunc;	/* Function implementing floating point operands */
-} OpDesc;
+};
 
 
 /*****************************************************************************
@@ -172,10 +174,15 @@ typedef struct {
  * VRange - Range declaration (may contain uninstantiated parameters)
  *
  *****************************************************************************/
-typedef struct {
-  rangestyle_t	vr_style;	/* Range style */
-  Expr	*vr_left,*vr_right;	/* Left and right portions of range */
-} VRange;
+class VRange
+{
+public:
+	VRange(rangestyle_t, Expr*, Expr*);
+	~VRange();
+	
+	rangestyle_t	vr_style;	/* Range style */
+	Expr	*vr_left, *vr_right;	/* Left and right portions of range */
+};
 
 /*****************************************************************************
  * Expr methods
@@ -221,7 +228,6 @@ int Expr_decodeVector(Expr *e,Scope *scope,Net **n,VRange **addr,VRange **bits);
 /*****************************************************************************
  * VRange methods
  *****************************************************************************/
-VRange *new_VRange(rangestyle_t ,Expr *msb,Expr *lsb);
 void delete_VRange(VRange *r, int recursive);
 void VRange_print(VRange *r,FILE *f);
 int VRange_parmEvalMsb(VRange *r,Scope *scope,unsigned *msb);
@@ -234,7 +240,7 @@ int VRange_getDirect(VRange *r,char *buf);
 /*****************************************************************************
  * NameExpr methods
  *****************************************************************************/
-NameExpr *new_NameExpr(const char *name,Expr *e);
+NameExpr *new_NameExpr(const char *name, Expr *e);
 
 /*****************************************************************************
  * OpDesc methods

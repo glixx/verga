@@ -68,12 +68,14 @@ char *strdup(const char *s);
 
 #define isodigit(c) ((c) >= '0' && (c) <= '7')
 
-typedef struct {
-  char		*vd_name;		/* Name for version number */
-  unsigned	vd_flags;		/* flags for this version */
-} VersionDef;
+struct VersionDef
+{
+	char		*vd_name;	/* Name for version number */
+	unsigned	vd_flags;	/* flags for this version */
+};
 
-typedef struct {
+struct Version
+{
   char str[32];		/* String version of version number */
   int major;		/* Major version number */
   int minor;		/* Minor version number */
@@ -81,7 +83,7 @@ typedef struct {
   int alpha;		/* Alpha level */
   int beta;		/* Beta level */
   int rc;       /* release candidate level */
-} Version;
+};
 
 typedef struct {
   int	length;

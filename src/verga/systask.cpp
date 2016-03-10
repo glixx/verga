@@ -100,7 +100,7 @@ SysTaskDescript sysTaskTable[] = {
   {"$writememh",	SysTask_writememh,	1,	3,	STF_NONE, {TAT_VALUE,TAT_NET,TAT_VALUE}},
 };
 
-static FILE *openFiles[STT_MAXFILES] = {0};
+static FILE *openFiles[STT_MAXFILES] = {NULL};
 
 /*****************************************************************************
  *
@@ -123,18 +123,18 @@ static void string_expand(char *s, ModuleInst *mi)
   }
 }
 
-const char *SysTask_findName(systask_f *f)
+const char *
+SysTask_findName(systask_f *f)
 {
-  int i;
-
-  for (i = 0;i < sizeof(sysTaskTable)/sizeof(sysTaskTable[0]);i++) {
-    if (sysTaskTable[i].st_func == f)
-      return sysTaskTable[i].st_name;
-  }
-  return 0;
+	for (int i = 0; i < sizeof(sysTaskTable)/sizeof(sysTaskTable[0]); ++i) {
+	if (sysTaskTable[i].st_func == f)
+		return (sysTaskTable[i].st_name);
+	}
+	return (NULL);
 }
 
-systask_f *SysTask_find(const char *name)
+systask_f *
+SysTask_find(const char *name)
 {
   int i;
 

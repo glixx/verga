@@ -135,6 +135,15 @@ public:
 		_interactive = newVal;
 	}
 	
+	VerilogStd std() const
+	{
+		return (_std);
+	}
+	void setStd(VerilogStd newVal)
+	{
+		_std = newVal;
+	}
+	
 	void printModules(List *show_modules);
 	
 	void displayModuleData();
@@ -165,7 +174,6 @@ public:
 	simtime_t vg_initTime;	/* Time need for user circuit to initialize. */
 
 	DelayType vg_delayType;	/* Type of delays to use */
-	VerilogStd vg_std;
 private:
 	/* Table of modules type*/
 	typedef std::map<const char*, ModuleDecl*, StringCompare> ModulesDict;
@@ -177,6 +185,8 @@ private:
 	char		*_baseDirectory;
 	/* Non-zero if we are in interactive mode */
 	bool		 _interactive;
+	/* Verilog standart to use */
+	VerilogStd	 _std;
 };
 
 void VGSecurity_init(VGSecurity *, int trusted);
