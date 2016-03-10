@@ -31,7 +31,7 @@ void ob_free(void*);
 char *ob_strdup(const char*);
 void ob_touch(void*);
 
-typedef void *malloc_f(int,char*);
+typedef void *malloc_f(int, char*);
 typedef void *calloc_f(int,int,char*);
 typedef void free_f(void*);
 typedef char *strdup_f(const char*);
@@ -57,7 +57,6 @@ static void nop_touch(void *p) {}
 #define HT_FREE(H,p) 		 (*((HashVTable*)H->vtable)->hv_free)(p)
 #define HT_STRDUP(H,s)		 (*((HashVTable*)H->vtable)->hv_strdup)(s)
 #define HT_TOUCH(H,p)		 (*((HashVTable*)H->vtable)->hv_touch)(p)
-
 
 static HashVTable obj_mmgr = {
   ob_malloc, ob_calloc, ob_free, ob_strdup, ob_touch

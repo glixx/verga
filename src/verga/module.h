@@ -18,15 +18,19 @@
 #ifndef __module_h
 #define __module_h
 
-#include <map>
-#include <string>
-
 #include "mitem.h"
+#include "verilog.h"
 
-#define SDF_LOCAL_ONLY		0x1	/* Lookup variable only in the local scope */
+#if __cplusplus >= 201103
+#include <unordered_map>
+typedef std::unordered_map<const char*, NetDecl*, StringCompare> NetDeclHash;
+#else
+#include <map>
+typedef std::map<const char*, NetDecl*, StringCompare> NetDeclHash;
+#endif
+typedef std::pair<const char*, NetDecl*> NetDeclHashElement;
 
-typedef std::map<std::string, NetDecl*> NetDeclHash;
-typedef std::pair<std::string, NetDecl*> NetDeclHashElement;
+#define SDF_LOCAL_ONLY	0x1	/* Lookup variable only in the local scope */
 
 /*****************************************************************************
  *
@@ -41,8 +45,7 @@ public:
 		sd_parent = NULL;
 	}
 	ScopeDecl	*sd_parent;	/* Parent scope */
-	//SHash/*NetDecl*/ sd_nets;	/* Net declarations */
-	NetDeclHash sd_nets;
+	NetDeclHash sd_nets;		/* Net declarations */
 };
 
 
@@ -162,6 +165,9 @@ public:
 class DynamicModule
 {
 public:
+	DynamicModule(const char*);
+	~DynamicModule();
+	
 	char		*dm_name;		/* tag name of dynamic module */
 	List		 dm_mitems;		/* MItems in the dynamc module */
 

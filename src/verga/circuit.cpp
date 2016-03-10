@@ -29,20 +29,6 @@ static void Circuit_buildHier(Circuit *c,ModuleInst *mi,ModuleInst *parent,char 
 
 Circuit::Circuit()
 {
-	this->init();
-}
-
-/*****************************************************************************
- *
- * Initialize the circuit data structure
- *
- * Parameters:
- *      c		Memory to initialize with circuit data structure.
- *
- *****************************************************************************/
-void
-Circuit::init()
-{
 	SHash_init(&this->c_nets);
 	NHash_init(&this->c_triggers);
 	SHash_init(&this->c_channels);
@@ -50,6 +36,19 @@ Circuit::init()
 	SHash_init(&this->c_dynamicModules);
 	this->c_evQueue = new_EvQueue(this);
 	this->c_root = 0;
+}
+
+Circuit::~Circuit()
+{
+}
+
+void Circuit::build(ModuleDecl *m)
+{
+	char path[STRMAX*2];
+
+	std::strncpy(path, m->name(), STRMAX*2);
+	this->c_root = Circuit_buildNets(this, m, NULL, NULL, path);
+	Circuit_buildHier(this, this->c_root, NULL, path);
 }
 
 /*****************************************************************************
@@ -898,7 +897,7 @@ static ModuleInst *Circuit_buildNets(Circuit *c,ModuleDecl *m,MIInstance *mid,Mo
  *     m		Top-level module to build
  *
  *****************************************************************************/
-void
+/*void
 Circuit_build(Circuit *c,ModuleDecl *m)
 {
 	char path[STRMAX*2];
@@ -907,7 +906,7 @@ Circuit_build(Circuit *c,ModuleDecl *m)
 	c->c_root = Circuit_buildNets(c,m,0,0,path);
 	Circuit_buildHier(c,c->c_root,0,path);
 }
-
+*/
 /*****************************************************************************
  *
  * Sort the threads scheduled at the current time (normally 0) to ensure
@@ -1437,40 +1436,6 @@ void Circuit_enableDynamicModule(Circuit *c,DynamicModule *dm)
     if (VGThread_isActive(t) && !wasActive)
       VGThread_exec(t);
   }
-}
-
-/*****************************************************************************
- *
- * Create a dynamic module object
- *
- * Parameters:
- *      name		Name of the dynamic module
- *
- *****************************************************************************/
-DynamicModule *new_DynamicModule(const char *name)
-{
-  DynamicModule *dm = (DynamicModule*) malloc(sizeof(DynamicModule));
-  dm->dm_name = strdup(name);
-  dm->dm_aliveThreads = 0;
-  List_init(&dm->dm_mitems);
-  List_init(&dm->dm_threads);
-  return dm;
-}
-
-/*****************************************************************************
- *
- * Delete a dynamic module object
- *
- * Parameters:
- *      dm		Dynamic module object to delete
- *
- *****************************************************************************/
-void delete_DynamicModule(DynamicModule *dm)
-{
-  free(dm->dm_name);
-  List_uninit(&dm->dm_mitems);
-  List_uninit(&dm->dm_threads);
-  free(dm);
 }
 
 /*****************************************************************************

@@ -88,15 +88,9 @@ void VGSecurity_handleException(VGSecurity *vgs,VGThread *t,const char *name)
   }
 }
 
-VGSim::VGSim()
+VGSim::VGSim() :
+_baseDirectory(NULL)
 {
-	this->init();
-}
-
-void
-VGSim::init()
-{
-	this->_baseDirectory = NULL;
 	this->_interactive = false;
 	this->vg_topModuleName = 0;
 	this->vg_defaultTopModuleName = 0;
@@ -346,9 +340,11 @@ void exitIfError()
   }
 }
 
-int startSimulation(const char *topName,int warning_mode,List *load_scripts,const char *initTimeSpec)
+int
+startSimulation(const char *topName, int warning_mode, List *load_scripts,
+    const char *initTimeSpec)
 {
-  ModuleDecl *m = vgsim.findModule(topName);
+	ModuleDecl *m = vgsim.findModule(topName);
   ListElem *le;
 
   /*
@@ -360,10 +356,10 @@ int startSimulation(const char *topName,int warning_mode,List *load_scripts,cons
     return 1;
   }
 
-  /*
-   * Build the circuit and sort threads for proper initialization.
-   */
-  Circuit_build(&vgsim.circuit(),m);
+	/*
+	 * Build the circuit and sort threads for proper initialization.
+	 */
+	vgsim.circuit().build(m);
   Circuit_sortThreads(&vgsim.circuit());
   Circuit_check(&vgsim.circuit());
 

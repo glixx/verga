@@ -20,6 +20,8 @@
 #ifndef __circuit_h
 #define __circuit_h
 
+#include "module.h"
+
 /*****************************************************************************
  *
  * Circuit - Class to represent final instantiated circuit
@@ -29,8 +31,10 @@ class Circuit
 {
 public:
 	Circuit();
+	~Circuit();
 	
-	void init();
+	void build(ModuleDecl*);
+	
 	SHash/*Net*/		 c_nets;		/* Global table of nets */
 	NHash/*Trigger*/	 c_triggers;		/* Triggers in this circuit */
 	SHash/*Channel*/	 c_channels;		/* Communication channels */
@@ -44,8 +48,6 @@ public:
 /*****************************************************************************
  * DynamicModule member functions
  *****************************************************************************/
-DynamicModule *new_DynamicModule(const char*);
-void delete_DynamicModule(DynamicModule*);
 void DynamicModule_addMItem(DynamicModule*,ModuleItem*);
 void DynamicModule_addThread(DynamicModule*,VGThread*);
 #define DynamicModule_setModuleInst(dm,mi) ((dm)->dm_moduleInst = (mi))
@@ -54,8 +56,7 @@ void DynamicModule_killNotify(DynamicModule*);
 /*****************************************************************************
  * Circuit member functions
  *****************************************************************************/
-
-void Circuit_build(Circuit *c,ModuleDecl *m);
+//void Circuit_build(Circuit *c,ModuleDecl *m);
 void Circuit_buildPathDelayMod(Circuit *c,ModuleInst *mi,ModuleInst *parent,char *path);
 void Circuit_installScript(Circuit *c,ModuleDecl *m,DynamicModule *dm);
 void Circuit_check(Circuit *c);

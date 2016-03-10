@@ -61,15 +61,6 @@
 #include "yybasic.h"		/* Basic parser functions */
 #include "vgrammar.hpp"		/* Symbols definitions for tokens */
 
-class StringCompare
-{
-public:
-	bool operator() (const char *x, const char *y) const
-	{
-		return (std::strncmp(x, y, STRMAX) < 0);
-	}
-};
-
 typedef std::list<const char*>	Stringlist;
 
 enum DelayType {
@@ -104,7 +95,7 @@ typedef struct {
 
 /*****************************************************************************
  *
- * GVSim - Top level structure for simulator data.
+ * GVSim - Top level class for simulator data.
  *
  *****************************************************************************/
 class VGSim
@@ -112,8 +103,6 @@ class VGSim
 public:
 	
 	VGSim();
-	
-	void init();
 	
 	void loadFiles(Stringlist&);
 	
@@ -178,8 +167,7 @@ public:
 	VerilogStd vg_std;
 private:
 	/* Table of modules type*/
-	typedef std::map<const char*, ModuleDecl*, StringCompare>
-			 ModulesDict;
+	typedef std::map<const char*, ModuleDecl*, StringCompare> ModulesDict;
 	/* Table of modules */
 	ModulesDict	 _modules;
 	/* Instantiated circuit to be simulated */

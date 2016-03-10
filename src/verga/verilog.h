@@ -21,6 +21,15 @@
 #define TYPE_INT	0
 #define TYPE_STR	1
 
+class StringCompare
+{
+public:
+	bool operator() (const char *x, const char *y) const
+	{
+		return (std::strncmp(x, y, STRMAX) < 0);
+	}
+};
+
 /*****************************************************************************
  *
  * Start a new module declaration.

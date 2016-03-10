@@ -138,7 +138,7 @@ void Circuit_execScript(Circuit *c,int argc,char *argv[])
     return;
   }
 
-  dm = new_DynamicModule(argv[1]);
+  dm = new DynamicModule(argv[1]);
 
   for (i = 3;i < argc;i++)
     if (strcmp(argv[i],"-delete") == 0)
@@ -150,7 +150,7 @@ void Circuit_execScript(Circuit *c,int argc,char *argv[])
 
   if (VerilogLoadScript(argv[2], dm) < 0) {
     vgio_printf("badscript %s\n",argv[1]);
-    delete_DynamicModule(dm);
+    delete dm;
   } else {
     if (!is_silent)
       vgio_echo("loaded script file '%s'.\n",argv[2]);
@@ -378,7 +378,7 @@ void Circuit_execDelScript(Circuit*c,int argc,char *argv[])
 
   Circuit_unloadDynamicModule(c,dm);
   SHash_remove(&c->c_dynamicModules, argv[1]);
-  delete_DynamicModule(dm);
+  delete dm;
 }
 
 /*****************************************************************************

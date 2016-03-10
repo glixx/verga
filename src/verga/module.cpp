@@ -19,6 +19,21 @@
 
 #include "verga.hpp"
 
+DynamicModule::DynamicModule(const char *name)
+{
+	this->dm_name = strdup(name);
+	this->dm_aliveThreads = 0;
+	List_init(&this->dm_mitems);
+	List_init(&this->dm_threads);
+}
+
+DynamicModule::~DynamicModule()
+{
+	free(this->dm_name);
+	List_uninit(&this->dm_mitems);
+	List_uninit(&this->dm_threads);
+}
+
 /*****************************************************************************
  *
  * Create a new declaration scope object
@@ -73,7 +88,8 @@ void Scope_init(Scope *s,const char *path,Scope *parent,ModuleInst *mi)
 
 void Scope_uninit(Scope *s)
 {
-  if (s->s_path) free(s->s_path);
+  if (s->s_path)
+	  free(s->s_path);
   SHash_uninit(&s->s_nets);
   SHash_uninit(&s->s_tasks);
 }
