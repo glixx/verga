@@ -93,7 +93,7 @@ _baseDirectory(NULL),
 _interactive(false),
 _std(VSTD_1995)
 {
-	this->vg_topModuleName = 0;
+	this->_topModuleName = 0;
 	this->vg_defaultTopModuleName = 0;
 	VGSecurity_init(&this->vg_sec,0);
 	this->vg_timescale.ts_units = 0;
@@ -440,11 +440,10 @@ startSimulation(const char *topName, int warning_mode, List *load_scripts,
     Circuit_execScript(&vgsim.circuit(), argc, argv);
   }
 
-
 	/*
 	 * Start the actual simulation.
 	 */
-	Circuit_run(&vgsim.circuit());
+	vgsim.circuit().run();
 
 	return (0);
 }
@@ -553,7 +552,7 @@ main(int argc, char *argv[])
 				vgsim.setBaseDirectory(optarg);
 				break;
 			case 't' :
-				vgsim.vg_topModuleName = optarg;
+				vgsim.setTopModuleName(optarg);
 				break;
 			case 'd' :
 				if (strcasecmp(optarg,"min") == 0)
@@ -612,7 +611,6 @@ main(int argc, char *argv[])
 	if (vgsim.vg_timescale.ts_units == 0)
 		vgsim.useDefaultTimescale();
 
-
 	/*
 	 * When thyme is executed by tkgate, the circuit files are passed indirectly as
 	 * temporary files and after loading the files, it is ok to delete them.  The '-D n'
@@ -650,8 +648,8 @@ main(int argc, char *argv[])
 	/*
 	 * No explicit top-module was given, try the default top module.
 	 */
-	if (!vgsim.vg_topModuleName)
-		vgsim.vg_topModuleName = vgsim.vg_defaultTopModuleName;
+	if (!vgsim.topModuleName())
+		vgsim.setTopModuleName(vgsim.vg_defaultTopModuleName);
 
 	/*
 	 * Either all modules must have a `timescale or none of them should have
@@ -667,13 +665,13 @@ main(int argc, char *argv[])
 	/*
 	 * If we do not have a top module name, we must exit.
 	 */
-	if (!vgsim.vg_topModuleName) {
+	if (!vgsim.topModuleName()) {
 		errorFile(&curPlace, ERR_NOTOP, "<none>");
 		exitIfError();
 		return (EXIT_FAILURE);
 	}
 
-	startSimulation(vgsim.vg_topModuleName, warning_mode, &load_scripts,
+	startSimulation(vgsim.topModuleName(), warning_mode, &load_scripts,
 	    initTimeSpec);
 
 	return (EXIT_SUCCESS);

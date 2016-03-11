@@ -143,6 +143,15 @@ public:
 	{
 		_std = newVal;
 	}
+        
+        char *topModuleName()
+        {
+        	return (_topModuleName);
+        }
+        void setTopModuleName(char* newVal)
+        {
+        	_topModuleName = newVal;
+        }
 	
 	void printModules(List *show_modules);
 	
@@ -160,8 +169,6 @@ public:
 		return (_circuit);
 	}
 	
-	/* Name of top-level module */
-	char		*vg_topModuleName;
 	/* Default name of top-level module */
 	char		*vg_defaultTopModuleName;
 
@@ -179,6 +186,8 @@ private:
 	typedef std::map<const char*, ModuleDecl*, StringCompare> ModulesDict;
 	/* Table of modules */
 	ModulesDict	 _modules;
+        /* Name of top-level module */
+	char		*_topModuleName;
 	/* Instantiated circuit to be simulated */
 	Circuit		 _circuit;
 	/* Base directory for input files */

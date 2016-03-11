@@ -79,7 +79,7 @@ typedef struct Trigger_str Trigger;
  * advance declarations from thyme.h
  *****************************************************************************/
 typedef union Event_union Event;
-typedef struct EvQueue_str EvQueue;
+class EvQueue;
 typedef unsigned long long simtime_t;		/* simulation time */
 typedef unsigned long long deltatime_t;		/* time delay */
 

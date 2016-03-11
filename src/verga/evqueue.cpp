@@ -352,7 +352,7 @@ void EvProbe_process(EvProbe *e,EvQueue *q)
 
   if (!Value_isEqual(e->ep_lastValue, Net_getValue(n))) {
     Value_copy(e->ep_lastValue, Net_getValue(n));
-    Net_reportValue(n, e->ep_who, e->ep_name, q->eq_circuit);
+    Net_reportValue(n, e->ep_who, e->ep_name, &q->eq_circuit);
   }
 }
 
@@ -587,16 +587,14 @@ Event *Event_priorityInsert(Event *PQ,Event *E)
  * Create an event queue.
  *
  * Parameters:
- *     C		Circuit controlled by event queue
+ *     circuit		Circuit controlled by event queue
  *
  *****************************************************************************/
-EvQueue *new_EvQueue(Circuit *C)
+EvQueue::EvQueue(Circuit &circuit) :
+eq_circuit(circuit)
 {
-  EvQueue *Q = (EvQueue*) malloc(sizeof(EvQueue));
-  EvQueue_init(Q,C);
-  return Q;
+    EvQueue_init(this);
 }
-
 /*****************************************************************************
  *
  * Event queue initialization.
@@ -606,11 +604,10 @@ EvQueue *new_EvQueue(Circuit *C)
  *     C		Circuit controlled by event queue
  *
  *****************************************************************************/
-void EvQueue_init(EvQueue *Q,Circuit *C)
+void EvQueue_init(EvQueue *Q)
 {
   int i;
 
-  Q->eq_circuit = C;
   Q->eq_finalTime = ~0;
   Q->eq_curTime = 0;
   Q->eq_numPending = 0;
@@ -1239,7 +1236,7 @@ void EvQueue_interactiveMainEventLoop(EvQueue *Q)
       if (do_input_check && !(Q->eq_flags & EVF_NOCMD)) {
 	if (input_ready(0)) {
 	  if (!get_line(buf,STRMAX)) return;
-	  Circuit_exec(Q->eq_circuit,buf);
+	  Circuit_exec(&Q->eq_circuit, buf);
 	} else {
 	  if (Q->eq_realQ) {
 	    struct timeval tv;
@@ -1313,7 +1310,7 @@ void EvQueue_interactiveMainEventLoop(EvQueue *Q)
 
       input_ready(1);
       if (!get_line(buf,STRMAX)) return;
-      Circuit_exec(Q->eq_circuit,buf);
+      Circuit_exec(&Q->eq_circuit, buf);
       simulator_running = EvQueue_isRunning(Q);
     }
   }

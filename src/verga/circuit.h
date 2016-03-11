@@ -28,6 +28,7 @@
 #if __cplusplus >= 201103
 #include <unordered_map>
 typedef std::unordered_map<std::string, Net*> NetDeclHash;
+typedef std::unordered_map<const char*, Channel*> ChannelHash;
 #else
 #include <map>
 typedef std::map<std::string, Net*> NetHash;
@@ -48,6 +49,7 @@ public:
 	~Circuit();
 	
 	void build(ModuleDecl*);
+	void run();
 	
 	NetHash		 c_nets;	/* Global table of nets */
 	NHash/*Trigger*/	 c_triggers;		/* Triggers in this circuit */
@@ -74,7 +76,6 @@ void DynamicModule_killNotify(DynamicModule*);
 void Circuit_buildPathDelayMod(Circuit *c,ModuleInst *mi,ModuleInst *parent,char *path);
 void Circuit_installScript(Circuit *c,ModuleDecl *m,DynamicModule *dm);
 void Circuit_check(Circuit *c);
-void Circuit_run(Circuit *c);
 Net *Circuit_findNet(Circuit *c,const char *name);
 Net *Circuit_findMemoryNet(Circuit *c,const char *name);
 ModuleInst *Circuit_findModuleInst(Circuit *c, const char *name);

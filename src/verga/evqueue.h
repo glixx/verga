@@ -17,6 +17,9 @@
 ****************************************************************************/
 #ifndef __evqueue_h
 #define __evqueue_h
+
+#include "circuit.h"
+
 /*****************************************************************************
  *
  * Event Queue Data Structures
@@ -239,8 +242,11 @@ typedef struct {
  * EvQueue - The event queue.
  *
  *****************************************************************************/
-struct EvQueue_str {
-  Circuit	*eq_circuit;			/* Pointer to top level cicuit */
+class EvQueue
+{
+public:
+    EvQueue(Circuit&);
+  Circuit	&eq_circuit;			/* Pointer to top level cicuit */
   eqflag_t	eq_flags;			/* Event queue flags */
 
   simtime_t	eq_finalTime;			/* Time of last final processing */
@@ -269,8 +275,7 @@ struct EvQueue_str {
 /*****************************************************************************
  * EvQueue member functions
  *****************************************************************************/
-EvQueue *new_EvQueue(Circuit *C);
-void EvQueue_init(EvQueue *Q,Circuit *C);
+void EvQueue_init(EvQueue *Q);
 
 void EvQueue_print(EvQueue *Q);
 

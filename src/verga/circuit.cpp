@@ -27,13 +27,13 @@
 static ModuleInst *Circuit_buildNets(Circuit *c,ModuleDecl *m,MIInstance *mi,ModuleInst *parent,char *path);
 static void Circuit_buildHier(Circuit *c,ModuleInst *mi,ModuleInst *parent,char *path);
 
-Circuit::Circuit()
+Circuit::Circuit() :
+c_evQueue(new EvQueue(*this)),
+c_root(NULL)
 {
 	NHash_init(&this->c_triggers);
 	SHash_init(&this->c_moduleInsts);
 	SHash_init(&this->c_dynamicModules);
-	this->c_evQueue = new_EvQueue(this);
-	this->c_root = 0;
 }
 
 Circuit::~Circuit()
@@ -1048,17 +1048,15 @@ void Circuit_installScript(Circuit *c,ModuleDecl *m,DynamicModule *dm)
  *
  * Begin simulating a circuit
  *
- * Parameters:
- *     c		Circuit to simulate
  *
  *****************************************************************************/
 void
-Circuit_run(Circuit *c)
+Circuit::run()
 {
 	if (vgsim.interactive())
-		EvQueue_interactiveMainEventLoop(c->c_evQueue);
+		EvQueue_interactiveMainEventLoop(this->c_evQueue);
 	else
-		EvQueue_mainEventLoop(c->c_evQueue);
+		EvQueue_mainEventLoop(this->c_evQueue);
 }
 
 /*****************************************************************************
