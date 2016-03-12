@@ -242,7 +242,11 @@ typedef struct {
  * the bits that are not addressed in the LHS are set to floating.
  *
  *****************************************************************************/
-struct Net_str {
+class Net
+{
+public:
+	Net(const char *name, nettype_t ntype, unsigned msb, unsigned lsb);
+	~Net();
   char			*n_name;		/* Full path name */
   nettype_t		n_type;			/* Type of wire */
   NetAttrlags		n_flags;		/* Attribute flags */
@@ -270,8 +274,6 @@ SNetMap *new_SNetMap(Net *net,int netLsb,int snLsb,int width);
  *****************************************************************************/
 Net *new_Net_memory(const char *name,unsigned msb,unsigned lsb,
 		    unsigned addrMsb,unsigned addrLsb);
-Net *new_Net(const char *name,nettype_t ntype,unsigned msb,unsigned lsb);
-void delete_Net(Net*);
 void Net_print(Net*,FILE*);
 void Net_posedgeListen(Net*n,Trigger*t);
 void Net_negedgeListen(Net*n,Trigger*t);

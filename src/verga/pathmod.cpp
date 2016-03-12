@@ -186,12 +186,12 @@ static Net *Circuit_dpath_findAddNet(Circuit *c,Scope *port_scope,NetDecl *nd,Mo
   /*
    * Create the actual net, and define it.
    */
-  n = new_Net(name,nd->n_type,msb,lsb);
+  n = new Net(name,nd->n_type,msb,lsb);
   Scope_defNet(port_scope,nd->n_name,n);
   n->n_type &= ~NT_P_WIRE;
   n->n_type |= NT_P_REG;
 
-  return n;
+  return (n);
 }
 
 /*****************************************************************************

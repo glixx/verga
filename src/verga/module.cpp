@@ -772,7 +772,7 @@ void ModuleInst_defParm(ModuleInst *mc,const char *name,Value *value)
   Net *n;
 
   sprintf(fullName,"%s.%s",mc->mc_path,name);
-  n = new_Net(fullName,NT_PARAMETER,Value_nbits(value)-1,0);
+  n = new Net(fullName,NT_PARAMETER,Value_nbits(value)-1,0);
   Value_copy(Net_getValue(n),value);
 
   Scope_defNet(ModuleInst_getScope(mc),name,n);
