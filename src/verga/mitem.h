@@ -73,13 +73,14 @@ typedef struct GateDesc_str {
  *
  *
  *****************************************************************************/
-typedef struct {
-  char		*n_name;		/* Name of net */
-  nettype_t	n_type;			/* Type of net */
-  VRange	*n_range;		/* Range for declaration (object is shared) */
-  VRange	*n_addrRange;		/* Address range for memories */
-  Place		n_place;		/* Place where net was declared */
-} NetDecl;
+struct NetDecl
+{
+	char		*n_name;		/* Name of net */
+	nettype_t	 n_type;		/* Type of net */
+	VRange		*n_range;		/* Range for declaration (object is shared) */
+	VRange		*n_addrRange;		/* Address range for memories */
+	Place		 n_place;		/* Place where net was declared */
+};
 
 typedef VGThread *MIgenerate_f(ModuleItem *mi,ModuleInst *modCtx,CodeBlock *cb);
 typedef void MIprint_f(ModuleItem *mi,FILE *f);

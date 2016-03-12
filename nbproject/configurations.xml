@@ -84,7 +84,7 @@
         </makeTool>
         <preBuild>
           <preBuildCommandWorkingDir>.</preBuildCommandWorkingDir>
-          <preBuildCommand>./configure CC=${IDE_CC} CXX=${IDE_CXX} CFLAGS="-g2" CXXFLAGS="-g2 -std=gnu++98 -pedantic -Wall"</preBuildCommand>
+          <preBuildCommand>./configure CC=${IDE_CC} CXX=${IDE_CXX} CFLAGS="-g2" CXXFLAGS="-g2 -std=gnu++98 -Wall"</preBuildCommand>
         </preBuild>
       </makefileType>
       <folder path="0/src/common">

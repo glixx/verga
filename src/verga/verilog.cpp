@@ -151,28 +151,29 @@ int VerilogLoadScript(const char *fileName,DynamicModule *dm)
  *      name			Name of file to read.
  *
  *****************************************************************************/
-int VerilogLoad(const char *name)
+int
+VerilogLoad(const char *name)
 {
-  FILE *f;
+	FILE *f;
 
-  if (!(f = openInPath(name))) {
-    return -1;
-  }
+	if (!(f = openInPath(name)))
+		return (-1);
 
-  cur_init(name);
+	cur_init(name);
 
-  yc_setup();
-  BeginPV();
-  yyrestart(f);
-  yc_pushpool();
-  yyparse();
-  yc_poppool();
-  fclose(f);
+	yc_setup();
+	BeginPV();
+	yyrestart(f);
+	yc_pushpool();
+	yyparse();
+	yc_poppool();
+	fclose(f);
 
-  return 0;
+	return (0);
 }
 
-void VerNewModule(const char *name)
+void
+VerNewModule(const char *name)
 {
 	Place *p = Place::getCurrent();
 
@@ -192,7 +193,8 @@ void VerNewModule(const char *name)
 		errorModule(cur.mod, p, ERR_WRONGMOD, name, p->p_moduleName);
 }
 
-void VerEndModule()
+void
+VerEndModule()
 {
 	if (!cur.isRedef)
 		vgsim.addModule(cur.mod);

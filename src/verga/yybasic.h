@@ -22,6 +22,10 @@
 #ifndef __yybasic_h
 #define __yybasic_h
 
+#include <sys/cdefs.h>
+
+__BEGIN_DECLS
+
 extern int ycLineNumber;
 extern char *ycFileName;
 
@@ -29,7 +33,6 @@ struct lex_keywordentry {
     char const *Keyword;
     int Value;
 };
-
 
 typedef union {
   int I;			/* Used for integers */
@@ -78,6 +81,8 @@ void yc_unputstring(char *s);
 
 int yc_bogochar();
 void yc_lexjunk();
+
+__END_DECLS
 
 #endif
 
