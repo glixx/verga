@@ -28,52 +28,35 @@ typedef float real_t;
 /*
   State symbol codes
  */
-typedef enum state_symbol_en {
-  SYM_INVALID = -1,
-#define SYM_INVALID SYM_INVALID
-  SYM_NUL1 = 0,
-#define SYM_NUL1 SYM_NUL1
-  SYM_ZERO = 1,
-#define SYM_ZERO SYM_ZERO
-  SYM_ONE = 2,
-#define SYM_ONE	SYM_ONE
-  SYM_NUL2 = 3,
-#define SYM_NUL2 SYM_NUL2
-  SYM_FLOAT = 4,
-#define SYM_FLOAT SYM_FLOAT
-  SYM_LOW = 5,
-#define SYM_LOW	SYM_LOW
-  SYM_HIGH = 6,
-#define SYM_HIGH SYM_HIGH
-  SYM_UNKNOWN = 7
-#define SYM_UNKNOWN SYM_UNKNOWN
-} StateSymbol;
+enum StateSymbol
+{
+	SYM_INVALID = -1,
+	SYM_NUL1 = 0,
+	SYM_ZERO = 1,
+	SYM_ONE = 2,
+	SYM_NUL2 = 3,
+	SYM_FLOAT = 4,
+	SYM_LOW = 5,
+	SYM_HIGH = 6,
+	SYM_UNKNOWN = 7
+};
 
 /*
  * Special property flags of Value
  */
-typedef enum value_flags_en {
+enum ValueFlags
+{
 	SF_NONE = 0,
-#define SF_NONE SF_NONE
-	SF_INT = 0x1,
-#define SF_INT SF_INT				/* Declared as an integer */
-	SF_DEC = 0x2,
-#define SF_DEC SF_DEC				/* Declared as sized decimal */
-	SF_HEX = 0x4,
-#define SF_HEX SF_HEX				/* Declared as sized hex */
-	SF_OCT = 0x8,
-#define SF_OCT SF_OCT				/* Declaeed as sized octal */
-	SF_BIN = 0x10,
-#define SF_BIN SF_BIN				/* Declared as sized binary */
-	SF_STRING = 0x20,
-#define SF_STRING SF_STRING			/* Declared as string */
-	SF_REAL = 0x40,
-#define SF_REAL	SF_REAL				/* Declared as real */
-	SF_STICKY_MASK = 0xffff,
-#define SF_STICKY_MASK SF_STICKY_MASK		/* These flags are sticky and are propegated */
-	SF_NETVAL = 0x10000
-#define SF_NETVAL SF_NETVAL			/* Value is directly associated with a net */
-} ValueFlags;
+	SF_INT = 0x1,	/* Declared as an integer */
+	SF_DEC = 0x2,	/* Declared as sized decimal */
+	SF_HEX = 0x4,	/* Declared as sized hex */
+	SF_OCT = 0x8,	/* Declaeed as sized octal */
+	SF_BIN = 0x10,	/* Declared as sized binary */
+	SF_STRING = 0x20,	/* Declared as string */
+	SF_REAL = 0x40,	/* Declared as real */
+	SF_STICKY_MASK = 0xffff,	/* These flags are sticky and are propegated */
+	SF_NETVAL = 0x10000	/* Value is directly associated with a net */
+};
 
 /*
  * Basic word size/byte size declarations.
@@ -149,7 +132,9 @@ flt      0  0  1  1  1  1
 */
 #define DEBUG_VALUE_MEMMGR 0
 
-struct Value_str {
+class Value
+{
+public:
 #if DEBUG_VALUE_MEMMGR
   int		status;		/* Status code for memory management */
 #endif
@@ -162,29 +147,23 @@ struct Value_str {
   unsigned	*flt;		/* Bit indicating float */
 };
 
-typedef enum strength_en {
+enum StrengthLevel
+{
   STR_HIGHZ = 0,
-#define STR_HIGHZ STR_HIGHZ
   STR_SMALL = 1,
-#define STR_SMALL STR_SMALL
   STR_MEDIUM = 2,
-#define STR_MEDIUM STR_MEDIUM
   STR_WEAK = 3,
-#define STR_WEAK STR_WEAK
   STR_LARGE = 4,
-#define STR_LARGE STR_LARGE
   STR_PULL = 5,
-#define STR_PULL STR_PULL
   STR_STRONG = 6,
-#define STR_STRONG STR_STRONG
   STR_SUPPLY = 7
-#define STR_SUPPLY STR_SUPPLY
-} StrengthLevel;
+};
 
-typedef struct {
+struct Strength
+{
   StrengthLevel one:4;
   StrengthLevel zero:4;
-} Strength;
+};
 
 Strength Strength_fromNettype(unsigned nettype);
 

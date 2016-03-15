@@ -832,7 +832,7 @@ static ModuleInst *Circuit_buildNets(Circuit *c,ModuleDecl *m,MIInstance *mid,Mo
   ListElem *le;
   HashElem *he;
 
-  mi = new_ModuleInst(m,c,parent,path);
+  mi = new ModuleInst(m,c,parent,path);
   SHash_insert(&c->c_moduleInsts,path,mi);
 
   for (he = Hash_first(&m->m_tasks);he; he = Hash_next(&m->m_tasks,he)) {
@@ -911,11 +911,11 @@ Circuit_build(Circuit *c,ModuleDecl *m)
  * proper initilization.
  *
  *****************************************************************************/
-void Circuit_sortThreads(Circuit *c)
+void Circuit::sortThreads()
 {
   /*may not be necessary*/
 #if 0
-  Event *e = c->c_evQueue->eq_wheelHead[0];
+  Event *e = this->c_evQueue->eq_wheelHead[0];
 
   for (;e;e = e->ev_base.eb_next) {
     switch (Event_getType(e)) {
@@ -960,11 +960,11 @@ void Circuit_installScript(Circuit *c,ModuleDecl *m,DynamicModule *dm)
   ListElem *le;
 
   sprintf(scriptRootName,"%%script%d",count++);
-  mi = new_ModuleInst(m,c,0,scriptRootName);
+  mi = new ModuleInst(m,c,0,scriptRootName);
   DynamicModule_setModuleInst(dm,mi);
 
-  Scope_setPeer(ModuleInst_getScope(mi),ModuleInst_getScope(c->c_root));
-  mi->mc_peer = c->c_root;
+  Scope_setPeer(ModuleInst_getScope(mi),ModuleInst_getScope(&c->root()));
+  mi->mc_peer = &c->root();
 
   for (le = List_first(&m->m_items);le; le = List_next(&m->m_items,le)) {
     ModuleItem *item = (ModuleItem*) ListElem_obj(le);
@@ -984,9 +984,6 @@ void Circuit_installScript(Circuit *c,ModuleDecl *m,DynamicModule *dm)
  *
  * Check a circuit for potential problems
  *
- * Parameters:
- *      c		Circuit to be checked
- *
  * This function does a final check for errors/warnings in the circuit.  The
  * major check is for floating wires (wires with no driving signal).  When
  * reporting floating nets, we need to be sure to report them only once for
@@ -994,14 +991,14 @@ void Circuit_installScript(Circuit *c,ModuleDecl *m,DynamicModule *dm)
  * the error in the first instance of a type that we find.
  *
  *****************************************************************************/
- void Circuit_check(Circuit *c)
+ void Circuit::check()
 {
 	NetHash::iterator he;
 	SHash reported;
 
 	SHash_init(&reported);
 
-	for (he = c->c_nets.begin(); he != c->c_nets.end(); ++he) {
+	for (he = this->c_nets.begin(); he != this->c_nets.end(); ++he) {
 		Net *n = he->second;
 
 		// Ignore entries that are parameters, or not the primary name for a net.
@@ -1025,7 +1022,7 @@ void Circuit_installScript(Circuit *c,ModuleDecl *m,DynamicModule *dm)
 				if (localName)
 					*localName++ = 0;
 
-				m = Circuit_findModuleInst(c,instname);
+				m = Circuit_findModuleInst(this,instname);
 
 				if (m) {
 					char buf[STRMAX];
@@ -1131,8 +1128,8 @@ ModuleInst *Circuit_findModuleInst(Circuit *c, const char *name)
 
   mi = (ModuleInst*)SHash_find(&c->c_moduleInsts, name);
   if (!mi) {
-    char *fullName = (char*) malloc(strlen(c->c_root->mc_path)+strlen(name)+2);
-    sprintf(fullName,"%s.%s",c->c_root->mc_path,name);
+    char *fullName = (char*) malloc(strlen(c->root().mc_path)+strlen(name)+2);
+    sprintf(fullName,"%s.%s",c->root().mc_path, name);
     mi = (ModuleInst*)SHash_find(&c->c_moduleInsts, fullName);
     free(fullName);
   }

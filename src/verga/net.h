@@ -219,6 +219,12 @@ typedef struct {
   List/*SNetMap*/	sn_maps;		/* Mappings between net bits and supernet bits */
 } SuperNet;
 
+union NetData
+{
+	Value	value;	/* Value of net */
+	Memory	memory;	/* Memory object */		 
+};
+
 /*****************************************************************************
  *
  * Net - an instantiated net
@@ -247,21 +253,18 @@ class Net
 public:
 	Net(const char *name, nettype_t ntype, unsigned msb, unsigned lsb);
 	~Net();
-  char			*n_name;		/* Full path name */
-  nettype_t		n_type;			/* Type of wire */
-  NetAttrlags		n_flags;		/* Attribute flags */
-  unsigned		n_msb,n_lsb;		/* Range of net */
-  unsigned		n_nbits;		/* Number of bits */
-  unsigned		n_numMonitors;		/* Number of monitors on this net */
-  List/*Trigger*/	n_posedgeNotify;	/* Triggers to notify on posedge */
-  List/*Trigger*/	n_negedgeNotify;	/* Triggers to notify on negedge */
-  int			n_numDrivers;		/* Number of drivers (if WIRE) */
+  char			 *n_name;		/* Full path name */
+  nettype_t		  n_type;			/* Type of wire */
+  NetAttrlags		  n_flags;		/* Attribute flags */
+  unsigned		  n_msb,n_lsb;		/* Range of net */
+  unsigned		  n_nbits;		/* Number of bits */
+  unsigned		  n_numMonitors;		/* Number of monitors on this net */
+  List/*Trigger*/	  n_posedgeNotify;	/* Triggers to notify on posedge */
+  List/*Trigger*/	  n_negedgeNotify;	/* Triggers to notify on negedge */
+  int			  n_numDrivers;		/* Number of drivers (if WIRE) */
   Value			**n_drivers;		/* Drivers (if WIRE) */
-  wirefunc_f		*n_wfunc;		/* Wire function */
-  union {
-    Value value;				/* Value of net */
-    Memory memory;				/* Memory object */
-  }			 n_data;
+  wirefunc_f		 *n_wfunc;		/* Wire function */
+	NetData		  n_data;
 };
 
 /*****************************************************************************

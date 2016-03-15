@@ -41,7 +41,7 @@ typedef struct SpecifyStat_str SpecifyStat;
 /*****************************************************************************
  * advance declarations from value.h
  *****************************************************************************/
-typedef struct Value_str Value;
+class Value;
 typedef int valueop_f(Value *r,Value *a,Value *b,Value *c);
 
 /*****************************************************************************
@@ -114,6 +114,6 @@ class Channel;
 /*****************************************************************************
  * advance declarations from directive.h
  *****************************************************************************/
-typedef struct Timescale_str Timescale;
+class Timescale;
 
 #endif

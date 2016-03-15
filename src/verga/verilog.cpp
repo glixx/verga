@@ -627,8 +627,8 @@ VerBeginScript()
 {
 	cur.mod = new ModuleDecl();
 	cur.isRedef = 0;
-	cur.mod->m_timescale = *ModuleInst_getTimescale(Circuit_getRoot(
-	    &vgsim.circuit()));
+	cur.mod->m_timescale = *ModuleInst_getTimescale(
+	    &vgsim.circuit().root());
 	cur.scope = &cur.mod->getScope();
 }
 

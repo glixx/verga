@@ -20,9 +20,9 @@
             </confList>
             <formatting>
                 <project-formatting-style>true</project-formatting-style>
-                <c-style>Default_1|OpenBSD</c-style>
-                <cpp-style>ANSI_0|OpenBSD</cpp-style>
-                <header-style>ANSI_1|OpenBSD</header-style>
+                <c-style>OpenSolaris|OpenSolaris</c-style>
+                <cpp-style>OpenSolaris|OpenSolaris</cpp-style>
+                <header-style>OpenSolaris|OpenSolaris</header-style>
             </formatting>
         </data>
     </configuration>

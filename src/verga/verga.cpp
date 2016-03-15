@@ -360,8 +360,8 @@ startSimulation(const char *topName, int warning_mode, List *load_scripts,
 	 * Build the circuit and sort threads for proper initialization.
 	 */
 	vgsim.circuit().build(m);
-  Circuit_sortThreads(&vgsim.circuit());
-  Circuit_check(&vgsim.circuit());
+	vgsim.circuit().sortThreads();
+	vgsim.circuit().check();
 
   if (vgsim.interactive()) {
     exitIfError();

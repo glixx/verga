@@ -148,6 +148,8 @@ private:
 class ModuleInst
 {
 public:
+	ModuleInst(ModuleDecl*, Circuit*, ModuleInst*, const char*);
+	~ModuleInst();
 	char		*mc_path;	/* Path for this context */
 	ModuleInst	*mc_peer;	/* Peer module (used for simulation scripts) */
 	ModuleDecl	*mc_mod;	/* Module definition */
@@ -226,8 +228,6 @@ void ModuleDecl_makeSpecify(ModuleDecl *m);
 /*****************************************************************************
  * ModuleInst member functions
  *****************************************************************************/
-ModuleInst *new_ModuleInst(ModuleDecl *md,Circuit *c,ModuleInst *parent,const char *path);
-void delete_ModuleInst(ModuleInst*);
 void ModuleInst_init(ModuleInst *mc,ModuleDecl *md,Circuit *c,ModuleInst *parent,const char *path);
 void ModuleInst_uninit(ModuleInst *mc);
 Value *ModuleInst_findParm(ModuleInst *mc,const char *name);

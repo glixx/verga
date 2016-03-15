@@ -29,21 +29,23 @@
 #define CD_ENDIF	3
 #define CD_IFDEFX	4
 
-struct Timescale_str {
-  simtime_t	ts_units;
-  simtime_t	ts_precision;
+class Timescale
+{
+public:
+	simtime_t	ts_units;
+	simtime_t	ts_precision;
 };
 
 /*
  * State information for processing compiler directives
  */
 typedef struct {
-  SHash		*d_macro_table;		/* Table of defined macros */
-  int		*d_ifdefStack;		/* Stack with the current if/else processing state */
-  int		d_ifdefLen;		/* Length of the ifdef stack */
-  int		d_ifdefAlloced;		/* Size of the ifdef stack array */
-  int		d_ifdefSkipLevel;	/* Level of ifdef that is being skipped */
-  int		d_ifdefInSkip;		/* Non-zero if we are "skipping" text */
+	SHash	*d_macro_table;		/* Table of defined macros */
+	int	*d_ifdefStack;		/* Stack with the current if/else processing state */
+	int	 d_ifdefLen;		/* Length of the ifdef stack */
+	int	 d_ifdefAlloced;		/* Size of the ifdef stack array */
+	int	 d_ifdefSkipLevel;	/* Level of ifdef that is being skipped */
+	int	 d_ifdefInSkip;		/* Non-zero if we are "skipping" text */
 } Directive;
 
 int Directive_handle(char *directive,int inSkip);

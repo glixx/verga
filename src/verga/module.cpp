@@ -728,19 +728,14 @@ new_NetDecl(const char *name, int wtype,VRange *range, VRange *addrRange,
 	return (n);
 }
 
-ModuleInst *new_ModuleInst(ModuleDecl *md,Circuit *c,ModuleInst *parent,const char *path)
+ModuleInst::ModuleInst(ModuleDecl *md,Circuit *c,ModuleInst *parent,const char *path)
 {
-  ModuleInst *mc = (ModuleInst*) malloc(sizeof(ModuleInst));
-
-  ModuleInst_init(mc,md,c,parent,path);
-
-  return mc;
+	ModuleInst_init(this, md, c, parent, path);
 }
 
-void delete_ModuleInst(ModuleInst *mc)
+ModuleInst::~ModuleInst()
 {
-  ModuleInst_uninit(mc);
-  free(mc);
+	ModuleInst_uninit(this);
 }
 
 void ModuleInst_init(ModuleInst *mi,ModuleDecl *md,Circuit *c,ModuleInst *parent,const char *path)

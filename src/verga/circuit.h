@@ -23,6 +23,7 @@
 #include "module.h"
 #include "channel.h"
 
+#include <cassert>
 #include <string>
 
 #if __cplusplus >= 201103
@@ -50,15 +51,23 @@ public:
 	
 	void build(ModuleDecl*);
 	void run();
+	void check();
+	void sortThreads();
+	ModuleInst &root()
+	{
+		assert(c_root != NULL);
+		return (*c_root);
+	}
 	
 	NetHash		 c_nets;	/* Global table of nets */
 	NHash/*Trigger*/	 c_triggers;		/* Triggers in this circuit */
 	ChannelHash	 c_channels;		/* Communication channels */
 	SHash/*ModuleInst*/	 c_moduleInsts;		/* Module instances */
-	ModuleInst		*c_root;		/* Root module instance */
 	EvQueue			*c_evQueue;		/* Global event queue */
 	/* Dynamicly loaded modules */
 	SHash			 c_dynamicModules;
+private:
+	ModuleInst		*c_root;		/* Root module instance */
 };
 
 /*****************************************************************************
@@ -75,7 +84,6 @@ void DynamicModule_killNotify(DynamicModule*);
 //void Circuit_build(Circuit *c,ModuleDecl *m);
 void Circuit_buildPathDelayMod(Circuit *c,ModuleInst *mi,ModuleInst *parent,char *path);
 void Circuit_installScript(Circuit *c,ModuleDecl *m,DynamicModule *dm);
-void Circuit_check(Circuit *c);
 Net *Circuit_findNet(Circuit *c,const char *name);
 Net *Circuit_findMemoryNet(Circuit *c,const char *name);
 ModuleInst *Circuit_findModuleInst(Circuit *c, const char *name);
@@ -87,14 +95,12 @@ void Circuit_exec(Circuit*c,char *cmd);
 void Circuit_readMemory(Circuit *c, const char *fileName, Net *net, unsigned start, unsigned stop, unsigned flags);
 int Circuit_writeMemory(Circuit *c, const char *fileName, Net *net, unsigned start, unsigned stop, unsigned flags);
 Channel *Circuit_getChannel(Circuit *c, const char*name);
-void Circuit_sortThreads(Circuit *c);
 void Circuit_unloadDynamicModule(Circuit *c,DynamicModule *dm);
 void Circuit_enableDynamicModule(Circuit *c,DynamicModule *dm);
 void Circuit_disableDynamicModule(Circuit *c,DynamicModule *dm);
 void Circuit_declareNet(Circuit *c,Scope *scope,NetDecl *nd,ModuleDecl *md,Place *place);
 void Circuit_execScript(Circuit*c,int argc,char *argv[]);
 void Circuit_finishModuleInst(Circuit *c, ModuleInst *mi, CodeBlock *codeBlock);
-#define Circuit_getRoot(c) (c)->c_root
 Scope *Circuit_getUpScope(Circuit *c,Scope *s);
 
 #endif
