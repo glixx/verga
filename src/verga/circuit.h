@@ -28,15 +28,18 @@
 
 #if __cplusplus >= 201103
 #include <unordered_map>
-typedef std::unordered_map<std::string, Net*> NetDeclHash;
+typedef std::unordered_map<std::string, Net*> NetHash;
 typedef std::unordered_map<const char*, Channel*> ChannelHash;
+typedef std::unordered_map<const char*, ModuleInst*> ModuleInstHash;
 #else
 #include <map>
 typedef std::map<std::string, Net*> NetHash;
 typedef std::map<const char*, Channel*, StringCompare> ChannelHash;
+typedef std::map<const char*, ModuleInst*, StringCompare> ModuleInstHash;
 #endif
 typedef std::pair<std::string, Net*> NetHashElement;
 typedef std::pair<const char*, Channel*> ChannelHashElement;
+typedef std::pair<const char*, ModuleInst*> ModuleInstHashElement;
 
 /*****************************************************************************
  *
@@ -60,12 +63,12 @@ public:
 	}
 	
 	NetHash		 c_nets;	/* Global table of nets */
-	NHash/*Trigger*/	 c_triggers;		/* Triggers in this circuit */
+	NHash/*Trigger*/ c_triggers;		/* Triggers in this circuit */
 	ChannelHash	 c_channels;		/* Communication channels */
-	SHash/*ModuleInst*/	 c_moduleInsts;		/* Module instances */
-	EvQueue			*c_evQueue;		/* Global event queue */
+	ModuleInstHash	 c_moduleInsts;		/* Module instances */
+	EvQueue		*c_evQueue;		/* Global event queue */
 	/* Dynamicly loaded modules */
-	SHash			 c_dynamicModules;
+	SHash		 c_dynamicModules;
 private:
 	ModuleInst		*c_root;		/* Root module instance */
 };

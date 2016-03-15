@@ -32,7 +32,6 @@ c_evQueue(new EvQueue(*this)),
 c_root(NULL)
 {
 	NHash_init(&this->c_triggers);
-	SHash_init(&this->c_moduleInsts);
 	SHash_init(&this->c_dynamicModules);
 }
 
@@ -57,19 +56,22 @@ void Circuit::build(ModuleDecl *m)
  *****************************************************************************/
 Scope *Circuit_getUpScope(Circuit *c,Scope *s)
 {
-  char path[STRMAX],*p;
-  ModuleInst *mi;
+	char path[STRMAX],*p;
+	ModuleInst *mi;
+	ModuleInstHash::iterator it;
 
-  strcpy(path,s->s_path);
-  if (!(p = strrchr(path,'.')) || p == path)
-    return 0;
+	std::strcpy(path,s->s_path);
+	if (!(p = std::strrchr(path,'.')) || p == path)
+		return (NULL);
 
-  *p = 0;
+	*p = 0;
 
-  mi = (ModuleInst*) SHash_find(&c->c_moduleInsts,path);
-  if (!mi) return 0;
-
-  return &mi->mc_scope;
+	it = c->c_moduleInsts.find(path);
+	if (it != c->c_moduleInsts.end()) {
+		mi = it->second;
+		return (&mi->mc_scope);
+	} else
+		return (NULL);
 }
 
 
@@ -407,17 +409,18 @@ Circuit_bindPorts(MIInstance *mi, ModuleInst *parent_ctx, ModuleDecl *subM,
  * connections are compatable.
  *
  *****************************************************************************/
-static void Circuit_mergeNets(Circuit *c,Net *eNet,ModuleInst *eCtx,Net *iNet,ModuleInst *iCtx)
+static void Circuit_mergeNets(Circuit *c,Net *eNet, ModuleInst *eCtx, Net *iNet,
+    ModuleInst *iCtx)
 {
-  const char *shortName = strrchr(iNet->n_name,'.');
+	const char *shortName = std::strrchr(iNet->n_name,'.');
 
-  if (shortName && *shortName)
-    shortName++;
-  else
-    shortName = iNet->n_name;
+	if (shortName && *shortName)
+		shortName++;
+	else
+		shortName = iNet->n_name;
 
 	c->c_nets[iNet->n_name] = eNet;
-  Scope_replaceLocalNet(ModuleInst_getScope(iCtx),shortName,eNet);
+	Scope_replaceLocalNet(ModuleInst_getScope(iCtx), shortName, eNet);
 
 	delete iNet;
 }
@@ -828,19 +831,19 @@ static void Circuit_buildHier(Circuit *c,ModuleInst *mi,ModuleInst *parent,char 
  *****************************************************************************/
 static ModuleInst *Circuit_buildNets(Circuit *c,ModuleDecl *m,MIInstance *mid,ModuleInst *parent,char *path)
 {
-  ModuleInst *mi;
-  ListElem *le;
-  HashElem *he;
+	ModuleInst *mi;
+	ListElem *le;
+	HashElem *he;
 
-  mi = new ModuleInst(m,c,parent,path);
-  SHash_insert(&c->c_moduleInsts,path,mi);
+	mi = new ModuleInst(m,c,parent,path);
+	c->c_moduleInsts.insert(ModuleInstHashElement(mi->mc_path, mi));
 
-  for (he = Hash_first(&m->m_tasks);he; he = Hash_next(&m->m_tasks,he)) {
-    UserTaskDecl *utd = (UserTaskDecl*) HashElem_obj(he);
-    UserTask *ut = new_UserTask(utd, ModuleInst_getScope(mi));
+	for (he = Hash_first(&m->m_tasks);he; he = Hash_next(&m->m_tasks,he)) {
+		UserTaskDecl *utd = (UserTaskDecl*) HashElem_obj(he);
+		UserTask *ut = new_UserTask(utd, ModuleInst_getScope(mi));
 
-    ModuleInst_defineTask(mi,UserTaskDecl_getName(utd),ut);
-  }
+		ModuleInst_defineTask(mi,UserTaskDecl_getName(utd),ut);
+	}
 
 #if 0
   printf("bn: %s parent: %s  path: %s\n",
@@ -1004,7 +1007,7 @@ void Circuit_installScript(Circuit *c,ModuleDecl *m,DynamicModule *dm)
 		// Ignore entries that are parameters, or not the primary name for a net.
 		if ((Net_getType(n) & NT_P_PARAMETER))
 			continue;
-		if (strcmp(he->first.c_str(), n->n_name) != 0)
+		if (he->first != n->n_name)
 			continue;
 
 		// Check for floaters only on nets
@@ -1124,17 +1127,22 @@ Trigger *Circuit_getNetTrigger(Circuit *c,Net *n,transtype_t tt)
  *****************************************************************************/
 ModuleInst *Circuit_findModuleInst(Circuit *c, const char *name)
 {
-  ModuleInst *mi;
-
-  mi = (ModuleInst*)SHash_find(&c->c_moduleInsts, name);
-  if (!mi) {
-    char *fullName = (char*) malloc(strlen(c->root().mc_path)+strlen(name)+2);
-    sprintf(fullName,"%s.%s",c->root().mc_path, name);
-    mi = (ModuleInst*)SHash_find(&c->c_moduleInsts, fullName);
-    free(fullName);
-  }
-
-  return mi;
+	ModuleInst *mi;
+	ModuleInstHash::iterator it;
+  
+	it = c->c_moduleInsts.find(name);
+	if (it == c->c_moduleInsts.end()) {
+		std::string fullName = std::string(c->root().mc_path).
+			append(".").append(name);
+		it = c->c_moduleInsts.find(fullName.c_str());
+		if (it != c->c_moduleInsts.end())
+			mi = it->second;
+		else
+			mi = NULL;
+	} else
+		mi = it->second;
+	
+	return (mi);
 }
 
 /*****************************************************************************
