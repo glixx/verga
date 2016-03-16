@@ -29,17 +29,17 @@
 #if __cplusplus >= 201103
 #include <unordered_map>
 typedef std::unordered_map<std::string, Net*> NetHash;
-typedef std::unordered_map<const char*, Channel*> ChannelHash;
-typedef std::unordered_map<const char*, ModuleInst*> ModuleInstHash;
+typedef std::unordered_map<std::string, Channel*> ChannelHash;
+typedef std::unordered_map<std::string, ModuleInst*> ModuleInstHash;
 #else
 #include <map>
 typedef std::map<std::string, Net*> NetHash;
-typedef std::map<const char*, Channel*, StringCompare> ChannelHash;
-typedef std::map<const char*, ModuleInst*, StringCompare> ModuleInstHash;
+typedef std::map<std::string, Channel*> ChannelHash;
+typedef std::map<std::string, ModuleInst*> ModuleInstHash;
 #endif
 typedef std::pair<std::string, Net*> NetHashElement;
-typedef std::pair<const char*, Channel*> ChannelHashElement;
-typedef std::pair<const char*, ModuleInst*> ModuleInstHashElement;
+typedef std::pair<std::string, Channel*> ChannelHashElement;
+typedef std::pair<std::string, ModuleInst*> ModuleInstHashElement;
 
 /*****************************************************************************
  *

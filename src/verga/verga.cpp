@@ -496,7 +496,7 @@ main(int argc, char *argv[])
 	int		 delete_on_load = 0;
 	unsigned	 delete_hash_code = 0;
 	const char	*initTimeSpec = 0;
-
+	
 	initErrorMessages();
 	
 	List_init(&load_scripts);

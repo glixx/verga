@@ -34,23 +34,24 @@ Place		curPlace;			/* The current place */
  * "current" object structure used by parser
  *
  *****************************************************************************/
-typedef struct {
-  ModuleDecl	*mod;			/* Module currently being defined */
-  int		dtype;			/* Current type for declarations */
-  VRange	*range;			/* Current range for declarations */
-  char		*instType;		/* Type name of current instances */
-  List		modParms;		/* List of module parameters */
-  unsigned	gtype;			/* Current primitive gate type */
-  Expr		*gdelay;		/* Current delay specification */
-  DynamicModule	*dynmod;		/* Dynamic module */
-  UserTaskDecl	*task;			/* User task declaration */
-  ScopeDecl	*scope;			/* Scope in which to make variable declarations */
-  int		isRedef;		/* This module is a redefinition (i.e., in error). */
-  const char	*esName;		/* Name of embedded script  */
-  unsigned	gstrength;	/* Strength of the signals */
-} Current;
+struct Current
+{
+	ModuleDecl	*mod;		/* Module currently being defined */
+	int		 dtype;		/* Current type for declarations */
+	VRange		*range;		/* Current range for declarations */
+	char		*instType;	/* Type name of current instances */
+	List		 modParms;	/* List of module parameters */
+	unsigned	 gtype;		/* Current primitive gate type */
+	Expr		*gdelay;	/* Current delay specification */
+	DynamicModule	*dynmod;	/* Dynamic module */
+	UserTaskDecl	*task;		/* User task declaration */
+	ScopeDecl	*scope;		/* Scope in which to make variable declarations */
+	int		 isRedef;	/* This module is a redefinition (i.e., in error). */
+	const char	*esName;	/* Name of embedded script  */
+	unsigned	 gstrength;	/* Strength of the signals */
+};
 
-static Current cur = {0};
+static Current cur = {NULL};
 
 
 /*****************************************************************************
@@ -90,12 +91,13 @@ cur_init(const char *fileName)
 	curPlace.init(fileName);
 }
 
-static int cur_getDeclContext()
+static int
+cur_getDeclContext()
 {
-  if (cur.task)
-    return TASK;
-  else
-    return MODULE;
+	if (cur.task)
+		return (TASK);
+	else
+		return (MODULE);
 }
 
 
@@ -110,7 +112,8 @@ static int cur_getDeclContext()
  * Dynamic module are modules that are read and parsed at run-time.
  *
  *****************************************************************************/
-int VerilogLoadScript(const char *fileName,DynamicModule *dm)
+int
+VerilogLoadScript(const char *fileName,DynamicModule *dm)
 {
   FILE *f;
   extern char *current_script;
@@ -179,7 +182,7 @@ VerNewModule(const char *name)
 
 	cur.isRedef = 0;
 
-	if (vgsim.findModule(name)) {
+	if (vgsim.findModule(name) != NULL) {
 		errorFile(&curPlace, ERR_MODREDEF, name);
 		cur.isRedef = 1;
 	}
@@ -425,7 +428,8 @@ void VerAutoAssign(int dtype,const char *lval,Expr *rval)
  *      right			Right-hand expression in range
  *
  *****************************************************************************/
-VRange *VerRange(rangestyle_t rs, Expr *left,Expr *right)
+VRange*
+VerRange(rangestyle_t rs, Expr *left,Expr *right)
 {
 	return (new VRange(rs, left, right));
 }

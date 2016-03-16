@@ -44,7 +44,6 @@
 
 extern Place curPlace;			/* The current place */
 
-
 /*
  * This flag should be set to zero if we are running as the simulator
  */

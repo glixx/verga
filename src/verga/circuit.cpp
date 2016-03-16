@@ -1069,16 +1069,17 @@ Circuit::run()
  *     negedges		List of Net* that trigger on a negedge
  *
  *****************************************************************************/
-Trigger *Circuit_getTrigger(Circuit *c,List *posedges,List *negedges)
+Trigger*
+Circuit_getTrigger(Circuit *c,List *posedges,List *negedges)
 {
-  unsigned hc = Trigger_sortAndGetHashCode(posedges,negedges);
-  Trigger *tlist,*r;
+	unsigned hc = Trigger_sortAndGetHashCode(posedges,negedges);
+	Trigger *tlist,*r;
 
-  tlist = (Trigger*) NHash_find(&c->c_triggers,hc);
-  r = Trigger_getTrigger(&tlist,posedges,negedges);
-  NHash_replace(&c->c_triggers,hc,tlist);
+	tlist = (Trigger*) NHash_find(&c->c_triggers,hc);
+	r = Trigger_getTrigger(&tlist,posedges,negedges);
+	NHash_replace(&c->c_triggers,hc,tlist);
 
-  return r;
+	return (r);
 }
 
 /*****************************************************************************

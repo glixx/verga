@@ -29,7 +29,11 @@
 #include <cstdarg>
 
 #include <list>
+#if __cplusplus >= 201103
+#include <unordered_map>
+#else
 #include <map>
+#endif
 
 #include "config.h"		/* Tkgate global configuration parameters */
 #include "thyme_config.h"	/* thyme-specific configuration parameters */
@@ -183,7 +187,11 @@ public:
 	DelayType vg_delayType;	/* Type of delays to use */
 private:
 	/* Table of modules type*/
-	typedef std::map<const char*, ModuleDecl*, StringCompare> ModulesDict;
+#if __cplusplus >= 201103
+	typedef std::unordered_map<std::string, ModuleDecl*> ModulesDict;
+#else
+	typedef std::map<std::string, ModuleDecl*> ModulesDict;
+#endif
 	/* Table of modules */
 	ModulesDict	 _modules;
         /* Name of top-level module */

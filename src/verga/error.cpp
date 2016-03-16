@@ -565,10 +565,11 @@ Place::getCurrent()
 int
 yyerror(char *err)
 {
-	if (strncmp(err,"syntax",6) == 0)
+	static const char errtxt[] = "syntax";
+	if (std::strncmp(err, errtxt, std::strlen(errtxt)) == 0)
 		errorFile(Place::getCurrent(), ERR_SYNTAX);
 	else
-		errorFile(Place::getCurrent(), ERR_YYERROR,err);
+		errorFile(Place::getCurrent(), ERR_YYERROR, err);
 
 	return (0);
 }
@@ -634,25 +635,25 @@ formatErrorMsg(char *p,ErrorDescriptor *ed,va_list ap)
  *      msg			Text of the error message.
  *
  *****************************************************************************/
-static void doErrorOutput(ErrorDescriptor *ed,const char *msg)
+static void
+doErrorOutput(ErrorDescriptor *ed,const char *msg)
 {
-  extern int errCount;
-  extern int warnCount;
+	extern int errCount;
+	extern int warnCount;
 
-  if (ed->ed_level > 0) {
-    errCount++;
-    reportDeferedWarnings();		/* Report any defered warnings */
-    vgio_printf("%s\n",msg);
-  } else {
-    if (warning_mode > 1) {
-      warnCount++;
-      if (warning_mode == 2 && errCount == 0)
-	deferWarning(msg);
-      else
-	vgio_printf("%s\n",msg);
-    }
-  }
-
+	if (ed->ed_level > 0) {
+		errCount++;
+		reportDeferedWarnings();	/* Report any defered warnings */
+		vgio_printf("%s\n",msg);
+	} else {
+		if (warning_mode > 1) {
+			warnCount++;
+		if (warning_mode == 2 && errCount == 0)
+			deferWarning(msg);
+		else
+			vgio_printf("%s\n",msg);
+		}
+	}
 }
 
 /*****************************************************************************
@@ -728,7 +729,8 @@ errorRun(errorcode_t ecode,...)
  *      ...			Error-specific arguments
  *
  *****************************************************************************/
-void errorFile(Place *place,errorcode_t ecode,...)
+void
+errorFile(Place *place,errorcode_t ecode,...)
 {
   ErrorDescriptor *ed = findError(ecode);
   char message[STRMAX],*p;
@@ -775,21 +777,23 @@ void errorFile(Place *place,errorcode_t ecode,...)
  *      ...			Error-specific arguments
  *
  *****************************************************************************/
-void errorModule(ModuleDecl *m,Place *place,errorcode_t ecode,...)
+void
+errorModule(ModuleDecl *m, Place *place, errorcode_t ecode, ...)
 {
-  ErrorDescriptor *ed = findError(ecode);
-  char buf[STRMAX],*p;
-  va_list ap;
+	ErrorDescriptor *ed = findError(ecode);
+	char buf[STRMAX], *p;
+	va_list ap;
 
-  if (m->m_errorsDone) return;
+	if (m->m_errorsDone)
+		return;
 
-  p = Place_report(place,errLevelText[ed->ed_level],0,buf);
+	p = Place_report(place,errLevelText[ed->ed_level],0,buf);
 
-  va_start(ap,ecode);
-  p += formatErrorMsg(p,ed,ap);
-  va_end(ap);
+	va_start(ap,ecode);
+	p += formatErrorMsg(p,ed,ap);
+	va_end(ap);
 
-  doErrorOutput(ed,buf);
+	doErrorOutput(ed,buf);
 }
 
 /*****************************************************************************
@@ -803,19 +807,21 @@ void errorModule(ModuleDecl *m,Place *place,errorcode_t ecode,...)
  *      ...			Error-specific arguments
  *
  *****************************************************************************/
-void errorNet(ModuleDecl *m,const char *net,Place *place,errorcode_t ecode,...)
+void
+errorNet(ModuleDecl *m, const char *net, Place *place, errorcode_t ecode, ...)
 {
-  ErrorDescriptor *ed = findError(ecode);
-  char buf[STRMAX],*p;
-  va_list ap;
+	ErrorDescriptor *ed = findError(ecode);
+	char buf[STRMAX],*p;
+	va_list ap;
 
-  if (m->m_errorsDone) return;
+	if (m->m_errorsDone)
+		return;
 
-  p = Place_report(place,errLevelText[ed->ed_level],net,buf);
+	p = Place_report(place, errLevelText[ed->ed_level], net, buf);
 
-  va_start(ap,ecode);
-  p += formatErrorMsg(p,ed,ap);
-  va_end(ap);
+	va_start(ap,ecode);
+	p += formatErrorMsg(p,ed,ap);
+	va_end(ap);
 
-  doErrorOutput(ed,buf);
+	doErrorOutput(ed,buf);
 }

@@ -32,6 +32,7 @@
 %token BNOR
 %token BNXOR
 %token BOR
+%token BREAKPT
 %token BXOR
 %token CASE
 %token CASEX
@@ -92,6 +93,7 @@
 %token REG
 %token REPEAT
 %token SCALAR
+%token SCRIPT
 %token SIGNED
 %token SMALL
 %token STRONG0
@@ -129,8 +131,6 @@
 %token <I> CMOS RCMOS BUFIF0 BUFIF1 NOTIF0 NOTIF1 NMOS PMOS RNMOS RPMOS
 %token <I> PRIMAND PRIMNAND PRIMNOR PRIMXOR PRIMXNOR BUF PRIMNOT
 %token <I> TRANIF0 TRANIF1 RTRANIF0 RTRANIF1 RTRAN KWOR TRAN COND
-
-%token BREAKPT SCRIPT
 
  /*
   * Markers for embedded scripts
