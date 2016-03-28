@@ -17,6 +17,9 @@
 ****************************************************************************/
 #ifndef __channel_h
 #define __channel_h
+
+#include <string>
+
 /*****************************************************************************
  *
  * Data Channel Data Structures
@@ -32,16 +35,18 @@ class Channel
 public:
 	
 	Channel(const char *name);
+	~Channel();
 	
-	char		*c_name;	/* Name of channel */
-	List/*Value*/	 c_queue;	/* Queue of channel */
-	List/*Event*/	 c_wake;		/* Events to be executed on wake up */
+	void wait(VGThread*);
+	int queueLen();
+	
+	std::string	 _name;		/* Name of channel */
+	List/*Value*/	 _queue;	/* Queue of channel */
+	List/*Event*/	 c_wake;	/* Events to be executed on wake up */
 	int		 c_isWatched;	/* Flag to indicated if this is a "watched" channel */
 	char		*c_format;	/* Format for watched data */
 };
 
-int Channel_queueLen(Channel *c);
-void Channel_wait(Channel *c, VGThread *thread);
 int Channel_read(Channel *c, Value *data);
 int Channel_write(Channel *c, Value *data);
 int Channel_setWatch(Channel *c, int doWatch, const char *format);
