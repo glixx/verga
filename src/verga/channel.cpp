@@ -29,14 +29,20 @@
  * Returns:		Newly created channel
  *
  *****************************************************************************/
-Channel::Channel(const char *name)
+Channel::Channel(const char *name) :
+_name(name)
 {
-	this->c_name = strndup(name, STRMAX);
-	List_init(&this->c_queue);
+	List_init(&this->_queue);
 	List_init(&this->c_wake);
 	this->c_isWatched = 0;
 	this->c_format = NULL;
 }
+
+Channel::~Channel()
+{
+
+}
+
 
 /*****************************************************************************
  *
@@ -47,12 +53,13 @@ static void
 Channel_reportWatched(Channel *c,Value *v)
 {
 	EvQueue *Q = vgsim.circuit().c_evQueue;
-  char buf[STRMAX];
+	char buf[STRMAX];
 
-  if (!c->c_format)
-    c->c_format = strdup("%h");
-  Value_format(v,c->c_format,buf);
-  vgio_printf("tell $queue %s %s @ %llu\n",c->c_name,buf,EvQueue_getCurTime(Q));
+	if (!c->c_format)
+		c->c_format = strdup("%h");
+	Value_format(v, c->c_format, buf);
+	vgio_printf("tell $queue %s %s @ %llu\n",c->_name.c_str(), buf,
+	    EvQueue_getCurTime(Q));
 }
 
 /*****************************************************************************
@@ -64,10 +71,11 @@ Channel_reportWatched(Channel *c,Value *v)
  *      thread		Thread to suspend until data is ready.
  *
  *****************************************************************************/
-void Channel_wait(Channel *c, VGThread *thread)
+void
+Channel::wait(VGThread *thread)
 {
-  List_addToTail(&c->c_wake,new_EvThread(thread));
-  VGThread_suspend(thread);
+	List_addToTail(&this->c_wake, new_EvThread(thread));
+	VGThread_suspend(thread);
 }
 
 /*****************************************************************************
@@ -78,9 +86,10 @@ void Channel_wait(Channel *c, VGThread *thread)
  *      c		Channel object
  *
  *****************************************************************************/
-int Channel_queueLen(Channel *c)
+int
+Channel::queueLen()
 {
-  return List_numElems(&c->c_queue);
+	return List_numElems(&this->_queue);
 }
 
 /*****************************************************************************
@@ -99,8 +108,8 @@ int Channel_setWatch(Channel *c, int isWatched, const char *format)
   if (c->c_format) free(c->c_format);
   c->c_format = format ? strdup(format) : strdup("%h");
   if (isWatched) {
-    while (List_numElems(&c->c_queue) > 0) {
-      Value *v = (Value*) List_popHead(&c->c_queue);
+    while (c->queueLen() > 0) {
+      Value *v = (Value*) List_popHead(&c->_queue);
       Channel_reportWatched(c,v);
     }
   }
@@ -111,10 +120,10 @@ int Channel_read(Channel *c, Value *data)
 {
   Value *v;
 
-  if (List_numElems(&c->c_queue) == 0)
-    return -1;
+	if (c->queueLen() == 0)
+		return -1;
 
-  v = (Value*) List_popHead(&c->c_queue);
+	v = (Value*)List_popHead(&c->_queue);
 
   Value_copy(data, v);
   delete_Value(v);
@@ -134,14 +143,14 @@ int Channel_write(Channel *c, Value *data)
   v = new_Value(Value_nbits(data));
 
   Value_copy(v, data);
-  List_addToTail(&c->c_queue, v);
+	List_addToTail(&c->_queue, v);
 
 #if 0
   {
     char buf[STRMAX];
 
     Value_getstr(data,buf);
-    vgio_echo("Channel_write(%s, %s)\n",c->c_name,buf);
+    vgio_echo("Channel_write(%s, %s)\n",c->_name,buf);
   }
 #endif
 

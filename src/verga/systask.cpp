@@ -1211,38 +1211,38 @@ static void SysTask_tkg_waituntil(VGThread *t, Value *r, int numArgs, void **arg
  *****************************************************************************/
 static void SysTask_tkg_recv(VGThread *t, Value *r, int numArgs, void **args, TaskContext *taskContext)
 {
-  char name[STRMAX];
-  Channel *c;
+	char name[STRMAX];
+	Channel *c;
 
-  if (!vgsim.vg_sec.vgs_queue) {
-    VGSecurity_handleException(&vgsim.vg_sec,t,"$tkg$recv");
-    return;
-  }
+	if (!vgsim.vg_sec.vgs_queue) {
+		VGSecurity_handleException(&vgsim.vg_sec,t,"$tkg$recv");
+		return;
+	}
 
-  if (numArgs != 1) return;
-  if (!r) {
-    return;
-  }
+	if (numArgs != 1)
+		return;
+	if (!r)
+		return;
 
-  Value_toString((Value*)args[0],name);
-  string_expand(name, VGThread_getModCtx(t));
-  c = Circuit_getChannel(t->t_modCtx->mc_circuit, name);
+	Value_toString((Value*)args[0],name);
+	string_expand(name, VGThread_getModCtx(t));
+	c = Circuit_getChannel(t->t_modCtx->mc_circuit, name);
 
-  if (Channel_read(c, r) < 0) {
-    /*
-     * No data is available on the channel.  Suspend the thread and wait for data.
-     * Backup the pc so this system task will be reexecuted when
-     * the thread wakes up.
-     */
-    Channel_wait(c,t);
-    t->t_pc--;
-  } else {
+	if (Channel_read(c, r) < 0) {
+	/*
+	 * No data is available on the channel.  Suspend the thread and wait for data.
+	 * Backup the pc so this system task will be reexecuted when
+	 * the thread wakes up.
+	 */
+		c->wait(t);
+		--t->t_pc;
+	} else {
 #if 0
-    char buf[1024];
-    Value_getstr(r,buf);
-    vgio_echo("$tkg$recv %s: data=%s\n",name,buf);
+		char buf[1024];
+		Value_getstr(r,buf);
+		vgio_echo("$tkg$recv %s: data=%s\n",name,buf);
 #endif
-  }
+	}
 }
 
 
