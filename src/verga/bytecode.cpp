@@ -34,7 +34,10 @@
  *****************************************************************************/
 CodeBlock::CodeBlock(ModuleInst *mi)
 {
-	this->init(mi);
+	this->_length = 0;
+	this->cb_nalloced = BCODE_BLOCKSIZE;
+	this->_module = mi;
+	this->cb_instructions = (ByteCode*) malloc(sizeof(ByteCode)*BCODE_BLOCKSIZE);
 }
 
 /*****************************************************************************
@@ -52,34 +55,18 @@ CodeBlock::~CodeBlock()
 
 /*****************************************************************************
  *
- * Initialize a CodeBlock
- *
- * Parameters:
- *     cb		CodeBlock to be initialized.
- *
- *****************************************************************************/
-void
-CodeBlock::init(ModuleInst *mi)
-{
-	this->cb_length = 0;
-	this->cb_nalloced = BCODE_BLOCKSIZE;
-	this->cb_module = mi;
-	this->cb_instructions = (ByteCode*) malloc(sizeof(ByteCode)*BCODE_BLOCKSIZE);
-}
-
-/*****************************************************************************
- *
  * Resize a codeblock to use the minimum number of bytes.
  *
  *****************************************************************************/
-void CodeBlock_close(CodeBlock *cb)
+void
+CodeBlock::close()
 {
-  ByteCode *oldBC = cb->cb_instructions;
+	ByteCode *oldBC = this->cb_instructions;
 
-  cb->cb_nalloced = cb->cb_length;
-  cb->cb_instructions = (ByteCode*) malloc(sizeof(ByteCode)*cb->cb_nalloced);
-  memcpy(cb->cb_instructions, oldBC, sizeof(ByteCode)*cb->cb_nalloced);
-  free(oldBC);
+	this->cb_nalloced = this->_length;
+	this->cb_instructions = (ByteCode*) malloc(sizeof(ByteCode)*this->cb_nalloced);
+	std::memcpy(this->cb_instructions, oldBC, sizeof(ByteCode)*this->cb_nalloced);
+	free(oldBC);
 }
 
 /*****************************************************************************
@@ -105,48 +92,52 @@ void CodeBlock_uninit(CodeBlock *cb)
  * Returns:		Next unused ByteCode in cb.
  *
  *****************************************************************************/
-ByteCode *CodeBlock_nextEmpty(CodeBlock *cb)
+ByteCode*
+CodeBlock::nextEmpty()
 {
-  if (cb->cb_length >= cb->cb_nalloced) {
-    cb->cb_nalloced += BCODE_BLOCKSIZE;
-    cb->cb_instructions = (ByteCode*) realloc(cb->cb_instructions,sizeof(ByteCode)*cb->cb_nalloced);
-  }
+	if (this->_length >= this->cb_nalloced) {
+		this->cb_nalloced += BCODE_BLOCKSIZE;
+		this->cb_instructions = (ByteCode*) realloc(this->cb_instructions,
+		    sizeof(ByteCode)*this->cb_nalloced);
+	}
 
-  return cb->cb_instructions + cb->cb_length++;
+	return (this->cb_instructions + this->_length++);
 }
 
-void CodeBlock_copy(CodeBlock *dst,unsigned dpos,CodeBlock *src,unsigned start,unsigned stop)
+void
+CodeBlock::copy(unsigned dpos,CodeBlock *src,unsigned start,unsigned stop)
 {
-  if (stop >= src->cb_length)
-    stop = src->cb_length -1;
-  unsigned copySize = (stop-start+1);
-  unsigned reqLen = dpos + copySize;		/* Required length */
+	if (stop >= src->_length)
+		stop = src->_length -1;
+	unsigned copySize = (stop-start+1);
+	unsigned reqLen = dpos + copySize;		/* Required length */
 
-  if (reqLen >= dst->cb_nalloced) {
-    dst->cb_nalloced = reqLen;
-    dst->cb_instructions = (ByteCode*) realloc(dst->cb_instructions,sizeof(ByteCode)*dst->cb_nalloced);
-  }
+	if (reqLen >= this->cb_nalloced) {
+		this->cb_nalloced = reqLen;
+		this->cb_instructions = (ByteCode*) realloc(this->cb_instructions,
+		    sizeof(ByteCode)*this->cb_nalloced);
+	}
 
-  memcpy(CodeBlock_get(dst,dpos),CodeBlock_get(src,start),sizeof(ByteCode)*copySize);
+	std::memcpy(CodeBlock_get(this, dpos), CodeBlock_get(src,start),
+	    sizeof (ByteCode)*copySize);
 #if 0
   {
-    int i;
-    unsigned *ptr = (unsigned*) CodeBlock_get(dst,dpos);
-    int n = sizeof(ByteCode)*(stop-start+1)/sizeof(unsigned);
+	int i;
+	unsigned *ptr = (unsigned*) CodeBlock_get(this, dpos);
+	int n = sizeof(ByteCode)*(stop-start+1)/sizeof(unsigned);
 
-    printf("copy %d <- %d..%d  n=%d\n",dpos,start,stop,n);
-    printf("  dst:");
-    for (i = 0;i <= n;i++) {
-      printf("%08x",ptr[i]);
-    }
-    printf("\n");
+	printf("copy %d <- %d..%d  n=%d\n",dpos,start,stop,n);
+	printf("  dst:");
+	for (i = 0;i <= n;i++) {
+		printf("%08x",ptr[i]);
+	}
+	printf("\n");
 
-    ptr = (unsigned*) CodeBlock_get(src,start);
-    printf("  src:");
-    for (i = 0;i <= n;i++) {
-      printf("%08x",ptr[i]);
-    }
-    printf("\n");
+	ptr = (unsigned*) CodeBlock_get(src, start);
+	printf("  src:");
+	for (i = 0;i <= n;i++)
+		printf("%08x",ptr[i]);
+	printf("\n");
   }
 #endif
 }
@@ -1327,27 +1318,19 @@ void BCDebugPrint_exec(BCDebugPrint *dp,VGThread *t)
  *     mitem		Module item this thread manages if applicable
  *
  *****************************************************************************/
-VGThread *new_VGThread(CodeBlock *cb,unsigned pc,ModuleInst *modCtx,ModuleItem *mitem)
+VGThread::VGThread(CodeBlock *cb,unsigned pc,ModuleInst *modCtx,ModuleItem *mitem)
 {
-  VGThread *thread = (VGThread *) malloc(sizeof(VGThread));
-
-  VGThread_init(thread,cb,pc,modCtx,mitem);
-
-  return thread;
+  VGThread_init(this,cb,pc,modCtx,mitem);
 }
 
 /*****************************************************************************
  *
  * Destroy a VGThread object.
  *
- * Parameters:
- *     thread		VGThread object to be destroyed.
- *
  *****************************************************************************/
-void delete_VGThread(VGThread *thread)
+VGThread::~VGThread()
 {
-  VGThread_uninit(thread);
-  free(thread);
+  VGThread_uninit(this);
 }
 
 /*****************************************************************************
@@ -1408,12 +1391,12 @@ void VGThread_kill(VGThread *t)
  *****************************************************************************/
 VGThread *VGThread_spawn(VGThread *parent,CodeBlock *cb,unsigned offset)
 {
-  VGThread *child = new_VGThread(cb, offset, parent->t_modCtx, parent->t_mitem);
+  VGThread *child = new VGThread(cb, offset, parent->t_modCtx, parent->t_mitem);
 
   child->t_parent = parent;
   parent->t_numChild++;
 
-  return child;
+  return (child);
 }
 
 /*****************************************************************************
@@ -1455,17 +1438,18 @@ void VGThread_goto(VGThread *thread,CodeBlock *codeBlock,unsigned offset)
  *     thread		Thread to execute.
  *
  *****************************************************************************/
-void VGThread_exec(VGThread *thread)
+void
+VGThread_exec(VGThread *thread)
 {
-  VGThread_resume(thread);
-  while (VGThread_isActive(thread)) {
-    if (do_input_check) {
-      EvQueue *Q = VGThread_getQueue(thread);
-      VGThread_suspend(thread);
-      EvQueue_enqueueAtHead(Q,new_EvThread(thread));
-    } else
-      VGThread_doNextInsruction(thread);
-  }
+	VGThread_resume(thread);
+	while (VGThread_isActive(thread)) {
+		if (do_input_check) {
+			EvQueue *Q = VGThread_getQueue(thread);
+			VGThread_suspend(thread);
+			EvQueue_enqueueAtHead(Q,new_EvThread(thread));
+		} else
+		VGThread_doNextInsruction(thread);
+	}
 }
 
 /*****************************************************************************

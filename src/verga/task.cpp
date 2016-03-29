@@ -93,10 +93,10 @@ void UserTask_generate(UserTask *ut,CodeBlock *cb)
   }
 
   ut->ut_block = cb;
-  ut->ut_offset = CodeBlock_size(cb);
+	ut->ut_offset = cb->size();
   StatDecl_generate(utd->utd_stat,&ut->ut_scope,cb);
 
-  BCReturn_init(CodeBlock_nextEmpty(cb));
+  BCReturn_init(cb->nextEmpty());
 }
 
 
@@ -136,10 +136,10 @@ void UserTask_generateCallInputs(UserTask *ut,void **sargs,CodeBlock *cb,Scope *
     if (value) {
       if (Value_nbits(value) < Net_nbits(net)) {
 	Value *new_value = new_Value(Net_nbits(net));
-	BCCopy_init(CodeBlock_nextEmpty(cb),new_value,value);
+	BCCopy_init(cb->nextEmpty(), new_value,value);
 	value = new_value;
       }
-      BCAsgn_init(CodeBlock_nextEmpty(cb),net,0,value,0,Net_nbits(net));
+      BCAsgn_init(cb->nextEmpty(), net,0,value,0,Net_nbits(net));
     }
   }
 }
@@ -182,12 +182,12 @@ void UserTask_generateCallOutputs(UserTask *ut,void **sargs,CodeBlock *cb,Scope 
     if (out_net) {
       if (Net_nbits(out_net) > Value_nbits(value)) {
 	Value *new_value = new_Value(Net_nbits(out_net));
-	BCCopy_init(CodeBlock_nextEmpty(cb),new_value,value);
+	BCCopy_init(cb->nextEmpty(), new_value,value);
 	value = new_value;
       }
-      BCAsgn_init(CodeBlock_nextEmpty(cb),out_net,0,value,0,Net_nbits(out_net));
+      BCAsgn_init(cb->nextEmpty(), out_net,0,value,0,Net_nbits(out_net));
     } else if (out_value) {
-      BCCopy_init(CodeBlock_nextEmpty(cb),out_value,value);
+      BCCopy_init(cb->nextEmpty(), out_value,value);
     }
   }
 
@@ -217,7 +217,7 @@ void UserTask_generateCall(UserTask *ut,void **sargs,CodeBlock *cb)
   /*
    * Generate a call to the task
    */
-  BCSubr_init(CodeBlock_nextEmpty(cb),ut->ut_block,ut->ut_offset);
+  BCSubr_init(cb->nextEmpty(), ut->ut_block,ut->ut_offset);
 
   /*
    * Generate code to copy output values and inout values from the arguments
@@ -275,7 +275,7 @@ void UserTask_generateInlineCall(UserTask *ut,void **sargs,CodeBlock *cb)
   UserTask_generateCallInputs(ut,sargs,cb,scope);
 
   ut->ut_block = cb;
-  ut->ut_offset = CodeBlock_size(cb);
+  ut->ut_offset = cb->size();
   StatDecl_generate(utd->utd_stat,scope,cb);
 
   /*

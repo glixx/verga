@@ -180,15 +180,16 @@ Event *new_EvThread(VGThread *thread)
  *     q		Event queue
  *
  *****************************************************************************/
-void EvThread_process(EvThread *tev,EvQueue *q)
+void
+EvThread_process(EvThread *tev,EvQueue *q)
 {
-  VGThread *thread = tev->et_thread;
+	VGThread *thread = tev->et_thread;
 
-  thread->t_pending = 0;
-  if (thread->t_isLive)
-    VGThread_exec(thread);
-  if (!thread->t_isLive)
-    delete_VGThread(thread);
+	thread->t_pending = 0;
+	if (thread->t_isLive)
+		VGThread_exec(thread);
+	if (!thread->t_isLive)
+		delete thread;
 }
 
 /*****************************************************************************

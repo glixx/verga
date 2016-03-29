@@ -21,6 +21,7 @@
 #include "mitem.h"
 #include "verilog.h"
 #include "circuit.h"
+#include "bytecode.h"
 
 #if __cplusplus >= 201103
 #include <unordered_map>
@@ -161,6 +162,11 @@ public:
 	
 	void init(ModuleDecl*, Circuit*, ModuleInst*,const char *path);
 	
+	void setCodeBlock(CodeBlock *newVal)
+	{
+		this->_codeBlock = newVal;
+	}
+	
 	char		*mc_path;	/* Path for this context */
 	ModuleInst	*mc_peer;	/* Peer module (used for simulation scripts) */
 	ModuleDecl	*mc_mod;	/* Module definition */
@@ -170,12 +176,15 @@ public:
 	ModuleInst	*_parent;	
 	List/*VGThread*/ _threads;	/* Threads in the module instance */
 	Scope		 mc_scope;	/* Scope in which varaibles/tasks are defined */
-	CodeBlock	*mc_codeBlock;	/* Code block for this module instance */
 private:
 	/**
 	 * @brief Circuit we are building
 	 */
 	Circuit		*_circuit;
+	/**
+	 * @brief Code block for this module instance
+	 */
+	CodeBlock	*_codeBlock;
 };
 
 /*****************************************************************************
@@ -253,7 +262,7 @@ void ModuleInst_defParm(ModuleInst *mc,const char *name,Value *value);
 void ModuleInst_defNet(ModuleInst *mc,const char *name,Net *n);
 const char *ModuleInst_findLocalNetName(ModuleInst *mc,Net *n);
 #define ModuleInst_getPath(mc) (mc)->mc_path
-#define ModuleInst_setCodeBlock(mc,cb) ((mc)->mc_codeBlock = (cb))
+
 #define ModuleInst_getModDecl(mc) (mc)->mc_mod
 UserTask *ModuleInst_findTask(ModuleInst *m,const char *name);
 int ModuleInst_defineTask(ModuleInst *m,const char *name,UserTask *ut);

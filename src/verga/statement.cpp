@@ -553,10 +553,10 @@ void SDNull_print(StatDecl *sd, FILE *f, int indent,unsigned flags)
   fprintf(f,";");
 }
 
-
-void SDNull_generate(StatDecl *sd, Scope *scope, CodeBlock *cb)
+void
+SDNull_generate(StatDecl *sd, Scope *scope, CodeBlock *cb)
 {
-  BCNoop_init(CodeBlock_nextEmpty(cb));
+	BCNoop_init(cb->nextEmpty());
 }
 
 static void SDTask_generateUserTask(SDTask *t,Scope *scope,UserTask *ut,CodeBlock *cb)
@@ -582,7 +582,7 @@ static void SDTask_generateUserTask(SDTask *t,Scope *scope,UserTask *ut,CodeBloc
   /*
    * Remember the top of the code we are generating
    */
-  top_bc = CodeBlock_size(cb);
+  top_bc = cb->size();
   if (t->t_nargs)
     sargs = (void**) malloc(sizeof(void*)*t->t_nargs);
 
@@ -620,7 +620,7 @@ static void SDTask_generateUserTask(SDTask *t,Scope *scope,UserTask *ut,CodeBloc
       break;
     }
   }
-  end_bc = CodeBlock_size(cb);
+  end_bc = cb->size();
 
   if (UserTask_isAuto(ut))
     UserTask_generateInlineCall(ut,sargs,cb);
@@ -690,7 +690,7 @@ void SDTask_generateSysTask(SDTask *t, Scope *scope, CodeBlock *cb,SysTaskDescri
   /*
    * Remember the top of the code we are generating
    */
-  top_bc = CodeBlock_size(cb);
+  top_bc = cb->size();
   if (t->t_nargs)
     sargs = (void**) malloc(sizeof(void*)*t->t_nargs);
 
@@ -730,12 +730,12 @@ void SDTask_generateSysTask(SDTask *t, Scope *scope, CodeBlock *cb,SysTaskDescri
       break;
     }
   }
-  end_bc = CodeBlock_size(cb);
+  end_bc = cb->size();
 
   /*
    * Generate the actual call to the task.
    */
-  BCTask_init(CodeBlock_nextEmpty(cb),taskEnt->st_func,taskCtx,0,t->t_nargs,sargs);
+  BCTask_init(cb->nextEmpty(), taskEnt->st_func,taskCtx,0,t->t_nargs,sargs);
 
   /*
    * If we needed a task context, set the block for the context.
@@ -816,15 +816,15 @@ void SDWait_generate(SDWait *sdw, Scope *scope, CodeBlock *cb)
 
   PHash_init(&H);
 
-  top_bc = CodeBlock_size(cb);
+  top_bc = cb->size();
   ret_val = Expr_generateS(sdw->w_cond,scope, cb);
-  branch_bc = CodeBlock_size(cb);
-  BCGoto_init(CodeBlock_nextEmpty(cb),ret_val,0,cb,0);
+  branch_bc = cb->size();
+  BCGoto_init(cb->nextEmpty(),ret_val,0,cb,0);
 
   trigger = Expr_getDefaultTrigger(sdw->w_cond, scope);
-  BCTrigger_init(CodeBlock_nextEmpty(cb),trigger);
-  BCGoto_init(CodeBlock_nextEmpty(cb),0,0,cb,top_bc);
-  end_bc = CodeBlock_size(cb);
+  BCTrigger_init(cb->nextEmpty(),trigger);
+  BCGoto_init(cb->nextEmpty(),0,0,cb,top_bc);
+  end_bc = cb->size();
 
   if (sdw->w_stat)
     StatDecl_generate(sdw->w_stat, scope, cb);
@@ -851,12 +851,13 @@ void SDWait_generate(SDWait *sdw, Scope *scope, CodeBlock *cb)
  * elsewhere in the verilog description.
  *
  *****************************************************************************/
-void SDRaise_generate(SDRaise *srw, Scope *scope, CodeBlock *cb)
+void
+SDRaise_generate(SDRaise *srw, Scope *scope, CodeBlock *cb)
 {
-  const char *name = Expr_getLitName(srw->r_event);
-  Net *net =  Scope_findNet(scope, name, 0);
+	const char *name = Expr_getLitName(srw->r_event);
+	Net *net =  Scope_findNet(scope, name, 0);
 
-  BCRaise_init(CodeBlock_nextEmpty(cb),net);
+	BCRaise_init(cb->nextEmpty(), net);
 }
 
 
@@ -885,14 +886,14 @@ static void SDAsgn_generateNetAsgnPiece(SDAsgn *sd, Scope *scope, CodeBlock *cb,
        */
       if (sd->a_bcond)
 	Expr_generateBCond(sd->a_bcond, scope, cb, (StatDecl*)sd);
-      BCAsgn_init(CodeBlock_nextEmpty(cb),n,nLsb,r,base_bit,lhs_size);
+      BCAsgn_init(cb->nextEmpty(), n,nLsb,r,base_bit,lhs_size);
     } else {
       if (!sd->a_bcond) {
 	/*
 	 * This is a non-blocking assignment with no blocking condition on the
 	 * assignment.
 	 */
-	BCNbAsgnD_init(CodeBlock_nextEmpty(cb),n,nLsb,r,base_bit,lhs_size,0);
+	BCNbAsgnD_init(cb->nextEmpty(), n,nLsb,r,base_bit,lhs_size,0);
       } else {
 	/*
 	 * This is a non-blocking assignment with a blocking condition on the
@@ -902,13 +903,13 @@ static void SDAsgn_generateNetAsgnPiece(SDAsgn *sd, Scope *scope, CodeBlock *cb,
 	if (Expr_type(sd->a_bcond) == E_AT) {
 	  Trigger *t = Expr_getTrigger(sd->a_bcond->e.opr[1], scope, (StatDecl*)sd);
 	  if (t)
-	    BCNbAsgnE_init(CodeBlock_nextEmpty(cb),n,nLsb,r,base_bit,lhs_size,t);
+	    BCNbAsgnE_init(cb->nextEmpty(), n,nLsb,r,base_bit,lhs_size,t);
 	} else if (Expr_type(sd->a_bcond) == E_DELAY) {
-	  Timescale *ts = ModuleInst_getTimescale(CodeBlock_getModuleInst(cb));
+	  Timescale *ts = ModuleInst_getTimescale(cb->module());
 	  deltatime_t delay;
 
 	  if (Expr_getDelay(sd->a_bcond, scope, ts, &delay) == 0)
-	    BCNbAsgnD_init(CodeBlock_nextEmpty(cb),n,nLsb,r,base_bit,lhs_size,delay);
+	    BCNbAsgnD_init(cb->nextEmpty(), n,nLsb,r,base_bit,lhs_size,delay);
 	}
       }
     }
@@ -940,26 +941,26 @@ static void SDAsgn_generateMemAsgnPiece(SDAsgn *sd, Scope *scope, CodeBlock *cb,
        */
       if (sd->a_bcond)
 	Expr_generateBCond(sd->a_bcond, scope, cb, (StatDecl*)sd);
-      BCMemPut_init(CodeBlock_nextEmpty(cb),n,nAddr, nLsb, r, base_bit, lhs_size);
+      BCMemPut_init(cb->nextEmpty(), n,nAddr, nLsb, r, base_bit, lhs_size);
     } else {
       if (!sd->a_bcond) {
-	BCNbMemPutD_init(CodeBlock_nextEmpty(cb),n,nAddr, nLsb, r, base_bit, lhs_size,0);
+	BCNbMemPutD_init(cb->nextEmpty(), n,nAddr, nLsb, r, base_bit, lhs_size,0);
       } else {
 	switch (Expr_type(sd->a_bcond)) {
 	case E_AT :
 	  {
 	    Trigger *trigger = Expr_getTrigger(sd->a_bcond->e.opr[1], scope, (StatDecl*)sd);
 	    if (trigger)
-	      BCNbMemPutE_init(CodeBlock_nextEmpty(cb),n,nAddr, nLsb, r, base_bit, lhs_size, trigger);
+	      BCNbMemPutE_init(cb->nextEmpty(),n,nAddr, nLsb, r, base_bit, lhs_size, trigger);
 	  }
 	  break;
 	case E_DELAY :
 	  {
-	    Timescale *ts = ModuleInst_getTimescale(CodeBlock_getModuleInst(cb));
+	    Timescale *ts = ModuleInst_getTimescale(cb->module());
 	    deltatime_t delay;
 
 	    if (Expr_getDelay(sd->a_bcond, scope, ts, &delay) == 0)
-	      BCNbMemPutD_init(CodeBlock_nextEmpty(cb),n,nAddr, nLsb, r, base_bit, lhs_size, delay);
+	      BCNbMemPutD_init(cb->nextEmpty(),n,nAddr, nLsb, r, base_bit, lhs_size, delay);
 	  }
 	  break;
 	}
@@ -1012,7 +1013,7 @@ void SDAsgn_generate(SDAsgn *sd, Scope *scope, CodeBlock *cb)
    */
   if ((Value_getAllFlags(r) & SF_NETVAL)) {
     Value *r_copy = new_Value(Value_nbits(r));
-    BCCopy_init(CodeBlock_nextEmpty(cb),r_copy,r);
+    BCCopy_init(cb->nextEmpty(), r_copy,r);
     r = r_copy;
   }
 
@@ -1080,8 +1081,8 @@ void SDIf_generate(SDIf *sd, Scope *scope, CodeBlock *cb)
    * otherwise we fall into the else part.
    */
   cond = Expr_generateS(sd->i_cond, scope, cb);
-  branch_bc = CodeBlock_size(cb);
-  BCGoto_init(CodeBlock_nextEmpty(cb),cond,0,cb,0);
+  branch_bc = cb->size();
+  BCGoto_init(cb->nextEmpty(), cond,0,cb,0);
 
   /*
    * Generate the else block if there is one followed by an uncondition jump
@@ -1089,15 +1090,15 @@ void SDIf_generate(SDIf *sd, Scope *scope, CodeBlock *cb)
    */
   if (sd->i_else)
     StatDecl_generate(sd->i_else, scope, cb);
-  then_bc = CodeBlock_size(cb);
-  BCGoto_init(CodeBlock_nextEmpty(cb),0,0,cb,0);
+  then_bc = cb->size();
+  BCGoto_init(cb->nextEmpty(), 0,0,cb,0);
 
   /*
    * Generate the then block.
    */
   if (sd->i_then)
     StatDecl_generate(sd->i_then, scope, cb);
-  after_bc = CodeBlock_size(cb);
+  after_bc = cb->size();
 
   /*
    * Go back and fix all of the branch offsets.
@@ -1114,13 +1115,13 @@ void SDWhile_generate(SDWhile *sd, Scope *scope, CodeBlock *cb)
   /*
    * Generate condition and save branch instruction and top of loop
    */
-  top_bc = CodeBlock_size(cb);
+  top_bc = cb->size();
   cond = Expr_generateS(sd->w_cond, scope, cb);
-  branch_bc = CodeBlock_size(cb);
-  BCGoto_init(CodeBlock_nextEmpty(cb),cond,1,cb,0);
+  branch_bc = cb->size();
+  BCGoto_init(cb->nextEmpty(),cond,1,cb,0);
   StatDecl_generate(sd->w_body,scope,cb);
-  BCGoto_init(CodeBlock_nextEmpty(cb),0,0,cb,top_bc);
-  after_bc = CodeBlock_size(cb);
+  BCGoto_init(cb->nextEmpty(),0,0,cb,top_bc);
+  after_bc = cb->size();
 
   /*
    * Go back and fix all of the branch offsets.
@@ -1135,9 +1136,9 @@ void SDForever_generate(SDForever *sd, Scope *scope, CodeBlock *cb)
   /*
    * Generate condition and save branch instruction and top of loop
    */
-  top_bc = CodeBlock_size(cb);
+  top_bc = cb->size();
   StatDecl_generate(sd->f_body,scope,cb);
-  BCGoto_init(CodeBlock_nextEmpty(cb),0,0,cb,top_bc);
+  BCGoto_init(cb->nextEmpty(),0,0,cb,top_bc);
 }
 
 void SDFor_generate(SDFor *sd, Scope *scope, CodeBlock *cb)
@@ -1153,14 +1154,14 @@ void SDFor_generate(SDFor *sd, Scope *scope, CodeBlock *cb)
   /*
    * Generate condition and save branch instruction and top of loop
    */
-  top_bc = CodeBlock_size(cb);
+  top_bc = cb->size();
   cond = Expr_generateS(sd->f_cond, scope, cb);
-  branch_bc = CodeBlock_size(cb);
-  BCGoto_init(CodeBlock_nextEmpty(cb),cond,1,cb,0);
+  branch_bc = cb->size();
+  BCGoto_init(cb->nextEmpty(),cond,1,cb,0);
   StatDecl_generate(sd->f_body,scope,cb);
   StatDecl_generate(sd->f_next,scope,cb);
-  BCGoto_init(CodeBlock_nextEmpty(cb),0,0,cb,top_bc);
-  after_bc = CodeBlock_size(cb);
+  BCGoto_init(cb->nextEmpty(),0,0,cb,top_bc);
+  after_bc = cb->size();
 
   /*
    * Go back and fix all of the branch offsets.
@@ -1202,19 +1203,19 @@ void SDCase_generate(SDCase *sdc, Scope *scope, CodeBlock *cb)
 
     cond = Expr_generateS(ce->ce_cond, scope, cb);
     result = new_Value(imax(Value_nbits(cond), Value_nbits(select)));
-    BCOpr_init(CodeBlock_nextEmpty(cb),Value_caseEq,result,select,cond,0);
-    skip_bc = CodeBlock_size(cb);
-    BCGoto_init(CodeBlock_nextEmpty(cb),result,1,cb,0);
+    BCOpr_init(cb->nextEmpty(), Value_caseEq,result,select,cond,0);
+    skip_bc = cb->size();
+    BCGoto_init(cb->nextEmpty(),result,1,cb,0);
     StatDecl_generate(ce->ce_stat, scope, cb);
-    branch_bc[i] = CodeBlock_size(cb);
-    BCGoto_init(CodeBlock_nextEmpty(cb),0,0,cb,0);
+    branch_bc[i] = cb->size();
+    BCGoto_init(cb->nextEmpty(), 0, 0, cb, 0);
     BCGoto_setOffset((BCGoto*)CodeBlock_get(cb,skip_bc),branch_bc[i]+1);
   }
   if (defaultStat) {
     StatDecl_generate(defaultStat, scope, cb);
     n--;
   }
-  after_bc = CodeBlock_size(cb);
+  after_bc = cb->size();
 
   for (i = 0;i < n;i++)
     BCGoto_setOffset((BCGoto*)CodeBlock_get(cb,branch_bc[i]),after_bc);
@@ -1234,35 +1235,35 @@ void SDFork_generate(SDFork *s, Scope *scope, CodeBlock *cb)
   /*
    * Goto to jump over code for fork branches
    */
-  start_bc = CodeBlock_size(cb);
-  BCGoto_init(CodeBlock_nextEmpty(cb),0,0,cb,0);
+  start_bc = cb->size();
+  BCGoto_init(cb->nextEmpty(),0,0,cb,0);
   branch_bc = (unsigned*) malloc(sizeof(unsigned)*n);
 
   for (le = List_first(s->f_stats), i = 0;le;le = List_next(s->f_stats, le), i++) {
     StatDecl *branch = (StatDecl*) ListElem_obj(le);
 
-    branch_bc[i] = CodeBlock_size(cb);
+    branch_bc[i] = cb->size();
     StatDecl_generate(branch, scope, cb);
-    BCEnd_init(CodeBlock_nextEmpty(cb));
+    BCEnd_init(cb->nextEmpty());
   }
 
   /*
    * Fix initial goto to jump here.
    */
-  after_bc = CodeBlock_size(cb);
+  after_bc = cb->size();
   BCGoto_setOffset((BCGoto*)CodeBlock_get(cb,start_bc),after_bc);
 
   /*
    * Spawn branch threads
    */
   for (i = 0;i < n;i++) {
-    BCSpawn_init(CodeBlock_nextEmpty(cb),cb,branch_bc[i]);
+    BCSpawn_init(cb->nextEmpty(), cb,branch_bc[i]);
   }
 
   /*
    * Wait for branches to finish.
    */
-  BCWait_init(CodeBlock_nextEmpty(cb));
+  BCWait_init(cb->nextEmpty());
 
   free(branch_bc);
 }
@@ -1284,22 +1285,21 @@ void SDRepeat_generate(SDRepeat *sdr, Scope *scope, CodeBlock *cb)
   count = Expr_generate(sdr->r_count, SSWORDSIZE, scope, cb);
   if ((Value_getAllFlags(count) & SF_NETVAL)) {
     Value *r_copy = new_Value(Value_nbits(count));
-    BCCopy_init(CodeBlock_nextEmpty(cb),r_copy,count);
+    BCCopy_init(cb->nextEmpty(), r_copy,count);
     count = r_copy;
   }
 
-
-  top_bc = CodeBlock_size(cb);
-  BCOpr_init(CodeBlock_nextEmpty(cb),Value_eq,cond,zero,count,0);
-  test_bc = CodeBlock_size(cb);
-  BCGoto_init(CodeBlock_nextEmpty(cb),cond,0,cb,0);
+  top_bc = cb->size();
+  BCOpr_init(cb->nextEmpty(), Value_eq,cond,zero,count,0);
+  test_bc = cb->size();
+  BCGoto_init(cb->nextEmpty(), cond,0,cb,0);
   StatDecl_generate(sdr->r_body, scope, cb);
   if (count->nbits <= SSWORDSIZE)
-    BCOpr_init(CodeBlock_nextEmpty(cb),Value_w_sub,count,count,one,0);
+    BCOpr_init(cb->nextEmpty(), Value_w_sub,count,count,one,0);
   else
-    BCOpr_init(CodeBlock_nextEmpty(cb),Value_sub,count,count,one,0);
-  BCGoto_init(CodeBlock_nextEmpty(cb),0,0,cb,top_bc);
-  after_bc = CodeBlock_size(cb);
+    BCOpr_init(cb->nextEmpty(), Value_sub,count,count,one,0);
+  BCGoto_init(cb->nextEmpty(), 0,0,cb,top_bc);
+  after_bc = cb->size();
 
   /*
    * Go back and fix all of the branch offsets.

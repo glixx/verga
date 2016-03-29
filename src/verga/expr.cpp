@@ -1146,7 +1146,7 @@ static Value *Expr_vectorGenerate(Expr *e, int nbits, Scope *scope, CodeBlock *c
 
     src_value = new_Value(Net_nbits(n));
     nAddr = Expr_generate(VRange_getLsb(addr),SSWORDSIZE,scope,cb);
-    BCMemFetch_init(CodeBlock_nextEmpty(cb),n,nAddr, src_value);
+    BCMemFetch_init(cb->nextEmpty(),n,nAddr, src_value);
   } else
     src_value = Net_getValue(n);
 
@@ -1170,7 +1170,7 @@ static Value *Expr_vectorGenerate(Expr *e, int nbits, Scope *scope, CodeBlock *c
   printf("\n");
 #endif
 
-  BCCopyRange_init(CodeBlock_nextEmpty(cb),ret_value,0,src_value,nLsb,width);
+  BCCopyRange_init(cb->nextEmpty(),ret_value,0,src_value,nLsb,width);
 
   if (bits)
 	  delete bits;
@@ -1565,14 +1565,14 @@ Value *Expr_generate(Expr *e,int nbits,Scope *scope,CodeBlock *cb)
        */
       lhs = new_Value(nbits);
       if (has_real && od->od_f_opfunc) {
-	BCOpr_init(CodeBlock_nextEmpty(cb),od->od_f_opfunc,lhs,temp_s[0],temp_s[1],temp_s[2]);
+	BCOpr_init(cb->nextEmpty(),od->od_f_opfunc,lhs,temp_s[0],temp_s[1],temp_s[2]);
 	if (od->od_outSize == OS_MAX) {
 	  lhs->flags = (ValueFlags)(lhs->flags | SF_REAL);
 	}
       } else if (nbits <= SSWORDSIZE && od->od_w_opfunc)
-	BCOpr_init(CodeBlock_nextEmpty(cb),od->od_w_opfunc,lhs,temp_s[0],temp_s[1],temp_s[2]);
+	BCOpr_init(cb->nextEmpty(),od->od_w_opfunc,lhs,temp_s[0],temp_s[1],temp_s[2]);
       else
-	BCOpr_init(CodeBlock_nextEmpty(cb),od->od_opfunc,lhs,temp_s[0],temp_s[1],temp_s[2]);
+	BCOpr_init(cb->nextEmpty(), od->od_opfunc,lhs,temp_s[0],temp_s[1],temp_s[2]);
 
       return lhs;
     }
@@ -1593,7 +1593,7 @@ Value *Expr_generate(Expr *e,int nbits,Scope *scope,CodeBlock *cb)
 	  temp_s[i] = 0;
       }
       lhs = new_Value(nbits);
-      BCOpr_init(CodeBlock_nextEmpty(cb),od->od_opfunc,lhs,temp_s[0],temp_s[1],temp_s[2]);
+      BCOpr_init(cb->nextEmpty(),od->od_opfunc,lhs,temp_s[0],temp_s[1],temp_s[2]);
 
       return lhs;
     }
@@ -1610,7 +1610,7 @@ Value *Expr_generate(Expr *e,int nbits,Scope *scope,CodeBlock *cb)
       temp_s[1] = Expr_generateS(e->e.opr[1],scope,cb);
 
       lhs = new_Value(nbits);
-      BCOpr_init(CodeBlock_nextEmpty(cb),od->od_opfunc,lhs,temp_s[0],temp_s[1],0);
+      BCOpr_init(cb->nextEmpty(),od->od_opfunc,lhs,temp_s[0],temp_s[1],0);
 
       return lhs;
     }
@@ -1640,7 +1640,7 @@ Value *Expr_generate(Expr *e,int nbits,Scope *scope,CodeBlock *cb)
 	return Net_getValue(n);
       else {
 	lhs = new_Value(nbits);
-	BCCopy_init(CodeBlock_nextEmpty(cb),lhs,Net_getValue(n));
+	BCCopy_init(cb->nextEmpty(),lhs,Net_getValue(n));
 	return lhs;
       }
     }
@@ -1682,7 +1682,7 @@ Value *Expr_generate(Expr *e,int nbits,Scope *scope,CodeBlock *cb)
 	}
 
 	lhs = new_Value(nbits);
-	BCTask_init(CodeBlock_nextEmpty(cb),func->st_func,0,lhs,e->e.task.argc,sargs);
+	BCTask_init(cb->nextEmpty(), func->st_func,0,lhs,e->e.task.argc,sargs);
       } else {
 	errorFile(Place::getCurrent(),ERR_NOTASK,e->e.task.name);
 	lhs = 0;
@@ -2213,17 +2213,18 @@ int Expr_getDelay(Expr *delayExpr,Scope *scope,Timescale *ts, deltatime_t *delay
  *     cb		CodeBlock to use
  *
  *****************************************************************************/
-int Expr_generateDelay(Expr *delay, Scope *scope, CodeBlock *cb)
+int
+Expr_generateDelay(Expr *delay, Scope *scope, CodeBlock *cb)
 {
-  Timescale *ts = ModuleInst_getTimescale(CodeBlock_getModuleInst(cb));
-  deltatime_t idelay;
+	Timescale *ts = ModuleInst_getTimescale(cb->module());
+	deltatime_t idelay;
 
-  if (Expr_getDelay(delay,scope,ts,&idelay) != 0)
-    return -1;
+	if (Expr_getDelay(delay,scope,ts,&idelay) != 0)
+	return (-1);
 
-  BCDelay_init(CodeBlock_nextEmpty(cb),idelay);
+	BCDelay_init(cb->nextEmpty(), idelay);
 
-  return 0;
+	return (0);
 }
 
 /*****************************************************************************
@@ -2237,16 +2238,18 @@ int Expr_generateDelay(Expr *delay, Scope *scope, CodeBlock *cb)
  *     stat		Statment blocking condition modifies (used for "@(*)")
  *
  *****************************************************************************/
-int Expr_generateTrigger(Expr *triggerExpr, Scope *scope, CodeBlock *cb, StatDecl *stat)
+int
+Expr_generateTrigger(Expr *triggerExpr, Scope *scope, CodeBlock *cb, StatDecl *stat)
 {
-  Trigger *t = 0;
+	Trigger *t = 0;
 
-  t = Expr_getTrigger(triggerExpr, scope, stat);
-  if (!t) return -1;
+	t = Expr_getTrigger(triggerExpr, scope, stat);
+	if (!t)
+		return (-1);
 
-  BCTrigger_init(CodeBlock_nextEmpty(cb),t);
+	BCTrigger_init(cb->nextEmpty(), t);
 
-  return 0;
+	return (0);
 }
 
 /*****************************************************************************

@@ -19,11 +19,12 @@
 ****************************************************************************/
 #ifndef __bytecode_h
 #define __bytecode_h
+
 /*****************************************************************************
  *
  * This file implements the simulation byte code classes.  The basic byte code
  * oepration is handled by the ByteCode object. A sequence of instructions is
- * stored in an array in which instructions are executed ni sequence.  Each
+ * stored in an array in which instructions are executed in sequence.  Each
  * thread is handled by a VGThread object which contains the current thread
  * state.  At any given time there may be a number of active threads and one
  * current thread.  Execution on the current thread continues until it is
@@ -93,6 +94,9 @@ struct VGFrame
 class VGThread
 {
 public:
+	VGThread(CodeBlock *cb,unsigned pc,ModuleInst *modCtx,ModuleItem *mitem);
+	~VGThread();
+
 	Event		*t_pending;	/* Pointer to event if pending, null otherwise */
 	ThreadState_t	 t_state;	/* State of the thread (active, blocked, paused, etc.)  */
 	int		 t_isLive;	/* Non-zero if this thread is live */
@@ -457,36 +461,52 @@ union ByteCode_union {
   BCDebugPrint	bc_dbgprint;	/* Print a debugging message */
 };
 
-/*****************************************************************************
- *
- * CodeBlock - a block of bytecode instructions.
- *
- *****************************************************************************/
+/**
+ * @brief A block of bytecode instructions.
+ */
 class CodeBlock
 {
 public:
-	CodeBlock(ModuleInst *mi);
+	CodeBlock(ModuleInst*);
 	~CodeBlock();
 	
-	void init(ModuleInst *mi);
+	const ModuleInst *module() const
+	{
+		return (_module);
+	}
+	ModuleInst *module()
+	{
+		return (_module);
+	}
 	
-	int		cb_length;		/* Number of generated instructions */
+	int size() const
+	{
+		return (_length);
+	}
+	void close();
+	ByteCode *nextEmpty();
+	void copy(unsigned dpos, CodeBlock *src, unsigned start, unsigned stop);
+	
 	int		cb_nalloced;		/* Number of allocated entries */
-	ModuleInst	*cb_module;		/* Module instance we are in */
 	ByteCode	*cb_instructions;	/* Vector of instructions */
+	
+private:
+	/**
+	 * @brief Module instance we are in
+	 */
+	ModuleInst	*_module;
+	/**
+	 * @brief Number of generated instructions
+	 */
+	int		_length;
 };
 
 /*****************************************************************************
  * CodeBlock member functions
  *****************************************************************************/
 void CodeBlock_uninit(CodeBlock *cb);
-ByteCode *CodeBlock_nextEmpty(CodeBlock *cb);
 #define CodeBlock_first(cb) (cb)->cb_instructions
-#define CodeBlock_size(cb) (cb)->cb_length
 #define CodeBlock_get(cb,offset) (&(cb)->cb_instructions[offset])
-#define CodeBlock_getModuleInst(cb) ((cb)->cb_module)
-void CodeBlock_close(CodeBlock*);
-void CodeBlock_copy(CodeBlock *dst,unsigned dpos,CodeBlock *src,unsigned start,unsigned stop);
 
 /*****************************************************************************
  * ByteCode member functions
@@ -648,8 +668,6 @@ void delete_VGFrame(VGFrame *);
 /*****************************************************************************
  * VGThread - member functions
  *****************************************************************************/
-VGThread *new_VGThread(CodeBlock *cb,unsigned pc,ModuleInst *modCtx,ModuleItem *mitem);
-void delete_VGThread(VGThread *);
 void VGThread_init(VGThread *thread,CodeBlock *cb,unsigned pc,ModuleInst *modCtx,ModuleItem *mitem);
 void VGThread_uninit(VGThread *thread);
 void VGThread_exec(VGThread *thread);

@@ -288,12 +288,13 @@ static int Circuit_dpath_generate_assign(Circuit *c, ModuleInst *mi, Scope *port
   if (lsize == 0 || rsize == 0)
     return -1;
 
-  /*
-   * Generate bytecode for right-hand side.
-   */
-  top_bc = CodeBlock_size(codeBlock);
-  rhs_ret = Expr_generate(mia->mia_rhs,size, port_scope, codeBlock);
-  if (!rhs_ret) return -1;
+	/*
+	 * Generate bytecode for right-hand side.
+	 */
+	top_bc = codeBlock->size();
+	rhs_ret = Expr_generate(mia->mia_rhs,size, port_scope, codeBlock);
+	if (!rhs_ret)
+		return (-1);
 
   /*
    * Expand any left-hand-side concatenation.
@@ -322,10 +323,10 @@ static int Circuit_dpath_generate_assign(Circuit *c, ModuleInst *mi, Scope *port
     }
 
     if ((NetDecl_getType(n) & NT_P_REG)) {
-      BCAsgn_init(CodeBlock_nextEmpty(codeBlock),n,nLsb,rhs_ret,base_bit,lhs_size);
+      BCAsgn_init(codeBlock->nextEmpty(), n,nLsb,rhs_ret,base_bit,lhs_size);
     } else {
       int driver_id = Net_addDriver(n);
-      BCWireAsgnD_init(CodeBlock_nextEmpty(codeBlock),n,driver_id,nLsb,rhs_ret,base_bit,lhs_size,0);
+      BCWireAsgnD_init(codeBlock->nextEmpty(), n,driver_id,nLsb,rhs_ret,base_bit,lhs_size,0);
     }
 
 #if 0
@@ -335,7 +336,7 @@ static int Circuit_dpath_generate_assign(Circuit *c, ModuleInst *mi, Scope *port
     base_bit += Expr_getBitSize(lhs_e, port_scope);
   }
 
-  return 0;
+  return (0);
 }
 
 
@@ -471,12 +472,10 @@ static void Circuit_dpath_makeInputHandlers(Circuit *c, ModuleInst *mi, CodeBloc
     /*
      * Create the thread and create the initial trigger
      */
-    top_bc = CodeBlock_size(codeBlock);
-    thread = new_VGThread(codeBlock,top_bc,mi, 0);
+    top_bc = codeBlock->size();
+    thread = new VGThread(codeBlock,top_bc,mi, 0);
     ModuleInst_addThread(mi, thread);
     trigger = Circuit_getNetTrigger(c,n,TT_EDGE);
-
-
 
     /*
      * Get the relevent delay statements
@@ -491,7 +490,7 @@ static void Circuit_dpath_makeInputHandlers(Circuit *c, ModuleInst *mi, CodeBloc
       /*
        * always @(a) z$a <= a;
        */
-      BCAsgn_init(CodeBlock_nextEmpty(codeBlock), pn, 0, Net_getValue(n), 0, Net_nbits(n));
+      BCAsgn_init(codeBlock->nextEmpty(), pn, 0, Net_getValue(n), 0, Net_nbits(n));
       break;
     case 1 :
       /*
@@ -500,7 +499,7 @@ static void Circuit_dpath_makeInputHandlers(Circuit *c, ModuleInst *mi, CodeBloc
       {
 	SpecifyStat *ss = (SpecifyStat *) ListElem_obj(List_first(&spec_stats));
 	if (!ss->ss_cond) {
-	  BCNbAsgnD_init(CodeBlock_nextEmpty(codeBlock), pn, 0, Net_getValue(n), 0, Net_nbits(n), ss->ss_idelay);
+	  BCNbAsgnD_init(codeBlock->nextEmpty(), pn, 0, Net_getValue(n), 0, Net_nbits(n), ss->ss_idelay);
 	  break;
 	}
       }
@@ -529,35 +528,38 @@ static void Circuit_dpath_makeInputHandlers(Circuit *c, ModuleInst *mi, CodeBloc
 	    Value *cond;
 
 	    if (last_goto != 0)
-	      BCGoto_setOffset((BCGoto*)CodeBlock_get(codeBlock,last_goto), CodeBlock_size(codeBlock));
+	      BCGoto_setOffset((BCGoto*)CodeBlock_get(codeBlock,last_goto),
+		  codeBlock->size());
 
 	    cond = Expr_generateS(ss->ss_cond, scope, codeBlock);
-	    last_goto = CodeBlock_size(codeBlock);
-	    BCGoto_init(CodeBlock_nextEmpty(codeBlock), cond, 1, codeBlock, 0);
-	    BCNbAsgnD_init(CodeBlock_nextEmpty(codeBlock), pn, 0, Net_getValue(n), 0, Net_nbits(n), ss->ss_idelay);
-	    List_addToTail(&gotoList, CodeBlock_get(codeBlock,CodeBlock_size(codeBlock)));
-	    BCGoto_init(CodeBlock_nextEmpty(codeBlock), 0, 0, codeBlock, 0);
+	    last_goto = codeBlock->size();
+	    BCGoto_init(codeBlock->nextEmpty(), cond, 1, codeBlock, 0);
+	    BCNbAsgnD_init(codeBlock->nextEmpty(), pn, 0, Net_getValue(n), 0, Net_nbits(n), ss->ss_idelay);
+	    List_addToTail(&gotoList, CodeBlock_get(codeBlock, codeBlock->size()));
+	    BCGoto_init(codeBlock->nextEmpty(), 0, 0, codeBlock, 0);
 	  } else {
 	    did_universal = 1;
 
 	    if (last_goto != 0)
-	      BCGoto_setOffset((BCGoto*)CodeBlock_get(codeBlock,last_goto), CodeBlock_size(codeBlock));
-	    BCNbAsgnD_init(CodeBlock_nextEmpty(codeBlock), pn, 0, Net_getValue(n), 0, Net_nbits(n), ss->ss_idelay);
+	      BCGoto_setOffset((BCGoto*)CodeBlock_get(codeBlock,last_goto),
+		  codeBlock->size());
+	    BCNbAsgnD_init(codeBlock->nextEmpty(), pn, 0, Net_getValue(n), 0,
+		Net_nbits(n), ss->ss_idelay);
 
 	    break;
 	  }
 	}
 	if (!did_universal) {
 	  if (last_goto != 0)
-	    BCGoto_setOffset((BCGoto*)CodeBlock_get(codeBlock,last_goto), CodeBlock_size(codeBlock));
-	  BCNbAsgnD_init(CodeBlock_nextEmpty(codeBlock), pn, 0, Net_getValue(n), 0, Net_nbits(n), 0);
+	    BCGoto_setOffset((BCGoto*)CodeBlock_get(codeBlock,last_goto),
+		codeBlock->size());
+	  BCNbAsgnD_init(codeBlock->nextEmpty(), pn, 0, Net_getValue(n), 0, Net_nbits(n), 0);
 	}
 
 	for (le2 = List_first(&gotoList);le2;le2 = List_next(&gotoList,le2)) {
 	  BCGoto *g = (BCGoto *) ListElem_obj(le2);
-	  BCGoto_setOffset(g, CodeBlock_size(codeBlock));
+	  BCGoto_setOffset(g, codeBlock->size());
 	}
-
 
 	List_init(&gotoList);
       }
@@ -567,8 +569,8 @@ static void Circuit_dpath_makeInputHandlers(Circuit *c, ModuleInst *mi, CodeBloc
     //
     // Wait for trigger condition and go back to do input loop again.
     //
-    BCTrigger_init(CodeBlock_nextEmpty(codeBlock),trigger);
-    BCGoto_init(CodeBlock_nextEmpty(codeBlock),0,0,codeBlock,top_bc);
+    BCTrigger_init(codeBlock->nextEmpty(),trigger);
+    BCGoto_init(codeBlock->nextEmpty(),0,0,codeBlock,top_bc);
 
     List_uninit(&spec_stats);
   }
@@ -688,13 +690,13 @@ void Circuit_buildPathDelayMod(Circuit *c,ModuleInst *mi,ModuleInst *parent,char
      */
     ModuleDecl_clearFaninFlags(ModuleInst_getModDecl(mi));
 
-    /*
-     * Save top of handler code address and generate a jump to the bottom where the
-     * trigger is located.  The 'goto' is a bootstap goto and is only executing during
-     * initialization.
-     */
-    top_bc = CodeBlock_size(codeBlock);
-    BCGoto_init(CodeBlock_nextEmpty(codeBlock),0,0,codeBlock,0);
+	/*
+	 * Save top of handler code address and generate a jump to the bottom where the
+	 * trigger is located.  The 'goto' is a bootstap goto and is only executing during
+	 * initialization.
+	 */
+	top_bc = codeBlock->size();
+	BCGoto_init(codeBlock->nextEmpty(), NULL, 0, codeBlock, 0);
 
     /*
      * Generate the code implementing this output
@@ -713,11 +715,11 @@ void Circuit_buildPathDelayMod(Circuit *c,ModuleInst *mi,ModuleInst *parent,char
      *		3) Creating a trigger on changes of the dependent inputs
      *		4) Creating a goto back to the top (after the bootstrap goto)
      */
-    thread = new_VGThread(codeBlock,top_bc,mi, 0);
+    thread = new VGThread(codeBlock,top_bc,mi, 0);
     ModuleInst_addThread(mi, thread);
-    BCGoto_setOffset((BCGoto*)CodeBlock_get(codeBlock,top_bc),CodeBlock_size(codeBlock));
-    BCTrigger_init(CodeBlock_nextEmpty(codeBlock),trigger);
-    BCGoto_init(CodeBlock_nextEmpty(codeBlock),0,0,codeBlock,top_bc+1);
+    BCGoto_setOffset((BCGoto*)CodeBlock_get(codeBlock,top_bc), codeBlock->size());
+    BCTrigger_init(codeBlock->nextEmpty(),trigger);
+    BCGoto_init(codeBlock->nextEmpty(), 0, 0, codeBlock,top_bc+1);
 
     Circuit_dpath_makeInputHandlers(c, mi, codeBlock, port_scope, scope, outName);
 

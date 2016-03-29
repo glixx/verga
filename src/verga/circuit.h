@@ -62,7 +62,11 @@ public:
 	Channel *channel(const char*);
 	
 	ModuleInst *findModuleInst(const char *name);
-	
+	/**
+	 * @brief Get the scope for the next higher context.
+	 * 
+	 * @return Scope instance or null if this is a top-level scope.
+	 */
 	Scope *getUpScope(Scope*);
 	
 	void finishModuleInst(ModuleInst *mi, CodeBlock *codeBlock);
@@ -97,7 +101,7 @@ private:
 	 */
 	ModuleInst		*_root;
 	/**
-	 * Module instances
+	 * @brief Module instances
 	 */
 	ModuleInstHash	 _moduleInsts;
 };

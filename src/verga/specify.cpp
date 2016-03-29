@@ -140,10 +140,10 @@ void Specify_addTask(Specify *s,StatDecl *t)
 static void Specify_generateTaskCall(Specify *s,ModuleInst *mi,CodeBlock *codeBlock,int index,int which,
 				     SDTask *task,TaskContext *taskCtx,int negateEdge,Scope *scope)
 {
-  VGThread *thread = new_VGThread(codeBlock,CodeBlock_size(codeBlock),mi,0);
+	VGThread *thread = new VGThread(codeBlock, codeBlock->size(), mi,0);
   const char *task_name = task->t_name;
   SysTaskDescript *taskEnt = SysTask_findEnt(task_name);
-  unsigned top_bc = CodeBlock_size(codeBlock);
+  unsigned top_bc = codeBlock->size();
   int nargs = 0;
   void **sargs = 0;
   int i,j;
@@ -188,7 +188,7 @@ static void Specify_generateTaskCall(Specify *s,ModuleInst *mi,CodeBlock *codeBl
 
     if (cond) {
       Value *ret_val = Expr_generate(cond,1,ModuleInst_getScope(mi),codeBlock);
-      BCGoto_init(CodeBlock_nextEmpty(codeBlock),ret_val,1,codeBlock,top_bc);
+      BCGoto_init(codeBlock->nextEmpty(), ret_val,1,codeBlock,top_bc);
     }
 
 #if SPECIFY_DEBUG
@@ -242,12 +242,12 @@ static void Specify_generateTaskCall(Specify *s,ModuleInst *mi,CodeBlock *codeBl
     }
   }
 
-  BCTask_init(CodeBlock_nextEmpty(codeBlock), taskEnt->st_func, taskCtx, 0, nargs, sargs);
+  BCTask_init(codeBlock->nextEmpty(), taskEnt->st_func, taskCtx, 0, nargs, sargs);
 
   if (which < 0) {
-    BCEnd_init(CodeBlock_nextEmpty(codeBlock));
+    BCEnd_init(codeBlock->nextEmpty());
   } else {
-    BCGoto_init(CodeBlock_nextEmpty(codeBlock),0,0,codeBlock,top_bc);
+    BCGoto_init(codeBlock->nextEmpty(), 0, 0, codeBlock,top_bc);
   }
 
 }
@@ -309,7 +309,7 @@ void Specify_generateTasks(Specify *s,ModuleInst *mi,CodeBlock *codeBlock)
 
     taskCtx = new_TaskContext(task->t_nargs,task->t_args, mi);
 
-    top_bc = CodeBlock_size(codeBlock);
+    top_bc = codeBlock->size();
     Specify_generateTaskCall(s,mi,codeBlock,-1,-1,task,taskCtx,0,scope);
 
     which = 0;
@@ -321,7 +321,7 @@ void Specify_generateTasks(Specify *s,ModuleInst *mi,CodeBlock *codeBlock)
 	Specify_generateTaskCall(s,mi,codeBlock,i,which++,task,taskCtx,1,scope);
       }
     }
-    end_bc = CodeBlock_size(codeBlock);
+    end_bc = codeBlock->size();
 
     TaskContext_setBlock(taskCtx,codeBlock,mi,top_bc,end_bc);
   }

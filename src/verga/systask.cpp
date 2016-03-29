@@ -197,7 +197,7 @@ void
 delete_TaskContext(TaskContext *tc)
 {
 	if (tc->tc_thread)
-		delete_VGThread(tc->tc_thread);
+		delete tc->tc_thread;
 	if (tc->tc_codeBlock)
 		delete tc->tc_codeBlock;
 	free(tc);
@@ -206,9 +206,9 @@ delete_TaskContext(TaskContext *tc)
 void TaskContext_setBlock(TaskContext *tc,CodeBlock *codeBlock,ModuleInst *mi,unsigned start,unsigned stop)
 {
 	tc->tc_codeBlock = new CodeBlock(mi);
-  tc->tc_thread = new_VGThread(tc->tc_codeBlock,0,mi,0);
-  CodeBlock_copy(tc->tc_codeBlock,0,codeBlock,start,stop);
-  VGThread_start(tc->tc_thread);
+	tc->tc_thread = new VGThread(tc->tc_codeBlock,0,mi,0);
+	tc->tc_codeBlock->copy(0,codeBlock,start,stop);
+	VGThread_start(tc->tc_thread);
 }
 
 int ilog10(simtime_t x)

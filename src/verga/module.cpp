@@ -727,7 +727,8 @@ new_NetDecl(const char *name, int wtype,VRange *range, VRange *addrRange,
 	return (n);
 }
 
-ModuleInst::ModuleInst(ModuleDecl *md,Circuit *c,ModuleInst *parent,const char *path)
+ModuleInst::ModuleInst(ModuleDecl *md, Circuit *c, ModuleInst *parent,
+    const char *path)
 {
 	this->init(md, c, parent, path);
 }

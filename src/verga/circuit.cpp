@@ -45,12 +45,6 @@ void Circuit::build(ModuleDecl *m)
 	this->buildHier(this->_root, NULL, path);
 }
 
-/*****************************************************************************
- *
- * Get the scope for the next higher context, or null if this is a top-level
- * scope.
- *
- *****************************************************************************/
 Scope*
 Circuit::getUpScope(Scope *s)
 {
@@ -446,9 +440,10 @@ static void Circuit_mergeNets(Circuit *c,Net *eNet, ModuleInst *eCtx, Net *iNet,
  *   assign top.f1.a = top.w3 & top.w4;
  *
  *****************************************************************************/
-static void Circuit_makeInAssign(Circuit *c,Net *iNet,ModuleInst *iCtx,Expr *expr,ModuleInst *eCtx,CodeBlock *codeBlock)
+static void
+Circuit_makeInAssign(Circuit *c,Net *iNet,ModuleInst *iCtx,Expr *expr,ModuleInst *eCtx,CodeBlock *codeBlock)
 {
-  VGThread *thread = new_VGThread(codeBlock,CodeBlock_size(codeBlock),eCtx,0);
+	VGThread *thread = new VGThread(codeBlock, codeBlock->size(), eCtx,0);
   int lsize = Net_nbits(iNet);
   int rsize = Expr_getBitSize(expr, ModuleInst_getScope(eCtx));
   int size = imax(lsize,rsize);
@@ -457,17 +452,17 @@ static void Circuit_makeInAssign(Circuit *c,Net *iNet,ModuleInst *iCtx,Expr *exp
   Value *rhs_ret;
   int driver_id;
 
-  top_bc = CodeBlock_size(codeBlock);
+  top_bc = codeBlock->size();
   rhs_ret = Expr_generate(expr,size,ModuleInst_getScope(eCtx), codeBlock);
   if (!rhs_ret) return;
 
   driver_id = Net_addDriver(iNet);
-  BCWireAsgnD_init(CodeBlock_nextEmpty(codeBlock),iNet,driver_id,0,rhs_ret,0,rsize,0);
+  BCWireAsgnD_init(codeBlock->nextEmpty(), iNet,driver_id,0,rhs_ret,0,rsize,0);
 
   trigger = Expr_getDefaultTrigger(expr, ModuleInst_getScope(eCtx));
-  BCTrigger_init(CodeBlock_nextEmpty(codeBlock),trigger);
+  BCTrigger_init(codeBlock->nextEmpty(), trigger);
 
-  BCGoto_init(CodeBlock_nextEmpty(codeBlock),0,0,codeBlock,top_bc);
+  BCGoto_init(codeBlock->nextEmpty(),0,0,codeBlock,top_bc);
 
   List_addToTail(&eCtx->_threads, thread);
 }
@@ -495,48 +490,49 @@ static void Circuit_makeInAssign(Circuit *c,Net *iNet,ModuleInst *iCtx,Expr *exp
  *   assign {top.w1,top.w2} = top.f1.z;
  *
  *****************************************************************************/
-static void Circuit_makeOutAssign(Circuit *c,Expr *expr,ModuleInst *eCtx,Net *iNet,
-				  ModuleInst *iCtx,CodeBlock *codeBlock)
+static void
+Circuit_makeOutAssign(Circuit *c,Expr *expr,ModuleInst *eCtx,Net *iNet,
+    ModuleInst *iCtx,CodeBlock *codeBlock)
 {
-  VGThread *thread = new_VGThread(codeBlock,CodeBlock_size(codeBlock),eCtx,0);
-  unsigned top_bc;
-  Trigger *trigger;
-  Value *rhs_ret;
-  List lhs_list;		/* List of left-hand side nets */
-  ListElem *le;
-  unsigned base_bit = 0;
+	VGThread *thread = new VGThread(codeBlock, codeBlock->size(), eCtx,0);
+	unsigned top_bc;
+	Trigger *trigger;
+	Value *rhs_ret;
+	List lhs_list;		/* List of left-hand side nets */
+	ListElem *le;
+	unsigned base_bit = 0;
 
-  top_bc = CodeBlock_size(codeBlock);
-  trigger = Circuit_getNetTrigger(c, iNet, TT_EDGE);
+	top_bc = codeBlock->size();
+	trigger = Circuit_getNetTrigger(c, iNet, TT_EDGE);
 
-  //  BCTrigger_init(CodeBlock_nextEmpty(codeBlock),trigger);
-  rhs_ret = &iNet->n_data.value;
+	//  BCTrigger_init(CodeBlock_nextEmpty(codeBlock),trigger);
+	rhs_ret = &iNet->n_data.value;
 
-  List_init(&lhs_list);
-  Expr_expandConcat(expr, ModuleInst_getScope(eCtx), &lhs_list);
+	List_init(&lhs_list);
+	Expr_expandConcat(expr, ModuleInst_getScope(eCtx), &lhs_list);
 
-  for (le = List_first(&lhs_list);le;le = List_next(&lhs_list,le)) {
-    Expr *lhs_e = (Expr*) ListElem_obj(le);
-    Net *n;
-    Value *nLsb;
-    unsigned lhs_size;
-    int driver_id;
+	for (le = List_first(&lhs_list);le;le = List_next(&lhs_list,le)) {
+		Expr *lhs_e = (Expr*) ListElem_obj(le);
+		Net *n;
+		Value *nLsb;
+		unsigned lhs_size;
+		int driver_id;
 
-    if (Expr_lhsGenerate(lhs_e,ModuleInst_getScope(eCtx),codeBlock,&n,&nLsb,&lhs_size,0) < 0) {
-      errorModule(eCtx->mc_mod, Place::getCurrent(), ERR_BADOUT);
-      return;
-    }
+		if (Expr_lhsGenerate(lhs_e,ModuleInst_getScope(eCtx),codeBlock,&n,&nLsb,&lhs_size,0) < 0) {
+			errorModule(eCtx->mc_mod, Place::getCurrent(), ERR_BADOUT);
+			return;
+		}
 
-    driver_id = Net_addDriver(n);
-    BCWireAsgnD_init(CodeBlock_nextEmpty(codeBlock),n,driver_id,nLsb,rhs_ret,base_bit,lhs_size,0);
+		driver_id = Net_addDriver(n);
+		BCWireAsgnD_init(codeBlock->nextEmpty(), n,driver_id,nLsb,rhs_ret,base_bit,lhs_size,0);
 
-    base_bit += Expr_getBitSize(lhs_e, ModuleInst_getScope(eCtx));
-  }
-  BCTrigger_init(CodeBlock_nextEmpty(codeBlock),trigger);
+		base_bit += Expr_getBitSize(lhs_e, ModuleInst_getScope(eCtx));
+	}
+	BCTrigger_init(codeBlock->nextEmpty(), trigger);
 
-  BCGoto_init(CodeBlock_nextEmpty(codeBlock),0,0,codeBlock,top_bc);
+	BCGoto_init(codeBlock->nextEmpty(),0,0,codeBlock,top_bc);
 
-  List_addToTail(&eCtx->_threads, thread);
+	List_addToTail(&eCtx->_threads, thread);
 }
 
 /*****************************************************************************
@@ -729,18 +725,18 @@ Circuit::finishModuleInst(ModuleInst *mi, CodeBlock *codeBlock)
 {
 	EvQueue *Q = Circuit_getQueue(this);
 	ModuleDecl *m = mi->mc_mod;
-  ListElem *le;
+	 ListElem *le;
 
-  if (ModuleDecl_getSpecify(mi->mc_mod))
-    Specify_generateTasks(ModuleDecl_getSpecify(mi->mc_mod),mi,codeBlock);
+	if (ModuleDecl_getSpecify(mi->mc_mod))
+		Specify_generateTasks(ModuleDecl_getSpecify(mi->mc_mod),mi,codeBlock);
 
-  CodeBlock_close(codeBlock);
-  ModuleInst_setCodeBlock(mi,codeBlock);
+	codeBlock->close();
+	mi->setCodeBlock(codeBlock);
 
-  /*
-   * If we saw any errors this time through we record them.
-   */
-  m->m_errorsDone = 1;
+	/*
+	 * If we saw any errors this time through we record them.
+	 */
+	m->m_errorsDone = 1;
 
   /*
    * Queue all threads from this module for execution.
