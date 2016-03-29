@@ -86,9 +86,6 @@ void CodeBlock_uninit(CodeBlock *cb)
  *
  * Allocate and return the next empty ByteCode in a CodeBlock
  *
- * Paramaters:
- *     cb		CodeBlock to use.
- *
  * Returns:		Next unused ByteCode in cb.
  *
  *****************************************************************************/

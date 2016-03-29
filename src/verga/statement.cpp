@@ -654,8 +654,8 @@ void SDTask_generateSysTask(SDTask *t, Scope *scope, CodeBlock *cb,SysTaskDescri
    * Make sure only 'specify' tasks are used in specify blocks and only non-specify
    * tasks are used outside specify blocks.
    */
-  if (ModuleDecl_getSpecify(mi->mc_mod) &&
-      (Specify_getFlags(ModuleDecl_getSpecify(mi->mc_mod)) & SPF_ACTIVE)) {
+  if (ModuleDecl_getSpecify(mi->_declaration) &&
+      (Specify_getFlags(ModuleDecl_getSpecify(mi->_declaration)) & SPF_ACTIVE)) {
     if (!(taskEnt->st_flags & STF_SPECIFY)) {
       /* Non-specify task used in specify block */
       errorFile(StatDecl_getPlace(t),ERR_BADSPECTASK,t->t_name);

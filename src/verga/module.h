@@ -85,11 +85,9 @@ typedef struct FaninNode_str {
 } FaninNode;
 
 
-/*****************************************************************************
- *
- * ModuleDecl - Declaration of a module
- *
- *****************************************************************************/
+/**
+ * @brief Declaration of a module
+ */
 class ModuleDecl
 {
 public:
@@ -169,7 +167,7 @@ public:
 	
 	char		*mc_path;	/* Path for this context */
 	ModuleInst	*mc_peer;	/* Peer module (used for simulation scripts) */
-	ModuleDecl	*mc_mod;	/* Module definition */
+	ModuleDecl	*_declaration;	/* Module definition */
 	/**
 	 * @brief Parent instance
 	 */
@@ -263,13 +261,13 @@ void ModuleInst_defNet(ModuleInst *mc,const char *name,Net *n);
 const char *ModuleInst_findLocalNetName(ModuleInst *mc,Net *n);
 #define ModuleInst_getPath(mc) (mc)->mc_path
 
-#define ModuleInst_getModDecl(mc) (mc)->mc_mod
+#define ModuleInst_getModDecl(mc) (mc)->_declaration
 UserTask *ModuleInst_findTask(ModuleInst *m,const char *name);
 int ModuleInst_defineTask(ModuleInst *m,const char *name,UserTask *ut);
 #define ModuleInst_getScope(mc) (&(mc)->mc_scope)
-#define ModuleInst_isPathDelayMod(mi) ModuleDecl_isPathDelayMod((mi)->mc_mod)
+#define ModuleInst_isPathDelayMod(mi) ModuleDecl_isPathDelayMod((mi)->_declaration)
 #define ModuleInst_addThread(mi, t) List_addToTail(&(mi)->_threads,(t))
-#define ModuleInst_getTimescale(mi) ModuleDecl_getTimescale((mi)->mc_mod)
+#define ModuleInst_getTimescale(mi) ModuleDecl_getTimescale((mi)->_declaration)
 
 FaninNode *new_FaninNode(ModuleItem *item);
 

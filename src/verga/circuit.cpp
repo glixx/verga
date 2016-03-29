@@ -82,7 +82,7 @@ static void Circuit_buildNets_reginit(Circuit *c,ModuleDecl *m,
   Net *reg;
 
   if (Expr_type(mia->mia_lhs) != E_LITERAL) {
-    errorModule(mi->mc_mod,ModuleItem_getPlace(mia),ERR_IE_BADEXP,"'non-literal initialization'");
+    errorModule(mi->_declaration,ModuleItem_getPlace(mia),ERR_IE_BADEXP,"'non-literal initialization'");
     return;
   }
 
@@ -94,7 +94,7 @@ static void Circuit_buildNets_reginit(Circuit *c,ModuleDecl *m,
 
   reg = Scope_findNet(scope, name, SDF_LOCAL_ONLY);
   if (!reg) {
-    errorModule(mi->mc_mod,ModuleItem_getPlace(mia),ERR_IE_BADVAR);
+    errorModule(mi->_declaration,ModuleItem_getPlace(mia),ERR_IE_BADVAR);
     return;
   }
 
@@ -123,7 +123,7 @@ static void Circuit_buildNets_parameter(Circuit *c,ModuleDecl *m,
 
   e = mid ? MIInstance_findParm(mid,mip->mip_name, mip->mip_ppPos) : 0;
   if (e && mip->mip_ppPos == -1) {
-    errorModule(mi->mc_mod,ModuleItem_getPlace(mip),ERR_NOTPPORT,mip->mip_name);
+    errorModule(mi->_declaration,ModuleItem_getPlace(mip),ERR_NOTPPORT,mip->mip_name);
     e = 0;
   }
 
@@ -157,7 +157,7 @@ static void Circuit_buildNets_parameter(Circuit *c,ModuleDecl *m,
   if (!s) return;
 
   if (ModuleInst_findNet(mi,mip->mip_name)) {
-    errorModule(mi->mc_mod,ModuleItem_getPlace(mip),ERR_REDEFP,mip->mip_name);
+    errorModule(mi->_declaration,ModuleItem_getPlace(mip),ERR_REDEFP,mip->mip_name);
     return;
   }
 
@@ -297,7 +297,7 @@ Circuit_bindPorts(MIInstance *mi, ModuleInst *parent_ctx, ModuleDecl *subM,
 
 			ne = (NameExpr*) ListElem_obj(le);
 			if (!ne->ne_name) {
-				errorModule(parent_ctx->mc_mod,
+				errorModule(parent_ctx->_declaration,
 				    ModuleItem_getPlace(mi), ERR_PORTMIX,
 				    mi->mii_instName, subM->name());
 				ok = 0;
@@ -308,7 +308,7 @@ Circuit_bindPorts(MIInstance *mi, ModuleInst *parent_ctx, ModuleDecl *subM,
 			net = ModuleInst_findNet(subM_ctx,ne->ne_name);
 
 			if (!nd || !net) {
-				errorNet(parent_ctx->mc_mod, ne->ne_name,
+				errorNet(parent_ctx->_declaration, ne->ne_name,
 				    ModuleItem_getPlace(mi), ERR_PORTNOTDEF,
 				    ne->ne_name,
 				mi->mii_instName,subM->name());
@@ -316,7 +316,7 @@ Circuit_bindPorts(MIInstance *mi, ModuleInst *parent_ctx, ModuleDecl *subM,
 				continue;
 			}
 			if (SHash_find(&donePorts,ne->ne_name)) {
-				errorNet(parent_ctx->mc_mod, ne->ne_name,
+				errorNet(parent_ctx->_declaration, ne->ne_name,
 				    ModuleItem_getPlace(mi), ERR_MULTCONN,
 				   ne->ne_name, mi->mii_instName, subM->name());
 				ok = 0;
@@ -337,7 +337,7 @@ Circuit_bindPorts(MIInstance *mi, ModuleInst *parent_ctx, ModuleDecl *subM,
 		    le = List_next(&subM->m_ports,le)) {
 			const char *portName = (const char*)ListElem_obj(le);
 			if (!SHash_find(&donePorts,portName)) {
-				errorNet(parent_ctx->mc_mod, portName,
+				errorNet(parent_ctx->_declaration, portName,
 				    ModuleItem_getPlace(mi), ERR_NOCONN,
 				    portName, mi->mii_instName, subM->name());
 				ok = 0;
@@ -350,7 +350,7 @@ Circuit_bindPorts(MIInstance *mi, ModuleInst *parent_ctx, ModuleDecl *subM,
 		 *****************************************************************************/
 		if (List_numElems(mi->mii_ports) != List_numElems(
 		    &subM->m_ports)) {
-			errorModule(parent_ctx->mc_mod, ModuleItem_getPlace(mi),
+			errorModule(parent_ctx->_declaration, ModuleItem_getPlace(mi),
 			    ERR_PORTCOUNT, mi->mii_instName, subM->name());
 			ok = 0;
 		} else {
@@ -368,7 +368,7 @@ Circuit_bindPorts(MIInstance *mi, ModuleInst *parent_ctx, ModuleDecl *subM,
 				ne = (NameExpr*) ListElem_obj(le);
 
 				if (!nd || !n) {
-					errorNet(parent_ctx->mc_mod, portName,
+					errorNet(parent_ctx->_declaration, portName,
 					    ModuleItem_getPlace(mi), ERR_NOCONN,
 					    portName, mi->mii_instName,
 					    subM->name());
@@ -519,7 +519,7 @@ Circuit_makeOutAssign(Circuit *c,Expr *expr,ModuleInst *eCtx,Net *iNet,
 		int driver_id;
 
 		if (Expr_lhsGenerate(lhs_e,ModuleInst_getScope(eCtx),codeBlock,&n,&nLsb,&lhs_size,0) < 0) {
-			errorModule(eCtx->mc_mod, Place::getCurrent(), ERR_BADOUT);
+			errorModule(eCtx->_declaration, Place::getCurrent(), ERR_BADOUT);
 			return;
 		}
 
@@ -584,7 +584,7 @@ Circuit::buildHierInstance(ModuleDecl *m,ModuleInst *mi,MIInstance *mid,
 
   subM = vgsim.findModule(mid->mii_name);
   if (!subM) {
-    errorModule(mi->mc_mod,ModuleItem_getPlace(mid),ERR_MODUNDEF,mid->mii_name);
+    errorModule(mi->_declaration,ModuleItem_getPlace(mid),ERR_MODUNDEF,mid->mii_name);
     return 1;
   }
   sprintf(pathTail,".%s", mid->mii_instName);
@@ -605,7 +605,7 @@ Circuit::buildHierInstance(ModuleDecl *m,ModuleInst *mi,MIInstance *mid,
       for (ple = List_first(mid->mii_parms);ple;ple = List_next(mid->mii_parms, ple)) {
 	ne = (NameExpr*) ListElem_obj(ple);
 	if (ne->ne_name) {
-	  errorModule(mi->mc_mod,ModuleItem_getPlace(mid),ERR_PARAMMIX,mid->mii_instName,
+	  errorModule(mi->_declaration,ModuleItem_getPlace(mid),ERR_PARAMMIX,mid->mii_instName,
 	    subM->name());
 	  break;
 	}
@@ -615,9 +615,9 @@ Circuit::buildHierInstance(ModuleDecl *m,ModuleInst *mi,MIInstance *mid,
        * Instance does not explicitly named parameters.  Need match number only.
        */
       if (List_numElems(mid->mii_parms) > List_numElems(&subM->m_parmPorts)) {
-	errorModule(mi->mc_mod,ModuleItem_getPlace(mid),ERR_TOOMANYPP,mid->mii_instName);
+	errorModule(mi->_declaration,ModuleItem_getPlace(mid),ERR_TOOMANYPP,mid->mii_instName);
       } else if (List_numElems(mid->mii_parms) < List_numElems(&subM->m_parmPorts)) {
-	errorModule(mi->mc_mod,ModuleItem_getPlace(mid),ERR_TOOFEWPP,mid->mii_instName);
+	errorModule(mi->_declaration,ModuleItem_getPlace(mid),ERR_TOOFEWPP,mid->mii_instName);
       }
     } else {
       /*
@@ -626,12 +626,12 @@ Circuit::buildHierInstance(ModuleDecl *m,ModuleInst *mi,MIInstance *mid,
       for (ple = List_first(mid->mii_parms);ple;ple = List_next(mid->mii_parms, ple)) {
 	ne = (NameExpr*) ListElem_obj(ple);
 	if (!ne->ne_name) {
-	  errorModule(mi->mc_mod,ModuleItem_getPlace(mid),ERR_PARAMMIX,mid->mii_instName,
+	  errorModule(mi->_declaration,ModuleItem_getPlace(mid),ERR_PARAMMIX,mid->mii_instName,
 	    subM->name());
 	  break;
 	}
 	if (!ModuleDecl_isParm(subM,ne->ne_name))
-	  errorModule(mi->mc_mod,ModuleItem_getPlace(mid),ERR_NOTPPORT,ne->ne_name);
+	  errorModule(mi->_declaration,ModuleItem_getPlace(mid),ERR_NOTPPORT,ne->ne_name);
       }
     }
   }
@@ -661,7 +661,7 @@ Circuit::buildHierInstance(ModuleDecl *m,ModuleInst *mi,MIInstance *mid,
 	Net *eNet = ModuleInst_findNet(mi,Expr_getLitName(ePorts[i]));
 
 	if (!eNet) {
-	  errorModule(mi->mc_mod,ModuleItem_getPlace(mid),ERR_IE_NONET,Expr_getLitName(ePorts[i]));
+	  errorModule(mi->_declaration,ModuleItem_getPlace(mid),ERR_IE_NONET,Expr_getLitName(ePorts[i]));
 	  continue;
 	}
 	Circuit_mergeNets(this, eNet,mi,iPorts[i],subM_ctx);
@@ -676,7 +676,7 @@ Circuit::buildHierInstance(ModuleDecl *m,ModuleInst *mi,MIInstance *mid,
 	  Circuit_makeInAssign(this, iPorts[i],subM_ctx,ePorts[i],mi,codeBlock);
 
 	  if (Net_nbits(iPorts[i]) != Expr_getBitSize(ePorts[i],ModuleInst_getScope(mi))) {
-	    errorNet(mi->mc_mod,portName,ModuleItem_getPlace(mid),WRN_INPORT,portName);
+	    errorNet(mi->_declaration,portName,ModuleItem_getPlace(mid),WRN_INPORT,portName);
 	  }
 
 	  break;
@@ -684,15 +684,15 @@ Circuit::buildHierInstance(ModuleDecl *m,ModuleInst *mi,MIInstance *mid,
 	  Circuit_makeOutAssign(this, ePorts[i],mi,iPorts[i],subM_ctx,codeBlock);
 
 	  if (Net_nbits(iPorts[i]) != Expr_getBitSize(ePorts[i],ModuleInst_getScope(mi))) {
-	    errorNet(mi->mc_mod,portName,ModuleItem_getPlace(mid),WRN_OUTPORT,portName);
+	    errorNet(mi->_declaration,portName,ModuleItem_getPlace(mid),WRN_OUTPORT,portName);
 	  }
 
 	  break;
 	case NT_P_INOUT :
-	  errorNet(mi->mc_mod,portName,ModuleItem_getPlace(mid),ERR_BADINOUT,portName);
+	  errorNet(mi->_declaration,portName,ModuleItem_getPlace(mid),ERR_BADINOUT,portName);
 	  break;
 	default :
-	  errorNet(mi->mc_mod,portName,ModuleItem_getPlace(mid),ERR_BADPORTTYPE,portName);
+	  errorNet(mi->_declaration,portName,ModuleItem_getPlace(mid),ERR_BADPORTTYPE,portName);
 	  break;
 	}
       }
@@ -724,11 +724,11 @@ void
 Circuit::finishModuleInst(ModuleInst *mi, CodeBlock *codeBlock)
 {
 	EvQueue *Q = Circuit_getQueue(this);
-	ModuleDecl *m = mi->mc_mod;
+	ModuleDecl *m = mi->_declaration;
 	 ListElem *le;
 
-	if (ModuleDecl_getSpecify(mi->mc_mod))
-		Specify_generateTasks(ModuleDecl_getSpecify(mi->mc_mod),mi,codeBlock);
+	if (ModuleDecl_getSpecify(mi->_declaration))
+		Specify_generateTasks(ModuleDecl_getSpecify(mi->_declaration),mi,codeBlock);
 
 	codeBlock->close();
 	mi->setCodeBlock(codeBlock);
@@ -765,7 +765,7 @@ void
 Circuit::buildHier(ModuleInst *mi,ModuleInst *parent,char *path)
 {
 	CodeBlock *codeBlock = new CodeBlock(mi);
-	 ModuleDecl *m = mi->mc_mod;
+	 ModuleDecl *m = mi->_declaration;
 	int error_count = 0;
 	ListElem *le;
 	HashElem *he;
@@ -1030,11 +1030,11 @@ Circuit::check()
 				if (m) {
 					char buf[STRMAX];
 
-					sprintf(buf,"%s.%s", m->mc_mod->name(), localName);
+					sprintf(buf,"%s.%s", m->_declaration->name(), localName);
 					if (!SHash_find(&reported,buf)) {
-						m->mc_mod->m_errorsDone = 0;
-						errorNet(m->mc_mod, n->name(),
-						    &m->mc_mod->m_place,
+						m->_declaration->m_errorsDone = 0;
+						errorNet(m->_declaration, n->name(),
+						    &m->_declaration->m_place,
 						    WRN_FLOATNET, localName);
 						SHash_insert(&reported,buf,n);
 					}

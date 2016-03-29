@@ -743,7 +743,7 @@ ModuleInst::init(ModuleDecl *md, Circuit *c, ModuleInst *parent, const char *pat
 {
 	this->mc_path = strdup(path);
 	this->mc_peer = 0;
-	this->mc_mod  = md;
+	this->_declaration  = md;
 	this->_circuit = c;
 	this->_parent = parent;
 	List_init(&this->_threads);

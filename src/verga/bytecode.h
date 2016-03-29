@@ -430,7 +430,7 @@ typedef struct {
 
 /*****************************************************************************
  *
- * ByteCode - A single byte code instruction.
+ * @brief A single byte code instruction.
  *
  *****************************************************************************/
 union ByteCode_union {

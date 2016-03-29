@@ -225,7 +225,7 @@ int ilog10(simtime_t x)
 
 static int SysTask_getstr_time(Value *S,char *p, ModuleInst *mi)
 {
-  Timescale *ts = &mi->mc_mod->m_timescale;
+  Timescale *ts = &mi->_declaration->m_timescale;
   simtime_t t;
 
   if (Value_toTime(S, &t) != 0) {

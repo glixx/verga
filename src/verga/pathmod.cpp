@@ -83,7 +83,7 @@ static int Circuit_dpath_computeDelays(Circuit *c,ModuleInst *mi)
 static int Circuit_dpath_checkPorts(Circuit *c, ModuleInst *mi, SHash *inset,
     SHash *outset)
 {
-	ModuleDecl *m = mi->mc_mod;
+	ModuleDecl *m = mi->_declaration;
 	NetDeclHash::iterator he;
 
 	/*
@@ -108,7 +108,7 @@ static int Circuit_dpath_checkPorts(Circuit *c, ModuleInst *mi, SHash *inset,
 			SHash_insert(outset, NetDecl_getName(netdecl), net);
 			break;
 		case NT_P_INOUT :
-			errorModule(mi->mc_mod,NetDecl_getPlace(netdecl),ERR_PATHDINOUT);
+			errorModule(mi->_declaration,NetDecl_getPlace(netdecl),ERR_PATHDINOUT);
 			return (-1);
 		default :
 			break;
