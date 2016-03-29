@@ -23,27 +23,24 @@
 
 #define NET_DEBUG 0
 
-Net *new_Net_memory(const char *name,unsigned msb,unsigned lsb,
-		    unsigned beginAddr,unsigned endAddr)
+Net::Net(const char *name, unsigned msb, unsigned lsb,
+    unsigned beginAddr, unsigned endAddr)
 {
-  Net *n = (Net*) malloc(sizeof(Net));
+	this->n_name = strdup(name);
+	this->n_msb = msb;
+	this->n_lsb = lsb;
+	this->n_nbits = iabs(msb-lsb) + 1;
+	this->n_drivers = 0;
+	this->n_type = NT_MEMORY;
+	this->n_flags = NA_NONE;
+	this->n_numDrivers = 0;
+	this->n_numMonitors = 0;
+	this->n_wfunc = Value_wire;
+	List_init(&this->n_posedgeNotify);
+	List_init(&this->n_negedgeNotify);
 
-  n->n_name = strdup(name);
-  n->n_msb = msb;
-  n->n_lsb = lsb;
-  n->n_nbits = iabs(msb-lsb) + 1;
-  n->n_drivers = 0;
-  n->n_type = NT_MEMORY;
-  n->n_flags = NA_NONE;
-  n->n_numDrivers = 0;
-  n->n_numMonitors = 0;
-  n->n_wfunc = Value_wire;
-  List_init(&n->n_posedgeNotify);
-  List_init(&n->n_negedgeNotify);
-
-  Memory_init(&n->n_data.memory,beginAddr, endAddr, n->n_nbits,n);
-
-  return n;
+	Memory_init(&this->n_data.memory, beginAddr, endAddr, this->n_nbits,
+	    this);
 }
 
 /*****************************************************************************
@@ -129,11 +126,13 @@ Net::~Net()
  * Returns:		Local name of net
  *
  *****************************************************************************/
-const char *Net_getLocalName(Net *n)
+const char *
+Net_getLocalName(Net *n)
 {
-  char *p = strrchr(n->n_name,'.');
-  if (!p) return n->n_name;
-  return p+1;
+	char *p = strrchr(n->name(),'.');
+	if (!p)
+		return n->name();
+	return (p+1);
 }
 
 /*****************************************************************************
@@ -379,9 +378,9 @@ void Net_print(Net *n,FILE *f)
     char buf[STRMAX];
 
     NT_getStr(n->n_type,buf);
-    fprintf(f,"%s [%d:%d] %s",buf,n->n_msb,n->n_lsb,n->n_name);
+    fprintf(f,"%s [%d:%d] %s",buf,n->n_msb,n->n_lsb, n->name());
   } else
-    fprintf(f,"reg [%d:%d] %s[]",n->n_msb,n->n_lsb,n->n_name);
+    fprintf(f,"reg [%d:%d] %s[]",n->n_msb,n->n_lsb, n->name());
 }
 
 /*****************************************************************************
@@ -502,11 +501,11 @@ void Net_driverChangeNotify(Net *n,int id)
 
 void Net_reportValue(Net *n,const char *who,const char *name,Circuit *c)
 {
-  EvQueue *Q = c->c_evQueue;
-  char buf[STRMAX];
+	EvQueue *Q = c->c_evQueue;
+	char buf[STRMAX];
 
-  if (!name) name = n->n_name;
-
+	if (!name)
+		name = n->name();
 
   Value_getvstr(Net_getValue(n),buf);
   if (who)

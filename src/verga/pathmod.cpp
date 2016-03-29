@@ -98,7 +98,7 @@ static int Circuit_dpath_checkPorts(Circuit *c, ModuleInst *mi, SHash *inset,
 			/* not an I/O net */
 			continue;
 
-		net->n_flags = (NetAttrlags)(net->n_flags | NA_INPATHDMOD);
+		net->n_flags = (NetAttrFlags)(net->n_flags | NA_INPATHDMOD);
 
 		switch (NetDecl_getType(netdecl) & NT_P_IO_MASK) {
 		case NT_P_INPUT :
@@ -460,10 +460,13 @@ static void Circuit_dpath_makeInputHandlers(Circuit *c, ModuleInst *mi, CodeBloc
     List_init(&spec_stats);
 
     pn = Scope_findNet(port_scope, name, SDF_LOCAL_ONLY);
-    if (!pn) continue;					/* Port is not in support */
-    if (strchr(Net_getName(pn),'$') == 0) continue;	/* Port in not an input */
-    n = Scope_findNet(scope, name, SDF_LOCAL_ONLY);
-    if (!n) continue;
+	if (!pn)
+		continue;					/* Port is not in support */
+	if (strchr(pn->name(), '$') == 0)
+		continue;	/* Port in not an input */
+	n = Scope_findNet(scope, name, SDF_LOCAL_ONLY);
+	if (!n)
+		continue;
 
     /*
      * Create the thread and create the initial trigger
@@ -596,8 +599,10 @@ static Trigger *Circuit_dpath_getPortTrigger(Circuit *c, ModuleInst *mi, Scope *
     Net *n;
 
     n = Scope_findNet(scope, name, SDF_LOCAL_ONLY);
-    if (!n) continue;					/* Port is not in support */
-    if (strchr(Net_getName(n),'$') == 0) continue;	/* Port in not an input */
+	if (!n)
+		continue;	/* Port is not in support */
+	if (strchr(n->name(), '$') == 0)
+		continue;	/* Port in not an input */
 
     List_addToTail(&posedges, n);
     List_addToTail(&negedges, n);

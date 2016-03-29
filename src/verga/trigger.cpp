@@ -215,25 +215,26 @@ Trigger *Trigger_getTrigger(Trigger **tlist,List *posedges,List *negedges)
  *     f		File on which to print representation.
  *
  *****************************************************************************/
-void Trigger_print(Trigger *t,FILE *f)
+void
+Trigger_print(Trigger *t, FILE *f)
 {
-  ListElem *le;
+	ListElem *le;
 
-  fprintf(f,"@id<%p> (",t);
-  for (le = List_first(t->t_posedges);le;le = List_next(t->t_posedges,le)) {
-    Net *n = (Net*)ListElem_obj(le);
+	std::fprintf(f, "@id<%p> (", t);
+	for (le = List_first(t->t_posedges);le;le = List_next(t->t_posedges,le)) {
+		Net *n = (Net*)ListElem_obj(le);
 
-    if (Net_nbits(n) > 1)
-      fprintf(f," %s",Net_getName(n));
-    else
-      fprintf(f," posedge %s",Net_getName(n));
-  }
-  for (le = List_first(t->t_negedges);le;le = List_next(t->t_negedges,le)) {
-    Net *n = (Net*)ListElem_obj(le);
+		if (Net_nbits(n) > 1)
+			fprintf(f," %s", n->name());
+		else
+			fprintf(f," posedge %s", n->name());
+	}
+	for (le = List_first(t->t_negedges);le;le = List_next(t->t_negedges,le)) {
+		Net *n = (Net*)ListElem_obj(le);
 
-    fprintf(f," negedge %s",Net_getName(n));
-  }
-  fprintf(f,")");
+		std::fprintf(f, " negedge %s", n->name());
+	}
+	std::fprintf(f, ")");
 }
 
 /*****************************************************************************

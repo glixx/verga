@@ -38,7 +38,8 @@ public:
 	~Channel();
 	
 	void wait(VGThread*);
-	int queueLen();
+	int queueLen() const;
+	int read(Value *data);
 	
 	std::string	 _name;		/* Name of channel */
 	List/*Value*/	 _queue;	/* Queue of channel */
@@ -47,7 +48,6 @@ public:
 	char		*c_format;	/* Format for watched data */
 };
 
-int Channel_read(Channel *c, Value *data);
 int Channel_write(Channel *c, Value *data);
 int Channel_setWatch(Channel *c, int doWatch, const char *format);
 

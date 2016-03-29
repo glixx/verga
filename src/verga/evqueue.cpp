@@ -398,7 +398,7 @@ Event *new_EvMem(Net *n,Value *addr,int nlsb,Value *s,int smsb,int slsb)
 
   if (Value_toInt(addr,&em->em_addr) < 0) {
     if ((Memory_getFlags(m) & MF_INITIALIZED))
-      errorRun(ERR_MEMADDR,Net_getName(n));
+      errorRun(ERR_MEMADDR, n->name());
   }
 
   if (Value_nbits(s) == nbits)

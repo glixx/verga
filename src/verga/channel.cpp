@@ -40,9 +40,7 @@ _name(name)
 
 Channel::~Channel()
 {
-
 }
-
 
 /*****************************************************************************
  *
@@ -87,7 +85,7 @@ Channel::wait(VGThread *thread)
  *
  *****************************************************************************/
 int
-Channel::queueLen()
+Channel::queueLen() const
 {
 	return List_numElems(&this->_queue);
 }
@@ -116,19 +114,20 @@ int Channel_setWatch(Channel *c, int isWatched, const char *format)
   return 0;
 }
 
-int Channel_read(Channel *c, Value *data)
+int
+Channel::read(Value *data)
 {
-  Value *v;
+	Value *v;
 
-	if (c->queueLen() == 0)
+	if (this->queueLen() == 0)
 		return -1;
 
-	v = (Value*)List_popHead(&c->_queue);
+	v = (Value*)List_popHead(&this->_queue);
 
-  Value_copy(data, v);
-  delete_Value(v);
+	Value_copy(data, v);
+	delete_Value(v);
 
-  return 0;
+	return 0;
 }
 
 int Channel_write(Channel *c, Value *data)

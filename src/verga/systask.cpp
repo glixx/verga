@@ -557,16 +557,18 @@ static void SysTask_tkg_probe(VGThread *t,Value *r,int numArgs,void **args,TaskC
     Net_addMonitor(taskContext->tc_nets[i]);
 
     if (*who && strcmp(who,"$probe") != 0) {
-      sprintf(key, "%s:%s",who,Net_getName(taskContext->tc_nets[i]));
+      std::sprintf(key, "%s:%s",who, taskContext->tc_nets[i]->name());
     } else {
-      sprintf(key, "$probe:%s",Net_getName(taskContext->tc_nets[i]));
+      std::sprintf(key, "$probe:%s", taskContext->tc_nets[i]->name());
       *who = 0;
     }
 
-    if (!*who)
-      vgio_printf("showprobe %s %d\n",Net_getName(taskContext->tc_nets[i]),Net_nbits(taskContext->tc_nets[i]));
+	if (!*who)
+		vgio_printf("showprobe %s %d\n", taskContext->tc_nets[i]->name(),
+		    Net_nbits(taskContext->tc_nets[i]));
 
-    Net_reportValue(taskContext->tc_nets[i], 0, Net_getName(taskContext->tc_nets[i]), c);
+	Net_reportValue(taskContext->tc_nets[i], 0, taskContext->tc_nets[i]->name(),
+	    c);
 
     /*
      * Add probe only if it does not already exist.
@@ -590,33 +592,35 @@ static void SysTask_tkg_probe(VGThread *t,Value *r,int numArgs,void **args,TaskC
  *     taskContext	Optional task context
  *
  *****************************************************************************/
-static void SysTask_tkg_unprobe(VGThread *t,Value *r,int numArgs,void **args,TaskContext *taskContext)
+static void
+SysTask_tkg_unprobe(VGThread *t,Value *r,int numArgs,void **args,TaskContext *taskContext)
 {
-  EvQueue *Q = Circuit_getQueue(t->t_modCtx->mc_circuit);
-  char who[STRMAX];
-  int i;
+	EvQueue *Q = Circuit_getQueue(t->t_modCtx->mc_circuit);
+	char who[STRMAX];
+	int i;
 
-  *who = 0;
-  if (numArgs > 0 && (Value_getTypeFlags((Value*)args[0]) & SF_STRING)) {
-    Value_toString((Value*)args[0],who);
-  }
+	*who = 0;
+	if (numArgs > 0 && (Value_getTypeFlags((Value*)args[0]) & SF_STRING))
+		Value_toString((Value*)args[0], who);
 
-  for (i = 0;i < taskContext->tc_numNets;i++) {
-    char key[STRMAX];
+	for (i = 0;i < taskContext->tc_numNets;i++) {
+		char key[STRMAX];
 
-    Net_removeMonitor(taskContext->tc_nets[i]);
+		Net_removeMonitor(taskContext->tc_nets[i]);
 
-    if (*who && strcmp(who,"$probe") != 0) {
-      sprintf(key, "%s:%s",who,Net_getName(taskContext->tc_nets[i]));
-    } else {
-      sprintf(key, "$probe:%s",Net_getName(taskContext->tc_nets[i]));
-    }
+		if (*who && std::strcmp(who,"$probe") != 0)
+			std::sprintf(key, "%s:%s", who, taskContext->
+			    tc_nets[i]->name());
+		else
+			std::sprintf(key, "$probe:%s", taskContext->
+			    tc_nets[i]->name());
 
-    EvQueue_removeFinal(Q,key);
+		EvQueue_removeFinal(Q, key);
 
-    if (!*who)
-      vgio_printf("hideprobe %s\n",Net_getName(taskContext->tc_nets[i]));
-  }
+		if (!*who)
+			vgio_printf("hideprobe %s\n", taskContext->tc_nets[i]->
+			    name());
+	}
 }
 
 /*****************************************************************************
@@ -1228,7 +1232,7 @@ static void SysTask_tkg_recv(VGThread *t, Value *r, int numArgs, void **args, Ta
 	string_expand(name, VGThread_getModCtx(t));
 	c = Circuit_getChannel(t->t_modCtx->mc_circuit, name);
 
-	if (Channel_read(c, r) < 0) {
+	if (c->read(r) < 0) {
 	/*
 	 * No data is available on the channel.  Suspend the thread and wait for data.
 	 * Backup the pc so this system task will be reexecuted when

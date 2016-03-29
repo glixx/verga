@@ -192,7 +192,7 @@ typedef enum Net_attr_flags_str {
 #define NA_CLOCK	NA_CLOCK	/* Net is a clock */
   NA_INPATHDMOD = 0x8 
 #define NA_INPATHDMOD	NA_INPATHDMOD	/* Net is in a path-delay module */
-} NetAttrlags;
+} NetAttrFlags;
 
 /*****************************************************************************
  *
@@ -252,10 +252,16 @@ class Net
 {
 public:
 	Net(const char *name, nettype_t ntype, unsigned msb, unsigned lsb);
+	Net(const char *name, unsigned msb, unsigned lsb, unsigned beginAddr,
+	    unsigned endAddr);
 	~Net();
-  char			 *n_name;		/* Full path name */
+	
+	char *name()
+	{
+		return (n_name);
+	}
   nettype_t		  n_type;			/* Type of wire */
-  NetAttrlags		  n_flags;		/* Attribute flags */
+  NetAttrFlags		  n_flags;		/* Attribute flags */
   unsigned		  n_msb,n_lsb;		/* Range of net */
   unsigned		  n_nbits;		/* Number of bits */
   unsigned		  n_numMonitors;		/* Number of monitors on this net */
@@ -265,6 +271,8 @@ public:
   Value			**n_drivers;		/* Drivers (if WIRE) */
   wirefunc_f		 *n_wfunc;		/* Wire function */
 	NetData		  n_data;
+private:
+	char			 *n_name;		/* Full path name */
 };
 
 /*****************************************************************************
@@ -275,8 +283,6 @@ SNetMap *new_SNetMap(Net *net,int netLsb,int snLsb,int width);
 /*****************************************************************************
  * Net member functions
  *****************************************************************************/
-Net *new_Net_memory(const char *name,unsigned msb,unsigned lsb,
-		    unsigned addrMsb,unsigned addrLsb);
 void Net_print(Net*,FILE*);
 void Net_posedgeListen(Net*n,Trigger*t);
 void Net_negedgeListen(Net*n,Trigger*t);
@@ -289,7 +295,6 @@ void Net_reportValue(Net *n,const char *who,const char *name,Circuit *C);
 const char *Net_getLocalName(Net*);
 #define Net_getDriver(n, id)	((n)->n_drivers[(id)])
 #define Net_nbits(n) 		(n)->n_nbits
-#define Net_getName(n) 		(n)->n_name
 #define Net_getValue(n)		(&(n)->n_data.value)
 #define Net_getMemory(n)	(&(n)->n_data.memory)
 #define Net_getType(n)		(n)->n_type

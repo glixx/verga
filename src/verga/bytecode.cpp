@@ -819,12 +819,12 @@ void BCMemPut_exec(BCMemPut *bmo,VGThread *t)
     vgio_echo("%p: BCMemPut: %s[?]=?",t,Net_getName(bmo->m_net));
 #endif
     if ((Memory_getFlags(m) & MF_INITIALIZED))
-      errorRun(ERR_MEMADDR,Net_getName(bmo->m_net));
+      errorRun(ERR_MEMADDR, bmo->m_net->name());
     goto done;
   } else {
     Memory_setFlags(m, MF_INITIALIZED);
     if (bmo->m_netLsb && Value_toInt(bmo->m_netLsb,&netLsb) < 0) {
-      errorRun(ERR_MEMBITS,Net_getName(bmo->m_net));
+      errorRun(ERR_MEMBITS, bmo->m_net->name());
       goto done;
     } else if (Net_nbits(bmo->m_net) == bmo->m_width) {
       Net_memSet(bmo->m_net, addr, bmo->m_data);

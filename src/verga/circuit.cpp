@@ -243,13 +243,13 @@ void Circuit_declareNet(Circuit *c,Scope *scope,NetDecl *nd,ModuleDecl *m,Place 
   }
   sprintf(buf,"%s.%s",scope->s_path,nd->n_name);
 
-  /*
-   * Create the net or memory.
-   */
-  if (has_mem)
-    n = new_Net_memory(buf,msb,lsb,beginAddr,endAddr);
-  else
-    n = new Net(buf,nd->n_type,msb,lsb);
+	/*
+	 * Create the net or memory.
+	 */
+	if (has_mem)
+		n = new Net(buf, msb, lsb, beginAddr, endAddr);
+	else
+		n = new Net(buf, nd->n_type, msb, lsb);
 
   /*
    * Define it.
@@ -412,14 +412,14 @@ Circuit_bindPorts(MIInstance *mi, ModuleInst *parent_ctx, ModuleDecl *subM,
 static void Circuit_mergeNets(Circuit *c,Net *eNet, ModuleInst *eCtx, Net *iNet,
     ModuleInst *iCtx)
 {
-	const char *shortName = std::strrchr(iNet->n_name,'.');
+	const char *shortName = std::strrchr(iNet->name(), '.');
 
 	if (shortName && *shortName)
 		shortName++;
 	else
-		shortName = iNet->n_name;
+		shortName = iNet->name();
 
-	c->c_nets[iNet->n_name] = eNet;
+	c->c_nets[iNet->name()] = eNet;
 	Scope_replaceLocalNet(ModuleInst_getScope(iCtx), shortName, eNet);
 
 	delete iNet;
@@ -994,7 +994,8 @@ void Circuit_installScript(Circuit *c,ModuleDecl *m,DynamicModule *dm)
  * the error in the first instance of a type that we find.
  *
  *****************************************************************************/
- void Circuit::check()
+void
+Circuit::check()
 {
 	NetHash::iterator he;
 	SHash reported;
@@ -1007,7 +1008,7 @@ void Circuit_installScript(Circuit *c,ModuleDecl *m,DynamicModule *dm)
 		// Ignore entries that are parameters, or not the primary name for a net.
 		if ((Net_getType(n) & NT_P_PARAMETER))
 			continue;
-		if (he->first != n->n_name)
+		if (he->first != n->name())
 			continue;
 
 		// Check for floaters only on nets
@@ -1020,7 +1021,7 @@ void Circuit_installScript(Circuit *c,ModuleDecl *m,DynamicModule *dm)
 				ModuleInst *m;
 				char *localName;
 
-				strcpy(instname,n->n_name);
+				strcpy(instname, n->name());
 				localName = strrchr(instname,'.');
 				if (localName)
 					*localName++ = 0;
@@ -1033,7 +1034,9 @@ void Circuit_installScript(Circuit *c,ModuleDecl *m,DynamicModule *dm)
 					sprintf(buf,"%s.%s", m->mc_mod->name(), localName);
 					if (!SHash_find(&reported,buf)) {
 						m->mc_mod->m_errorsDone = 0;
-						errorNet(m->mc_mod,n->n_name,&m->mc_mod->m_place,WRN_FLOATNET,localName);
+						errorNet(m->mc_mod, n->name(),
+						    &m->mc_mod->m_place,
+						    WRN_FLOATNET, localName);
 						SHash_insert(&reported,buf,n);
 					}
 				}
@@ -1250,7 +1253,7 @@ void Circuit_readMemory(Circuit *c, const char *fileName, Net *net, unsigned sta
   while (fgets(buf,STRMAX,f)) {
     if (!m && net) {
       if (!(Net_getType(net) & NT_P_MEMORY)) {
-	errorRun(ERR_NOTMEM,Net_getName(net));
+	errorRun(ERR_NOTMEM, net->name());
 	break;
       }
       m = Net_getMemory(net);
@@ -1334,7 +1337,7 @@ int Circuit_writeMemory(Circuit *c, const char *fileName, Net *net, unsigned sta
    */
   if (net) {
     if (!(Net_getType(net) & NT_P_MEMORY)) {
-      errorRun(ERR_NOTMEM,Net_getName(net));
+      errorRun(ERR_NOTMEM, net->name());
       return 0;
     }
     m = Net_getMemory(net);
@@ -1360,7 +1363,7 @@ int Circuit_writeMemory(Circuit *c, const char *fileName, Net *net, unsigned sta
       m = Net_getMemory(n);
 
       if ((Net_getType(n) & NT_P_MEMORY)) {
-	fprintf(f,"\n@memory %s\n",Net_getName(n));
+	fprintf(f,"\n@memory %s\n", n->name());
 	Memory_dump(m,f,flags,0,~0);
       }
     }

@@ -163,7 +163,7 @@ static void Memory_monitorWrite(Memory *M,unsigned A)
 
     Memory_get(M,A,data);
     Value_getstr(data,dstr);
-    vgio_printf("memory %s %u : %s\n",Net_getName(M->m_net),A,dstr);
+    vgio_printf("memory %s %u : %s\n", M->m_net->name(), A, dstr);
   }
 }
 
@@ -187,7 +187,7 @@ void Memory_accessNotify(Memory *m, unsigned addr,int isWrite)
     Memory_get(m, addr, data);
     Value_getstr(data,sdata);
     vgio_printf("memory-addr %s %u \"%s\" %s @ %llu\n",
-		Net_getName(m->m_net),addr,sdata,
+		m->m_net->name(), addr,sdata,
 		isWrite?"write":"read",
 		EvQueue_getCurTime(Q)
 		);
