@@ -20,16 +20,14 @@
 
 #include <string>
 
-/*****************************************************************************
+/**
  *
- * Data Channel Data Structures
+ * @brief Data Channel Data Structures
  *
  * Data queues are used to implement communication channels.  These are accessed
  * through the system tasks $tkg$write and $tkg$read.  It is also possible for
  * the GUI write to a channel through command $write.
- *
- *****************************************************************************/
-
+ */
 class Channel
 {
 public:
@@ -40,8 +38,10 @@ public:
 	void wait(VGThread*);
 	int queueLen() const;
 	int read(Value *data);
-	
-	std::string	 _name;		/* Name of channel */
+	/**
+	 * @brief Name of channel
+	 */
+	std::string	 _name;		
 	List/*Value*/	 _queue;	/* Queue of channel */
 	List/*Event*/	 c_wake;	/* Events to be executed on wake up */
 	int		 c_isWatched;	/* Flag to indicated if this is a "watched" channel */

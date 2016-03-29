@@ -1225,7 +1225,8 @@ SysTask_tkg_waituntil(VGThread *t, Value *r, int numArgs, void **args, TaskConte
  * Usage: $tkg$recv("name")
  *
  *****************************************************************************/
-static void SysTask_tkg_recv(VGThread *t, Value *r, int numArgs, void **args, TaskContext *taskContext)
+static void
+SysTask_tkg_recv(VGThread *t, Value *r, int numArgs, void **args, TaskContext *taskContext)
 {
 	char name[STRMAX];
 	Channel *c;
@@ -1242,7 +1243,7 @@ static void SysTask_tkg_recv(VGThread *t, Value *r, int numArgs, void **args, Ta
 
 	Value_toString((Value*)args[0],name);
 	string_expand(name, VGThread_getModCtx(t));
-	c = Circuit_getChannel(t->t_modCtx->circuit(), name);
+	c = t->t_modCtx->circuit()->channel(name);
 
 	if (c->read(r) < 0) {
 	/*
@@ -1291,10 +1292,10 @@ static void SysTask_tkg_send(VGThread *t, Value *r, int numArgs, void **args, Ta
     return;
   }
 
-  Value_toString((Value*)args[0],name);
-  string_expand(name, VGThread_getModCtx(t));
-  c = Circuit_getChannel(t->t_modCtx->circuit(), name);
-  Channel_write(c, (Value*) args[1]);
+	Value_toString((Value*)args[0],name);
+	string_expand(name, VGThread_getModCtx(t));
+	c = t->t_modCtx->circuit()->channel(name);
+	Channel_write(c, (Value*) args[1]);
 }
 
 /*****************************************************************************

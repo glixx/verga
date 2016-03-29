@@ -723,10 +723,10 @@ void Circuit_execWrite(Circuit*c,int argc,char *argv[])
     return;
   }
 
-  channel = Circuit_getChannel(c,argv[1]);
+	channel = c->channel(argv[1]);
 
-  v = new_Value(1);
-  Value_convert(v, argv[2]);
+	v = new_Value(1);
+	Value_convert(v, argv[2]);
 
 #if 0
   {
@@ -771,9 +771,9 @@ void Circuit_execQWatch(Circuit*c,int argc,char *argv[])
     return;
   }
 
-  channel = Circuit_getChannel(c,argv[1]);
-  if (channel)
-    Channel_setWatch(channel,1,format);
+	channel = c->channel(argv[1]);
+	if (channel)
+		Channel_setWatch(channel,1,format);
 }
 
 

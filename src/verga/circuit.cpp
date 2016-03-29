@@ -24,9 +24,6 @@
 
 #define DEBUG 0
 
-static ModuleInst *Circuit_buildNets(Circuit *c,ModuleDecl *m,MIInstance *mi,ModuleInst *parent,char *path);
-static void Circuit_buildHier(Circuit *c,ModuleInst *mi,ModuleInst *parent,char *path);
-
 Circuit::Circuit() :
 c_evQueue(new EvQueue(*this)),
 _root(NULL)
@@ -44,8 +41,8 @@ void Circuit::build(ModuleDecl *m)
 	char path[STRMAX*2];
 
 	std::strncpy(path, m->name(), STRMAX*2);
-	this->_root = Circuit_buildNets(this, m, NULL, NULL, path);
-	Circuit_buildHier(this, this->_root, NULL, path);
+	this->_root = this->buildNets(m, NULL, NULL, path);
+	this->buildHier(this->_root, NULL, path);
 }
 
 /*****************************************************************************
@@ -54,7 +51,8 @@ void Circuit::build(ModuleDecl *m)
  * scope.
  *
  *****************************************************************************/
-Scope *Circuit_getUpScope(Circuit *c,Scope *s)
+Scope*
+Circuit::getUpScope(Scope *s)
 {
 	char path[STRMAX],*p;
 	ModuleInst *mi;
@@ -66,8 +64,8 @@ Scope *Circuit_getUpScope(Circuit *c,Scope *s)
 
 	*p = 0;
 
-	it = c->c_moduleInsts.find(path);
-	if (it != c->c_moduleInsts.end()) {
+	it = this->_moduleInsts.find(path);
+	if (it != this->_moduleInsts.end()) {
 		mi = it->second;
 		return (&mi->mc_scope);
 	} else
@@ -139,7 +137,7 @@ static void Circuit_buildNets_parameter(Circuit *c,ModuleDecl *m,
 
   scope = ModuleInst_getScope(mi);
   if (mip->mip_ppPos >= 0)
-    scope = Circuit_getUpScope(c,scope);
+    scope = c->getUpScope(scope);
   s = Expr_parmEval(e,scope,PEF_NONE);
 
 #if 0
@@ -580,8 +578,9 @@ static int mergablePort(Net *iNet,Expr *eNet,ModuleInst *eCtx)
  *     codeBlock	CodeBlock for generating parameter expressions
  *
  *****************************************************************************/
-static int Circuit_buildHier_instance(Circuit *c,ModuleDecl *m,ModuleInst *mi,MIInstance *mid,
-				       ModuleInst *parent,char *path,CodeBlock *codeBlock)
+int
+Circuit::buildHierInstance(ModuleDecl *m,ModuleInst *mi,MIInstance *mid,
+    ModuleInst *parent,char *path,CodeBlock *codeBlock)
 {
   char *pathTail = strend(path);		/* Save old tail of path */
   ModuleDecl *subM;
@@ -594,7 +593,7 @@ static int Circuit_buildHier_instance(Circuit *c,ModuleDecl *m,ModuleInst *mi,MI
   }
   sprintf(pathTail,".%s", mid->mii_instName);
 
-  subM_ctx = Circuit_buildNets(c,subM,mid,parent,path);
+	subM_ctx = this->buildNets(subM,mid,parent,path);
 
   /*
    * Check for parameter port consistency.
@@ -669,7 +668,7 @@ static int Circuit_buildHier_instance(Circuit *c,ModuleDecl *m,ModuleInst *mi,MI
 	  errorModule(mi->mc_mod,ModuleItem_getPlace(mid),ERR_IE_NONET,Expr_getLitName(ePorts[i]));
 	  continue;
 	}
-	Circuit_mergeNets(c,eNet,mi,iPorts[i],subM_ctx);
+	Circuit_mergeNets(this, eNet,mi,iPorts[i],subM_ctx);
       } else {
 	const char *portName = Net_getLocalName(iPorts[i]);
 
@@ -678,7 +677,7 @@ static int Circuit_buildHier_instance(Circuit *c,ModuleDecl *m,ModuleInst *mi,MI
 	 *****************************************************************************/
 	switch ((Net_getType(iPorts[i]) & NT_P_IO_MASK)) {
 	case NT_P_INPUT :
-	  Circuit_makeInAssign(c,iPorts[i],subM_ctx,ePorts[i],mi,codeBlock);
+	  Circuit_makeInAssign(this, iPorts[i],subM_ctx,ePorts[i],mi,codeBlock);
 
 	  if (Net_nbits(iPorts[i]) != Expr_getBitSize(ePorts[i],ModuleInst_getScope(mi))) {
 	    errorNet(mi->mc_mod,portName,ModuleItem_getPlace(mid),WRN_INPORT,portName);
@@ -686,7 +685,7 @@ static int Circuit_buildHier_instance(Circuit *c,ModuleDecl *m,ModuleInst *mi,MI
 
 	  break;
 	case NT_P_OUTPUT :
-	  Circuit_makeOutAssign(c,ePorts[i],mi,iPorts[i],subM_ctx,codeBlock);
+	  Circuit_makeOutAssign(this, ePorts[i],mi,iPorts[i],subM_ctx,codeBlock);
 
 	  if (Net_nbits(iPorts[i]) != Expr_getBitSize(ePorts[i],ModuleInst_getScope(mi))) {
 	    errorNet(mi->mc_mod,portName,ModuleItem_getPlace(mid),WRN_OUTPORT,portName);
@@ -704,10 +703,10 @@ static int Circuit_buildHier_instance(Circuit *c,ModuleDecl *m,ModuleInst *mi,MI
     }
   }
 
-  Circuit_buildHier(c,subM_ctx,parent,path);
-  *pathTail = 0;
+	this->buildHier(subM_ctx,parent, path);
+	*pathTail = 0;
 
-  return 0;
+	return (0);
 }
 
 /*****************************************************************************
@@ -725,10 +724,11 @@ static int Circuit_buildHier_instance(Circuit *c,ModuleDecl *m,ModuleInst *mi,MI
  * used by this module instance.
  *
  *****************************************************************************/
-void Circuit_finishModuleInst(Circuit *c, ModuleInst *mi, CodeBlock *codeBlock)
+void
+Circuit::finishModuleInst(ModuleInst *mi, CodeBlock *codeBlock)
 {
-  EvQueue *Q = Circuit_getQueue(c);
-  ModuleDecl *m = mi->mc_mod;
+	EvQueue *Q = Circuit_getQueue(this);
+	ModuleDecl *m = mi->mc_mod;
   ListElem *le;
 
   if (ModuleDecl_getSpecify(mi->mc_mod))
@@ -765,21 +765,22 @@ void Circuit_finishModuleInst(Circuit *c, ModuleInst *mi, CodeBlock *codeBlock)
  *     path		Path prefix for expanding sub-modules.
  *
  *****************************************************************************/
-static void Circuit_buildHier(Circuit *c,ModuleInst *mi,ModuleInst *parent,char *path)
+void
+Circuit::buildHier(ModuleInst *mi,ModuleInst *parent,char *path)
 {
 	CodeBlock *codeBlock = new CodeBlock(mi);
-  ModuleDecl *m = mi->mc_mod;
-  int error_count = 0;
-  ListElem *le;
-  HashElem *he;
-  SHash *mi_tasks = &mi->mc_scope.s_tasks;
+	 ModuleDecl *m = mi->mc_mod;
+	int error_count = 0;
+	ListElem *le;
+	HashElem *he;
+	SHash *mi_tasks = &mi->mc_scope.s_tasks;
 
   /*
    * If there are any path delay statements, use special compilation code to handle
    * the object as a specify module.
    */
   if (ModuleInst_isPathDelayMod(mi)) {
-    Circuit_buildPathDelayMod(c,mi,parent,path);
+    Circuit_buildPathDelayMod(this, mi,parent,path);
     return;
   }
 
@@ -807,12 +808,12 @@ static void Circuit_buildHier(Circuit *c,ModuleInst *mi,ModuleInst *parent,char 
       }
       break;
     case IC_INSTANCE :
-      error_count += Circuit_buildHier_instance(c,m,mi,(MIInstance*)item,parent,path,codeBlock);
+	error_count += this->buildHierInstance(m, mi, (MIInstance*)item,parent,path,codeBlock);
       break;
     }
   }
 
-  Circuit_finishModuleInst(c,mi,codeBlock);
+	this->finishModuleInst(mi, codeBlock);
 }
 
 /*****************************************************************************
@@ -829,14 +830,16 @@ static void Circuit_buildHier(Circuit *c,ModuleInst *mi,ModuleInst *parent,char 
  * Returns:	ModuleInst object
  *
  *****************************************************************************/
-static ModuleInst *Circuit_buildNets(Circuit *c,ModuleDecl *m,MIInstance *mid,ModuleInst *parent,char *path)
+ModuleInst*
+Circuit::buildNets(ModuleDecl *m, MIInstance *mid, ModuleInst *parent,
+    char *path)
 {
 	ModuleInst *mi;
 	ListElem *le;
 	HashElem *he;
 
-	mi = new ModuleInst(m,c,parent,path);
-	c->c_moduleInsts.insert(ModuleInstHashElement(mi->mc_path, mi));
+	mi = new ModuleInst(m, this, parent,path);
+	this->_moduleInsts.insert(ModuleInstHashElement(mi->mc_path, mi));
 
 	for (he = Hash_first(&m->m_tasks);he; he = Hash_next(&m->m_tasks,he)) {
 		UserTaskDecl *utd = (UserTaskDecl*) HashElem_obj(he);
@@ -846,47 +849,46 @@ static ModuleInst *Circuit_buildNets(Circuit *c,ModuleDecl *m,MIInstance *mid,Mo
 	}
 
 #if 0
-  printf("bn: %s parent: %s  path: %s\n",
-	 mid ? mid->mii_name : "(null)",
-	 parent ? parent->mc_path : "(null)",path);
+	printf("bn: %s parent: %s  path: %s\n",
+	    mid ? mid->mii_name : "(null)",
+	    parent ? parent->mc_path : "(null)",path);
 #endif
 
-  for (le = List_first(&m->m_items);le; le = List_next(&m->m_items,le)) {
-    ModuleItem *item = (ModuleItem*) ListElem_obj(le);
+	for (le = List_first(&m->m_items);le; le = List_next(&m->m_items,le)) {
+		ModuleItem *item = (ModuleItem*) ListElem_obj(le);
 
-    switch (item->mi_type) {
-    case IC_PARAMETER :
-      Circuit_buildNets_parameter(c,m,mi,(MIParameter*)item,mid);
-      break;
-    case IC_REGINIT :
-      Circuit_buildNets_reginit(c,m,mi,(MIAssign*)item,mid);
-      break;
-    case IC_NETDECL :
-      {
-	MINetDecl *mid = (MINetDecl*)item;
-	NetDecl *nd = mid->mid_decl;
+		switch (item->mi_type) {
+		case IC_PARAMETER :
+			Circuit_buildNets_parameter(this,m,mi,(MIParameter*)item,mid);
+			break;
+		case IC_REGINIT :
+			Circuit_buildNets_reginit(this,m,mi,(MIAssign*)item,mid);
+			break;
+		case IC_NETDECL : {
+			MINetDecl *mid = (MINetDecl*)item;
+			NetDecl *nd = mid->mid_decl;
 
-	/*
-	 * Internal nets for path delay modules are defered until later
-	 */
-	if (ModuleInst_isPathDelayMod(mi) && (NetDecl_getType(nd) & NT_P_IO_MASK) == 0) break;
+			/*
+			 * Internal nets for path delay modules are defered until later
+			 */
+			if (ModuleInst_isPathDelayMod(mi) &&
+			    (NetDecl_getType(nd) & NT_P_IO_MASK) == 0)
+				break;
 
-	Circuit_declareNet(c,
-			   ModuleInst_getScope(mi),
-			   nd,
-			   m,ModuleItem_getPlace(item));
-      }
-      break;
-    case IC_ASSIGN :
-    case IC_ALWAYS :
-    case IC_INITIAL :
-    case IC_INSTANCE :
-    case IC_GATE :
-      break;
-    }
-  }
+			Circuit_declareNet(this, ModuleInst_getScope(mi), nd, m,
+			    ModuleItem_getPlace(item));
+		}
+		break;
+		case IC_ASSIGN :
+		case IC_ALWAYS :
+		case IC_INITIAL :
+		case IC_INSTANCE :
+		case IC_GATE :
+			break;
+		}
+	}
 
-  return mi;
+	return (mi);
 }
 
 /*****************************************************************************
@@ -955,32 +957,33 @@ void Circuit::sortThreads()
  *     m		Top-level module to build
  *
  *****************************************************************************/
-void Circuit_installScript(Circuit *c,ModuleDecl *m,DynamicModule *dm)
+void
+Circuit::installScript(ModuleDecl *m,DynamicModule *dm)
 {
-  static int count = 0;
-  char scriptRootName[STRMAX];
-  ModuleInst *mi;
-  ListElem *le;
+	static int count = 0;
+	char scriptRootName[STRMAX];
+	ModuleInst *mi;
+	ListElem *le;
 
-  sprintf(scriptRootName,"%%script%d",count++);
-  mi = new ModuleInst(m,c,0,scriptRootName);
-  DynamicModule_setModuleInst(dm,mi);
+	sprintf(scriptRootName,"%%script%d",count++);
+	mi = new ModuleInst(m, this, NULL, scriptRootName);
+	DynamicModule_setModuleInst(dm, mi);
 
-  Scope_setPeer(ModuleInst_getScope(mi),ModuleInst_getScope(&c->root()));
-  mi->mc_peer = &c->root();
+	Scope_setPeer(ModuleInst_getScope(mi),ModuleInst_getScope(&this->root()));
+	mi->mc_peer = &this->root();
 
-  for (le = List_first(&m->m_items);le; le = List_next(&m->m_items,le)) {
-    ModuleItem *item = (ModuleItem*) ListElem_obj(le);
+	for (le = List_first(&m->m_items);le; le = List_next(&m->m_items,le)) {
+		ModuleItem *item = (ModuleItem*) ListElem_obj(le);
 
-    if (item->mi_type == IC_NETDECL) {
-      //      Circuit_buildNets_netdecl(c,m,mi,(MINetDecl*)item);
-      Circuit_declareNet(c,ModuleInst_getScope(mi),
-      			 ((MINetDecl*)item)->mid_decl,
-      			 m,ModuleItem_getPlace(item));
-    }
-  }
+		if (item->mi_type == IC_NETDECL) {
+		//      Circuit_buildNets_netdecl(c,m,mi,(MINetDecl*)item);
+			Circuit_declareNet(this, ModuleInst_getScope(mi),
+      			    ((MINetDecl*)item)->mid_decl,
+      			    m, ModuleItem_getPlace(item));
+		}
+	}
 
-  Circuit_buildHier(c,mi,0,scriptRootName);
+	this->buildHier(mi, NULL, scriptRootName);
 }
 
 /*****************************************************************************
@@ -1026,7 +1029,7 @@ Circuit::check()
 				if (localName)
 					*localName++ = 0;
 
-				m = Circuit_findModuleInst(this,instname);
+				m = this->findModuleInst(instname);
 
 				if (m) {
 					char buf[STRMAX];
@@ -1129,17 +1132,18 @@ Trigger *Circuit_getNetTrigger(Circuit *c,Net *n,transtype_t tt)
  *
  *
  *****************************************************************************/
-ModuleInst *Circuit_findModuleInst(Circuit *c, const char *name)
+ModuleInst*
+Circuit::findModuleInst(const char *name)
 {
 	ModuleInst *mi;
 	ModuleInstHash::iterator it;
   
-	it = c->c_moduleInsts.find(name);
-	if (it == c->c_moduleInsts.end()) {
-		std::string fullName = std::string(c->root().mc_path).
+	it = this->_moduleInsts.find(name);
+	if (it == this->_moduleInsts.end()) {
+		std::string fullName = std::string(this->root().mc_path).
 			append(".").append(name);
-		it = c->c_moduleInsts.find(fullName.c_str());
-		if (it != c->c_moduleInsts.end())
+		it = this->_moduleInsts.find(fullName.c_str());
+		if (it != this->_moduleInsts.end())
 			mi = it->second;
 		else
 			mi = NULL;
@@ -1182,20 +1186,22 @@ Net *Circuit_findNet(Circuit *c,const char *name)
  * exactly one memory net, that net is returned.
  *
  *****************************************************************************/
-Net *Circuit_findMemoryNet(Circuit *c,const char *name)
+Net*
+Circuit_findMemoryNet(Circuit *c,const char *name)
 {
   Net *net = Circuit_findNet(c,name);
   ModuleInst *m;
   HashElem *he;
   SHash *nets;
 
-  if (net && (Net_getType(net) & NT_P_MEMORY)) {
-    return net;
-  }
+	if (net && (Net_getType(net) & NT_P_MEMORY)) {
+		return net;
+	}
 
-  net = 0;
-  m = Circuit_findModuleInst(c, name);
-  if (!m) return 0;
+	net = NULL;
+	m = c->findModuleInst(name);
+	if (!m)
+		return (NULL);
 
   nets = &m->mc_scope.s_nets;
   for (he = Hash_first(nets);he;he = Hash_next(nets, he)) {
@@ -1207,7 +1213,7 @@ Net *Circuit_findMemoryNet(Circuit *c,const char *name)
     }
   }
 
-  return net;
+	return (net);
 }
 
 /*****************************************************************************
@@ -1383,17 +1389,18 @@ int Circuit_writeMemory(Circuit *c, const char *fileName, Net *net, unsigned sta
  *      name		Name of the channel.
  *
  *****************************************************************************/
-Channel *Circuit_getChannel(Circuit *c, const char *name)
+Channel*
+Circuit::channel(const char *name)
 {
 	Channel *channel;
 	ChannelHash::iterator it;
 
-	it = c->c_channels.find(name);
-	if (it != c->c_channels.end()) 
+	it = this->_channels.find(name);
+	if (it != this->_channels.end()) 
 		channel = it->second;
 	else {
 		channel = new Channel(name);
-		c->c_channels.insert(ChannelHashElement(name, channel));
+		this->_channels.insert(ChannelHashElement(name, channel));
 	}
 
 	return (channel);

@@ -727,9 +727,9 @@ void Circuit_buildPathDelayMod(Circuit *c,ModuleInst *mi,ModuleInst *parent,char
     delete_Scope(port_scope);
   }
 
- error_cleanup:	/* Goto used if something above failed. */
-  SHash_uninit(&outset);
-  SHash_uninit(&inset);
+	error_cleanup:	/* Goto used if something above failed. */
+	SHash_uninit(&outset);
+	SHash_uninit(&inset);
 
-  Circuit_finishModuleInst(c,mi,codeBlock);
+	c->finishModuleInst(mi,codeBlock);
 }

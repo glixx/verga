@@ -646,7 +646,7 @@ void VerEndScript()
 	extern int errCount;
 
 	if (errCount == 0)
-		Circuit_installScript(&vgsim.circuit(),cur.mod,cur.dynmod);
+		vgsim.circuit().installScript(cur.mod, cur.dynmod);
 	cur.mod = NULL;
 	cur.isRedef = 0;
 	cur.scope = NULL;

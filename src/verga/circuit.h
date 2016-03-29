@@ -52,9 +52,22 @@ public:
 	~Circuit();
 	
 	void build(ModuleDecl*);
+	
 	void run();
+	
 	void check();
+	
 	void sortThreads();
+	
+	Channel *channel(const char*);
+	
+	ModuleInst *findModuleInst(const char *name);
+	
+	Scope *getUpScope(Scope*);
+	
+	void finishModuleInst(ModuleInst *mi, CodeBlock *codeBlock);
+	
+	void installScript(ModuleDecl *m, DynamicModule *dm);
 	
 	ModuleInst &root()
 	{
@@ -63,18 +76,30 @@ public:
 		return (*_root);
 	}
 	
-	NetHash		 c_nets;	/* Global table of nets */
+	NetHash		 c_nets;		/* Global table of nets */
 	NHash/*Trigger*/ c_triggers;		/* Triggers in this circuit */
-	ChannelHash	 c_channels;		/* Communication channels */
-	ModuleInstHash	 c_moduleInsts;		/* Module instances */
 	EvQueue		*c_evQueue;		/* Global event queue */
-	/* Dynamicly loaded modules */
+	/**
+	 * @brief Dynamicly loaded modules
+	 */
 	SHash		 c_dynamicModules;
 private:
+	ModuleInst *buildNets(ModuleDecl*, MIInstance*, ModuleInst*, char*);
+	void buildHier(ModuleInst *mi,ModuleInst *parent,char *path);
+	int buildHierInstance(ModuleDecl*, ModuleInst*, MIInstance*, ModuleInst*,
+	    char*, CodeBlock*);
+	/**
+	 * @brief Communication channels
+	 */
+	ChannelHash	 _channels;
 	/**
 	 * @brief Root module instance
 	 */
-	ModuleInst		*_root;		
+	ModuleInst		*_root;
+	/**
+	 * Module instances
+	 */
+	ModuleInstHash	 _moduleInsts;
 };
 
 /*****************************************************************************
@@ -88,12 +113,9 @@ void DynamicModule_killNotify(DynamicModule*);
 /*****************************************************************************
  * Circuit member functions
  *****************************************************************************/
-//void Circuit_build(Circuit *c,ModuleDecl *m);
 void Circuit_buildPathDelayMod(Circuit *c,ModuleInst *mi,ModuleInst *parent,char *path);
-void Circuit_installScript(Circuit *c,ModuleDecl *m,DynamicModule *dm);
 Net *Circuit_findNet(Circuit *c,const char *name);
 Net *Circuit_findMemoryNet(Circuit *c,const char *name);
-ModuleInst *Circuit_findModuleInst(Circuit *c, const char *name);
 Trigger *Circuit_getTrigger(Circuit *c,List *posedge,List *negedge);
 Trigger *Circuit_getNetTrigger(Circuit *c,Net*,transtype_t);
 #define Circuit_getQueue(c) (c)->c_evQueue
@@ -101,13 +123,11 @@ Trigger *Circuit_getNetTrigger(Circuit *c,Net*,transtype_t);
 void Circuit_exec(Circuit*c,char *cmd);
 void Circuit_readMemory(Circuit *c, const char *fileName, Net *net, unsigned start, unsigned stop, unsigned flags);
 int Circuit_writeMemory(Circuit *c, const char *fileName, Net *net, unsigned start, unsigned stop, unsigned flags);
-Channel *Circuit_getChannel(Circuit *c, const char*name);
+
 void Circuit_unloadDynamicModule(Circuit *c,DynamicModule *dm);
 void Circuit_enableDynamicModule(Circuit *c,DynamicModule *dm);
 void Circuit_disableDynamicModule(Circuit *c,DynamicModule *dm);
 void Circuit_declareNet(Circuit *c,Scope *scope,NetDecl *nd,ModuleDecl *md,Place *place);
 void Circuit_execScript(Circuit*c,int argc,char *argv[]);
-void Circuit_finishModuleInst(Circuit *c, ModuleInst *mi, CodeBlock *codeBlock);
-Scope *Circuit_getUpScope(Circuit *c,Scope *s);
 
 #endif
