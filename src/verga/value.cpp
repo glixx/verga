@@ -35,34 +35,32 @@ static int value_print_showbits = 1;
 
 static struct value_fl *value_freePool = 0;
 
-Strength
-Strength_fromNettype(unsigned nettype)
+Strength&
+Strength::operator =(unsigned nettype)
 {
-    Strength result;
+	if (nettype & NT_P_HIGHZ0)
+		this->zero = STR_HIGHZ;
+	else if (nettype & NT_P_WEAK0)
+		this->zero = STR_WEAK;
+	else if (nettype & NT_P_PULL0)
+		this->zero = STR_PULL;
+	else if (nettype & NT_P_STRONG0)
+		this->zero = STR_STRONG;
+	else if (nettype & NT_P_SUPPLY0)
+		this->zero = STR_SUPPLY;
     
-    if (nettype & NT_P_HIGHZ0)
-        result.zero = STR_HIGHZ;
-    else if (nettype & NT_P_WEAK0)
-        result.zero = STR_WEAK;
-    else if (nettype & NT_P_PULL0)
-        result.zero = STR_PULL;
-    else if (nettype & NT_P_STRONG0)
-        result.zero = STR_STRONG;
-    else if (nettype & NT_P_SUPPLY0)
-        result.zero = STR_SUPPLY;
+	if (nettype & NT_P_HIGHZ1)
+		this->one = STR_HIGHZ;
+	else if (nettype & NT_P_WEAK1)
+		this->one = STR_WEAK;
+	else if (nettype & NT_P_PULL1)
+		this->one = STR_PULL;
+	else if (nettype & NT_P_STRONG1)
+		this->one = STR_STRONG;
+	else if (nettype & NT_P_SUPPLY1)
+		this->one = STR_SUPPLY;
     
-    if (nettype & NT_P_HIGHZ1)
-        result.one = STR_HIGHZ;
-    else if (nettype & NT_P_WEAK1)
-        result.one = STR_WEAK;
-    else if (nettype & NT_P_PULL1)
-        result.one = STR_PULL;
-    else if (nettype & NT_P_STRONG1)
-        result.one = STR_STRONG;
-    else if (nettype & NT_P_SUPPLY1)
-        result.one = STR_SUPPLY;
-    
-    return result;
+	return (*this);
 }
 
 /*

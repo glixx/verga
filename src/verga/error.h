@@ -164,12 +164,14 @@ typedef struct ErrorDescriptor_str {
 class Place
 {
 public:
-	
+
 	void init(const char*);
 	
 	void endModule();
 	
 	static Place *getCurrent();
+	
+	void setModuleElement(ModuleElement*);
 	
 	char		*p_fileName;		/* Name of file */
 	char		*p_moduleName;		/* Name of module */
@@ -177,6 +179,8 @@ public:
 	ModuleItem	*p_mitem;		/* Module item if appropriate */
 	int		 p_lineNo;		/* Line number within file */
 	int		 p_modLineNo;		/* Line number within module */
+private:
+	ModuleElement	*_mitem;
 };
 
 /*****************************************************************************

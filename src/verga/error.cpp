@@ -538,6 +538,12 @@ void Place_setCurrent(Place *p)
   curPlace = *p;
 }
 
+void
+Place::setModuleElement(ModuleElement *element)
+{
+	_mitem = element;
+}
+
 /*****************************************************************************
  *
  * Get the "current" place.

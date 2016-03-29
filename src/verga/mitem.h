@@ -20,14 +20,17 @@
 #ifndef __mitem_h
 #define __mitem_h
 
-#include "value.h"
+#if __cplusplus < 201103
+#define override
+#define final
+#endif
 
+#include "value.h"
 
 /*
  * Module item flags
  */
 #define MIF_IMMEDIATE	0x1		/* Schedule item for immediate execution on startup */
-
 
 /*****************************************************************************
  *
@@ -59,10 +62,10 @@ enum gateargcode_t
 };
 
 typedef struct GateDesc_str {
-  int		gd_code;	/* Code for this gate type */
-  char const		*gd_name;	/* Name of this gate type */
-  gateargcode_t	gd_gac;		/* Gate argument handling */
-  int		gd_minPorts;	/* Minimum number of ports */
+  int		 gd_code;	/* Code for this gate type */
+  char const	*gd_name;	/* Name of this gate type */
+  gateargcode_t	 gd_gac;		/* Gate argument handling */
+  int		 gd_minPorts;	/* Minimum number of ports */
   valueop_f	*gd_baseFunc;	/* Base function */
   valueop_f	*gd_outFunc;	/* Final output function */
 } GateDesc;
@@ -179,15 +182,17 @@ typedef struct {
  * MIGate - A gate instance item
  *
  *****************************************************************************/
-typedef struct {
-  MICommon		mig_common;		/* Common fields */
-  GateDesc		*mig_desc;		/* Type description */
-  Expr			*mig_delay;		/* Delay expression */
-  const	char		*mig_instName;		/* Name of instance */
-  VRange		*mig_slices;		/* Range/number of slices */
-  List/*Expr*/		*mig_ports;		/* Ports */
-  Strength mig_strength;    /* Strength of the output values */
-} MIGate;
+class MIGate
+{
+public:
+	MICommon		 mig_common;		/* Common fields */
+	GateDesc		*mig_desc;		/* Type description */
+	Expr			*mig_delay;		/* Delay expression */
+	const	char		*mig_instName;		/* Name of instance */
+	VRange			*mig_slices;		/* Range/number of slices */
+	List/*Expr*/		*mig_ports;		/* Ports */
+	Strength		 _strength;    /* Strength of the output values */
+};
 
 
 /*****************************************************************************
@@ -206,6 +211,40 @@ union ModuleItem_uni {
   MIGate	mi_gate;		/* An gate instance item */
   MINetDecl	mi_netdec;		/* An net declaration item */
   MIParameter	mi_parm;		/* An parameter item */
+};
+
+class ModuleElement
+{
+public:
+	
+	ModuleElement();
+	virtual ~ModuleElement();
+	
+	virtual VGThread *generate(ModuleInst *modCtx, CodeBlock *cb) = 0;
+	virtual void printf(FILE *f) = 0;
+private:
+	Place		 _place;	/* Location of declaration */
+	DynamicModule	*_dynMod;	/* Dynamic module if dynamically loaded */
+	unsigned	 _flags;	/* Item flags */
+};
+
+class Gate : public ModuleElement
+{
+public:
+	Gate(unsigned gateType, unsigned strength, Expr *delay,
+	    const char *instName, VRange *slices, List *ports);
+	~Gate();
+	
+	VGThread* generate(ModuleInst* modCtx, CodeBlock* cb) override;
+	void printf(FILE* f) override;
+
+private:
+	GateDesc		*_description;		/* Type description */
+	Expr			*mig_delay;		/* Delay expression */
+	const	char		*mig_instName;		/* Name of instance */
+	VRange			*mig_slices;		/* Range/number of slices */
+	List/*Expr*/		*mig_ports;		/* Ports */
+	Strength		 _strength;    /* Strength of the output values */
 };
 
 /*****************************************************************************
@@ -243,7 +282,6 @@ Expr *MIInstance_findParm(MIInstance *mi,const char *name, int ppIdx);
 /*****************************************************************************
  * MIGate methods
  *****************************************************************************/
-
 MIGate *new_MIGate(unsigned gateType, unsigned strength, Expr *delay, const char *instName, VRange *slices, List *ports);
 int MIGate_pathdGenerate(MIGate *mig,ModuleInst *mi,CodeBlock *codeBlock,List *asgns);
 

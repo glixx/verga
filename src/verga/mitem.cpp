@@ -37,6 +37,8 @@ static GateDesc gateTable[] = {
   {PRIMNAND,	"nand",		GAC_MULTIN,	2,	Value_nand,	0},
   {PRIMNOR,	"nor",		GAC_MULTIN,	2,	Value_nor,	0},
   {PRIMXNOR,	"xnor",		GAC_MULTIN,	2,	Value_nxor,	0},
+  {PULLUP,	"pullup",	GAC_FIXED,	0,	Value_pmos,	0},
+  {PULLDOWN,	"pulldown",	GAC_FIXED,	0,	Value_pmos,	0},
   {PMOS,	"pmos",		GAC_FIXED,	3,	Value_pmos,	0},
   {NMOS,	"nmos",		GAC_FIXED,	3,	Value_nmos,	0},
   {BUFIF0,	"bufif0",	GAC_FIXED,	3,	Value_bufif0,	0},
@@ -83,6 +85,45 @@ static MItemVTable vtable_MIGate = {
   (MIprint_f*) MIGate_print
 };
 
+Gate::Gate(unsigned gateType, unsigned strength, Expr* delay,
+    const char* instName, VRange* slices, List* ports)
+{
+	int i;
+
+	this->_description = NULL;
+	for (i = 0; i < sizeof(gateTable)/sizeof(gateTable[0]); ++i) {
+		if (gateTable[i].gd_code == gateType) {
+			this->_description = &gateTable[i];
+			break;
+		}
+	}
+/*
+	this->mig_instName = instName ? strdup(instName) : NULL;
+	this->mig_delay = delay;
+	this->mig_slices = slices;
+	this->mig_ports = ports;
+	this->_strength = strength;
+	if (!this->mig_desc)
+		errorFile(ModuleItem_getPlace(this), ERR_GATEUNIMP, instName);*/
+}
+
+Gate::~Gate()
+{
+
+}
+
+VGThread*
+Gate::generate(ModuleInst* modCtx, CodeBlock* cb)
+{
+	return (NULL);
+}
+
+void
+Gate::printf(FILE* f)
+{
+
+}
+
 /*****************************************************************************
  *
  * Create a module item of the specified type (only basic fields are initialized)
@@ -113,6 +154,18 @@ ModuleItem *new_ModuleItem(itemcode_t mitype)
   }
 
   return mi;
+}
+
+ModuleElement::ModuleElement()
+{
+	Place_copy(&_place, Place::getCurrent());
+	_place.setModuleElement(this);
+	_dynMod = NULL;
+	_flags = 0;
+}
+
+ModuleElement::~ModuleElement()
+{
 }
 
 void ModuleItem_killNotify(ModuleItem *mi)
@@ -155,7 +208,7 @@ new_MIGate(
   mig->mig_delay = delay;
   mig->mig_slices = slices;
   mig->mig_ports = ports;
-  mig->mig_strength = Strength_fromNettype(strength);
+  mig->_strength = strength;
 
   if (!mig->mig_desc)
     errorFile(ModuleItem_getPlace(mig), ERR_GATEUNIMP, instName);

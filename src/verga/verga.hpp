@@ -66,6 +66,10 @@
 #include "vgrammar.hpp"		/* Symbols definitions for tokens */
 
 typedef std::list<const char*>	Stringlist;
+#if __cplusplus < 201103
+#define override
+#define final
+#endif
 
 enum DelayType {
 	/* Use minimum delays */

@@ -106,7 +106,7 @@ enum ValueFlags
  * Wire handler function
  *
  *****************************************************************************/
-typedef void wirefunc_f(Value *R,Value *A,Value *B);
+typedef void wirefunc_f(Value *R, Value *A, Value *B);
 
 
 /*****************************************************************************
@@ -161,11 +161,11 @@ enum StrengthLevel
 
 struct Strength
 {
-  StrengthLevel one:4;
-  StrengthLevel zero:4;
+	StrengthLevel one:4;
+	StrengthLevel zero:4;
+	
+	Strength &operator =(unsigned nettype);
 };
-
-Strength Strength_fromNettype(unsigned nettype);
 
 /*****************************************************************************
  *

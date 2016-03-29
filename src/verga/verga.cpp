@@ -128,7 +128,8 @@ static void usage()
  *    current directory
  *    user's home directory (value of HOME)
  *****************************************************************************/
-FILE *openInPath(const char *name)
+FILE *
+openInPath(const char *name)
 {
   char buf[STRMAX];
   FILE *f;
@@ -168,7 +169,7 @@ FILE *openInPath(const char *name)
     if ((f = fopen(buf,"r"))) return f;
   }
 
-  return 0;
+	return (NULL);
 }
 
 /*****************************************************************************

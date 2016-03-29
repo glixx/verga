@@ -456,18 +456,21 @@ union ByteCode_union {
  * CodeBlock - a block of bytecode instructions.
  *
  *****************************************************************************/
-struct CodeBlock_str {
-  int		cb_length;		/* Number of generated instructions */
-  int		cb_nalloced;		/* Number of allocated entries */
-  ModuleInst	*cb_module;		/* Module instance we are in */
-  ByteCode	*cb_instructions;	/* Vector of instructions */
+class CodeBlock
+{
+public:
+	CodeBlock(ModuleInst *mi);
+	~CodeBlock();
+	
+	int		cb_length;		/* Number of generated instructions */
+	int		cb_nalloced;		/* Number of allocated entries */
+	ModuleInst	*cb_module;		/* Module instance we are in */
+	ByteCode	*cb_instructions;	/* Vector of instructions */
 };
 
 /*****************************************************************************
  * CodeBlock member functions
  *****************************************************************************/
-CodeBlock *new_CodeBlock(ModuleInst *mi);
-void delete_CodeBlock(CodeBlock *);
 void CodeBlock_init(CodeBlock *cb,ModuleInst *mi);
 void CodeBlock_uninit(CodeBlock *cb);
 ByteCode *CodeBlock_nextEmpty(CodeBlock *cb);

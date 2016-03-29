@@ -48,6 +48,7 @@ typedef int valueop_f(Value *r,Value *a,Value *b,Value *c);
  * advance declarations from mitem.h
  *****************************************************************************/
 typedef union ModuleItem_uni ModuleItem;
+class ModuleElement;
 
 /*****************************************************************************
  * advance declarations from module.h
@@ -63,7 +64,7 @@ class Scope;
 typedef union ByteCode_union ByteCode;
 class VGThread;
 typedef void BCfunc(ByteCode *bc,VGThread *t);
-typedef struct CodeBlock_str CodeBlock;
+class CodeBlock;
 
 /*****************************************************************************
  * advance declarations from expr.h

@@ -2070,7 +2070,7 @@ int Value_nmos(Value *R,Value *I,Value *G,Value *dummy)
  * H|H z H H H H      H|1 0 1 1 1 1      H|0 0 0 0 0 0      H|1 1 1 1 1 1  011
  *
  *****************************************************************************/
-int Value_pmos(Value *R,Value *I,Value *G,Value *dummy)
+int Value_pmos(Value *R, Value *I, Value *G, Value *dummy)
 {
   int wc = SSNUMWORDS(R->nbits);
   register int i;

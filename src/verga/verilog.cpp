@@ -712,17 +712,19 @@ void VerSpecParam(const char *name,Expr *value)
   Specify_addSpecParam(s, name, value);
 }
 
-void VerGateDecl(int gtype, Expr *delay)
+void
+VerGateDecl(int gtype, Expr *delay)
 {
-  cur.gtype = gtype;
-  cur.gdelay = delay;
+	cur.gtype = gtype;
+	cur.gdelay = delay;
 }
 
-void VerGateDecl(int gtype, unsigned strength, Expr *delay)
+void
+VerGateDecl(int gtype, unsigned strength, Expr *delay)
 {
-  cur.gtype = gtype;
-  cur.gstrength = strength;
-  cur.gdelay = delay;
+	cur.gtype = gtype;
+	cur.gstrength = strength;
+	cur.gdelay = delay;
 }
 
 void VerGateInst(const char *iname, VRange *range, List *ports)

@@ -393,19 +393,20 @@ void Net_print(Net *n,FILE *f)
  * Returns:		Driver ID of newly created driver.
  *
  *****************************************************************************/
-int Net_addDriver(Net*n)
+int
+Net_addDriver(Net *n)
 {
-  int id = n->n_numDrivers++;
+	int id = n->n_numDrivers++;
 
-  if (id == 0)
-    n->n_drivers = (Value**) malloc(sizeof(Value*)*n->n_numDrivers);
-  else
-    n->n_drivers = (Value**) realloc(n->n_drivers, sizeof(Value*)*n->n_numDrivers);
+	if (id == 0)
+		n->n_drivers = (Value**) malloc(sizeof(Value*)*n->n_numDrivers);
+	else
+		n->n_drivers = (Value**) realloc(n->n_drivers, sizeof(Value*)*n->n_numDrivers);
 
-  n->n_drivers[id] = new_Value(Net_nbits(n));
-  Value_float(n->n_drivers[id]);
+	n->n_drivers[id] = new_Value(Net_nbits(n));
+	Value_float(n->n_drivers[id]);
 
-  return id;
+	return (id);
 }
 
 /*****************************************************************************

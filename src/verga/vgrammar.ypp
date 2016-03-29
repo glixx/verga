@@ -88,8 +88,6 @@
 %token REAL
 %token PULL0
 %token PULL1
-%token PULLDOWN
-%token PULLUP
 %token REG
 %token REPEAT
 %token SCALAR
@@ -128,9 +126,9 @@
 %token WIRE
 %token WOR
 
-%token <I> CMOS RCMOS BUFIF0 BUFIF1 NOTIF0 NOTIF1 NMOS PMOS RNMOS RPMOS
-%token <I> PRIMAND PRIMNAND PRIMNOR PRIMXOR PRIMXNOR BUF PRIMNOT
-%token <I> TRANIF0 TRANIF1 RTRANIF0 RTRANIF1 RTRAN KWOR TRAN COND
+%token <I> BUFIF0 BUFIF1 CMOS COND RCMOS KWOR NOTIF0 NOTIF1 NMOS PMOS PRIMAND
+%token <I> PRIMNAND PRIMNOR PRIMXOR PRIMXNOR PULLUP PULLDOWN RNMOS RPMOS BUF PRIMNOT
+%token <I> TRANIF0 TRANIF1 RTRANIF0 RTRANIF1 RTRAN TRAN
 
  /*
   * Markers for embedded scripts
@@ -150,7 +148,7 @@
 %token <F> REALNUM
 
 %type <S> dlit decltail dlits
-%type <I> casekw cmos_gtype mos_gtype inx_gtype outx_gtype bif_gtype tran_gtype trif_gtype
+%type <I> casekw cmos_gtype mos_gtype inx_gtype outx_gtype bif_gtype tran_gtype trif_gtype pull_gtype
 
 %type <U> net_type netattrs netattr
 %type <I> reg_type xreg_type port_type capsize drstrength size0 size1 ptype oautomatic
@@ -398,6 +396,7 @@ gate	: inx_gtype LPAREN drstrength RPAREN odelay
 	| bif_gtype odelay { VerGateDecl($1,$2); } ginsts SEMI
 	| tran_gtype odelay { VerGateDecl($1,$2); } ginsts SEMI
 	| trif_gtype odelay { VerGateDecl($1,$2); } ginsts SEMI
+	| pull_gtype { VerGateDecl($1, 0); } ginsts SEMI
 	;
 
 inx_gtype	: PRIMAND | PRIMNAND | PRIMNOR | PRIMXOR | PRIMXNOR | KWOR ;
@@ -407,6 +406,7 @@ mos_gtype	: NMOS | PMOS | RNMOS | RPMOS ;
 bif_gtype	: BUFIF0 | BUFIF1 | NOTIF0 | NOTIF1 ;
 tran_gtype	: TRAN | RTRAN ;
 trif_gtype	: TRANIF0 | TRANIF1 | RTRANIF0 | RTRANIF1 ;
+pull_gtype	: PULLUP | PULLDOWN ;
 
 drstrength	: size0 COMMA size1 { $$ = $1|$3; }
 		| size1 COMMA size0 { $$ = $1|$3; }

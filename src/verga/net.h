@@ -260,17 +260,17 @@ public:
 	{
 		return (n_name);
 	}
-  nettype_t		  n_type;			/* Type of wire */
-  NetAttrFlags		  n_flags;		/* Attribute flags */
-  unsigned		  n_msb,n_lsb;		/* Range of net */
-  unsigned		  n_nbits;		/* Number of bits */
-  unsigned		  n_numMonitors;		/* Number of monitors on this net */
-  List/*Trigger*/	  n_posedgeNotify;	/* Triggers to notify on posedge */
-  List/*Trigger*/	  n_negedgeNotify;	/* Triggers to notify on negedge */
-  int			  n_numDrivers;		/* Number of drivers (if WIRE) */
-  Value			**n_drivers;		/* Drivers (if WIRE) */
-  wirefunc_f		 *n_wfunc;		/* Wire function */
-	NetData		  n_data;
+	nettype_t		  n_type;	/* Type of wire */
+	NetAttrFlags		  n_flags;		/* Attribute flags */
+	unsigned		  n_msb, n_lsb;		/* Range of net */
+	unsigned		  n_nbits;		/* Number of bits */
+	unsigned		  n_numMonitors;		/* Number of monitors on this net */
+	List/*Trigger*/		  n_posedgeNotify;	/* Triggers to notify on posedge */
+	List/*Trigger*/		  n_negedgeNotify;	/* Triggers to notify on negedge */
+	int			  n_numDrivers;		/* Number of drivers (if WIRE) */
+	Value			**n_drivers;	/* Drivers (if WIRE) */
+	wirefunc_f		 *n_wfunc;	/* Wire function */
+	NetData		  	  n_data;
 private:
 	char			 *n_name;		/* Full path name */
 };
