@@ -79,10 +79,10 @@ enum ThreadState_t
  * VGFrame - Represents a stack frame for a thread.
  *
  *****************************************************************************/
-typedef struct VGFrame_str VGFrame;
-struct VGFrame_str {
-  ByteCode	*f_pc;		/* Instruction to which to return */
-  VGFrame	*f_next;	/* Next address on stack */
+struct VGFrame
+{
+	ByteCode	*f_pc;		/* Instruction to which to return */
+	VGFrame		*f_next;	/* Next address on stack */
 };
 
 /*****************************************************************************
@@ -93,19 +93,19 @@ struct VGFrame_str {
 class VGThread
 {
 public:
-  Event		*t_pending;	/* Pointer to event if pending, null otherwise */
-  ThreadState_t	 t_state;	/* State of the thread (active, blocked, paused, etc.)  */
-  int		 t_isLive;	/* Non-zero if this thread is live */
-  int		 t_wait;	/* Suspend until this many threads end */
-  CodeBlock	*t_start_block;	/* CodeBlock to use for starting thread */
-  unsigned	 t_start_pc;	/* Offset into starting thread for PC */
-  ByteCode	*t_pc;		/* Thread program counter */
-  ModuleInst	*t_modCtx;	/* Module context in which thread was initiated */
-  ModuleItem	*t_mitem;	/* Module item of thead (if applicable) */
-  int		 t_numChild;	/* Number of running child tasks */
-  VGThread	*t_parent;	/* Parent task */
-  VGThread	*t_next;	/* Next pointer when we are in the active queue */
-  VGFrame	*t_callStack;	/* Call stack for any calls to user tasks/functions */
+	Event		*t_pending;	/* Pointer to event if pending, null otherwise */
+	ThreadState_t	 t_state;	/* State of the thread (active, blocked, paused, etc.)  */
+	int		 t_isLive;	/* Non-zero if this thread is live */
+	int		 t_wait;	/* Suspend until this many threads end */
+	CodeBlock	*t_start_block;	/* CodeBlock to use for starting thread */
+	unsigned	 t_start_pc;	/* Offset into starting thread for PC */
+	ByteCode	*t_pc;		/* Thread program counter */
+	ModuleInst	*t_modCtx;	/* Module context in which thread was initiated */
+	ModuleItem	*t_mitem;	/* Module item of thead (if applicable) */
+	int		 t_numChild;	/* Number of running child tasks */
+	VGThread	*t_parent;	/* Parent task */
+	VGThread	*t_next;	/* Next pointer when we are in the active queue */
+	VGFrame		*t_callStack;	/* Call stack for any calls to user tasks/functions */
 };
 
 /*****************************************************************************
@@ -113,82 +113,88 @@ public:
  * BCOpr - Do a basic 1 to 3 operand operation
  *
  *****************************************************************************/
-typedef struct {
-  BCfunc	*o_func;	/* Function for */
-  valueop_f	*o_op;		/* Operation function */
-  Value		*o_dest;	/* Destination state */
-  Value		*o_opr[3];	/* Operand states */
-} BCOpr;
+struct BCOpr
+{
+	BCfunc		*o_func;	/* Function for */
+	valueop_f	*o_op;		/* Operation function */
+	Value		*o_dest;	/* Destination state */
+	Value		*o_opr[3];	/* Operand states */
+};
 
 /*****************************************************************************
  *
  * BCMemFetch - Fetch a value from a memory
  *
  *****************************************************************************/
-typedef struct {
-  BCfunc	*m_func;	/* Handler function */
-  Net		*m_net;		/* Net for memory */
-  Value		*m_addr;	/* Address we are operating on */
-  Value		*m_data;	/* Value to store/retrieve from memory */
-} BCMemFetch;
+struct BCMemFetch
+{
+	BCfunc	*m_func;	/* Handler function */
+	Net		*m_net;		/* Net for memory */
+	Value		*m_addr;	/* Address we are operating on */
+	Value		*m_data;	/* Value to store/retrieve from memory */
+};
 
 /*****************************************************************************
  *
  * BCMemPut - Put a value into memory
  *
  *****************************************************************************/
-typedef struct {
-  BCfunc	*m_func;	/* Handler function */
-  Net		*m_net;		/* Net for memory */
-  Value		*m_addr;	/* Address we are operating on */
-  Value		*m_netLsb;	/* LSB on net (memory) */
-  Value		*m_data;	/* Value to store/retrieve from memory */
-  unsigned	m_valLsb;	/* Lsb in value */
-  unsigned	m_width;	/* Width of assignment */
-} BCMemPut;
+struct BCMemPut
+{
+	BCfunc	*m_func;	/* Handler function */
+	Net		*m_net;		/* Net for memory */
+	Value		*m_addr;	/* Address we are operating on */
+	Value		*m_netLsb;	/* LSB on net (memory) */
+	Value		*m_data;	/* Value to store/retrieve from memory */
+	unsigned	m_valLsb;	/* Lsb in value */
+	unsigned	m_width;	/* Width of assignment */
+};
 
 /*****************************************************************************
  *
  * BCNbMemPutD - Non-blocking store of a value into memory
  *
  *****************************************************************************/
-typedef struct {
-  BCfunc	*m_func;	/* Handler function */
-  Net		*m_net;		/* Net for memory */
-  Value		*m_addr;	/* Address we are operating on */
-  Value		*m_netLsb;	/* LSB on net (memory) */
-  Value		*m_data;	/* Value to store/retrieve from memory */
-  unsigned	m_valLsb;	/* Lsb in value */
-  unsigned	m_width;	/* Width of assignment */
-  deltatime_t	m_delay;	/* Delay for assignment */
-} BCNbMemPutD;
+struct BCNbMemPutD
+{
+	BCfunc		*m_func;	/* Handler function */
+	Net		*m_net;		/* Net for memory */
+	Value		*m_addr;	/* Address we are operating on */
+	Value		*m_netLsb;	/* LSB on net (memory) */
+	Value		*m_data;	/* Value to store/retrieve from memory */
+	unsigned	 m_valLsb;	/* Lsb in value */
+	unsigned	 m_width;	/* Width of assignment */
+	deltatime_t	 m_delay;	/* Delay for assignment */
+};
 
 /*****************************************************************************
  *
  * BCNbMemPutE - Non-blocking store of a value into memory
  *
  *****************************************************************************/
-typedef struct {
-  BCfunc	*m_func;	/* Handler function */
-  Net		*m_net;		/* Net for memory */
-  Value		*m_addr;	/* Address we are operating on */
-  Value		*m_netLsb;	/* LSB on net (memory) */
-  Value		*m_data;	/* Value to store/retrieve from memory */
-  unsigned	m_valLsb;	/* Lsb in value */
-  unsigned	m_width;	/* Width of assignment */
-  Trigger	*m_trigger;	/* Trigger for assignment */
-} BCNbMemPutE;
+struct BCNbMemPutE
+{
+	BCfunc	*m_func;	/* Handler function */
+	Net		*m_net;		/* Net for memory */
+	Value		*m_addr;	/* Address we are operating on */
+	Value		*m_netLsb;	/* LSB on net (memory) */
+	Value		*m_data;	/* Value to store/retrieve from memory */
+	unsigned	m_valLsb;	/* Lsb in value */
+	unsigned	m_width;	/* Width of assignment */
+	Trigger	*m_trigger;	/* Trigger for assignment */
+};
 
 /*****************************************************************************
  *
  * BCCopy - Copy a value with possible mismatch in bit size.
  *
  *****************************************************************************/
-typedef struct {
-  BCfunc	*c_func;	/* Function for */
-  Value		*c_dst;		/* Destination state */
-  Value		*c_src;		/* Source states */
-} BCCopy;
+struct BCCopy
+{
+	BCfunc	*c_func;	/* Function for */
+	Value	*c_dst;		/* Destination state */
+	Value	*c_src;		/* Source states */
+};
 
 /*****************************************************************************
  *
@@ -462,6 +468,8 @@ public:
 	CodeBlock(ModuleInst *mi);
 	~CodeBlock();
 	
+	void init(ModuleInst *mi);
+	
 	int		cb_length;		/* Number of generated instructions */
 	int		cb_nalloced;		/* Number of allocated entries */
 	ModuleInst	*cb_module;		/* Module instance we are in */
@@ -471,7 +479,6 @@ public:
 /*****************************************************************************
  * CodeBlock member functions
  *****************************************************************************/
-void CodeBlock_init(CodeBlock *cb,ModuleInst *mi);
 void CodeBlock_uninit(CodeBlock *cb);
 ByteCode *CodeBlock_nextEmpty(CodeBlock *cb);
 #define CodeBlock_first(cb) (cb)->cb_instructions
@@ -656,7 +663,7 @@ void VGThread_goto(VGThread *thread,CodeBlock *codeBlock,unsigned offset);
 void VGThread_kill(VGThread *thread);
 #define VGThread_getModCtx(thread) (thread)->t_modCtx
 #define VGThread_getCircuit(thread) (thread)->t_modCtx->mc_circuit
-#define VGThread_getQueue(thread) Circuit_getQueue((thread)->t_modCtx->mc_circuit)
+#define VGThread_getQueue(thread) Circuit_getQueue((thread)->t_modCtx->circuit())
 #define VGThread_suspend(t) ((t)->t_state = ThreadState_t((t)->t_state | TS_BLOCKED))
 #define VGThread_resume(t) ((t)->t_state = ThreadState_t((t)->t_state & ~TS_BLOCKED))
 #define VGThread_enable(t) ((t)->t_state = ThreadState_t((t)->t_state & ~TS_DISABLED))

@@ -41,14 +41,13 @@ typedef std::pair<std::string, Net*> NetHashElement;
 typedef std::pair<std::string, Channel*> ChannelHashElement;
 typedef std::pair<std::string, ModuleInst*> ModuleInstHashElement;
 
-/*****************************************************************************
- *
- * Circuit - Class to represent final instantiated circuit
- *
- *****************************************************************************/
+/**
+ * @brief Class to represent final instantiated circuit
+ */
 class Circuit
 {
 public:
+	
 	Circuit();
 	~Circuit();
 	
@@ -56,10 +55,12 @@ public:
 	void run();
 	void check();
 	void sortThreads();
+	
 	ModuleInst &root()
 	{
-		assert(c_root != NULL);
-		return (*c_root);
+		assert(_root != NULL);
+		
+		return (*_root);
 	}
 	
 	NetHash		 c_nets;	/* Global table of nets */
@@ -70,7 +71,10 @@ public:
 	/* Dynamicly loaded modules */
 	SHash		 c_dynamicModules;
 private:
-	ModuleInst		*c_root;		/* Root module instance */
+	/**
+	 * @brief Root module instance
+	 */
+	ModuleInst		*_root;		
 };
 
 /*****************************************************************************

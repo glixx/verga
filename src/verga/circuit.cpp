@@ -29,7 +29,7 @@ static void Circuit_buildHier(Circuit *c,ModuleInst *mi,ModuleInst *parent,char 
 
 Circuit::Circuit() :
 c_evQueue(new EvQueue(*this)),
-c_root(NULL)
+_root(NULL)
 {
 	NHash_init(&this->c_triggers);
 	SHash_init(&this->c_dynamicModules);
@@ -44,8 +44,8 @@ void Circuit::build(ModuleDecl *m)
 	char path[STRMAX*2];
 
 	std::strncpy(path, m->name(), STRMAX*2);
-	this->c_root = Circuit_buildNets(this, m, NULL, NULL, path);
-	Circuit_buildHier(this, this->c_root, NULL, path);
+	this->_root = Circuit_buildNets(this, m, NULL, NULL, path);
+	Circuit_buildHier(this, this->_root, NULL, path);
 }
 
 /*****************************************************************************
@@ -157,7 +157,7 @@ static void Circuit_buildNets_parameter(Circuit *c,ModuleDecl *m,
 	   mi->mc_path,
 	   mid ? mid->mii_name : "(null)",
 	   mip->mip_ppPos,
-	   mi->mc_parent
+	   mi->_parent
 	   );
   }
 #endif
@@ -471,7 +471,7 @@ static void Circuit_makeInAssign(Circuit *c,Net *iNet,ModuleInst *iCtx,Expr *exp
 
   BCGoto_init(CodeBlock_nextEmpty(codeBlock),0,0,codeBlock,top_bc);
 
-  List_addToTail(&eCtx->mc_threads, thread);
+  List_addToTail(&eCtx->_threads, thread);
 }
 
 /*****************************************************************************
@@ -538,7 +538,7 @@ static void Circuit_makeOutAssign(Circuit *c,Expr *expr,ModuleInst *eCtx,Net *iN
 
   BCGoto_init(CodeBlock_nextEmpty(codeBlock),0,0,codeBlock,top_bc);
 
-  List_addToTail(&eCtx->mc_threads, thread);
+  List_addToTail(&eCtx->_threads, thread);
 }
 
 /*****************************************************************************
@@ -745,7 +745,7 @@ void Circuit_finishModuleInst(Circuit *c, ModuleInst *mi, CodeBlock *codeBlock)
   /*
    * Queue all threads from this module for execution.
    */
-  for (le = List_first(&mi->mc_threads);le;le = List_next(&mi->mc_threads,le)) {
+  for (le = List_first(&mi->_threads);le;le = List_next(&mi->_threads,le)) {
     VGThread *t = (VGThread*) ListElem_obj(le);
 
     EvQueue_enqueueAfter(Q,new_EvThread(t),0);

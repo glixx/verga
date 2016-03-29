@@ -69,9 +69,10 @@ void VGSecurity_init(VGSecurity *vgs,int trusted)
  *     vgs		VGSecurity object to be initialized.
  *
  *****************************************************************************/
-void VGSecurity_handleException(VGSecurity *vgs,VGThread *t,const char *name)
+void
+VGSecurity_handleException(VGSecurity *vgs,VGThread *t,const char *name)
 {
-  EvQueue *Q = Circuit_getQueue(t->t_modCtx->mc_circuit);
+	EvQueue *Q = Circuit_getQueue(t->t_modCtx->circuit());
 
   switch (vgs->vgs_handling) {
   case 0 :		/* ignore */

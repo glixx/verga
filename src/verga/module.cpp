@@ -729,7 +729,7 @@ new_NetDecl(const char *name, int wtype,VRange *range, VRange *addrRange,
 
 ModuleInst::ModuleInst(ModuleDecl *md,Circuit *c,ModuleInst *parent,const char *path)
 {
-	ModuleInst_init(this, md, c, parent, path);
+	this->init(md, c, parent, path);
 }
 
 ModuleInst::~ModuleInst()
@@ -737,15 +737,16 @@ ModuleInst::~ModuleInst()
 	ModuleInst_uninit(this);
 }
 
-void ModuleInst_init(ModuleInst *mi,ModuleDecl *md,Circuit *c,ModuleInst *parent,const char *path)
+void
+ModuleInst::init(ModuleDecl *md, Circuit *c, ModuleInst *parent, const char *path)
 {
-  mi->mc_path = strdup(path);
-  mi->mc_peer = 0;
-  mi->mc_mod  = md;
-  mi->mc_circuit = c;
-  mi->mc_parent = parent;
-  List_init(&mi->mc_threads);
-  Scope_init(&mi->mc_scope,path,0,mi);
+	this->mc_path = strdup(path);
+	this->mc_peer = 0;
+	this->mc_mod  = md;
+	this->_circuit = c;
+	this->_parent = parent;
+	List_init(&this->_threads);
+	Scope_init(&this->mc_scope, path, 0, this);
 }
 
 void ModuleInst_uninit(ModuleInst *mc)

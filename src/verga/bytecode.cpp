@@ -34,7 +34,7 @@
  *****************************************************************************/
 CodeBlock::CodeBlock(ModuleInst *mi)
 {
-	CodeBlock_init(this, mi);
+	this->init(mi);
 }
 
 /*****************************************************************************
@@ -58,12 +58,13 @@ CodeBlock::~CodeBlock()
  *     cb		CodeBlock to be initialized.
  *
  *****************************************************************************/
-void CodeBlock_init(CodeBlock *cb,ModuleInst *mi)
+void
+CodeBlock::init(ModuleInst *mi)
 {
-  cb->cb_length =  0;
-  cb->cb_nalloced = BCODE_BLOCKSIZE;
-  cb->cb_module = mi;
-  cb->cb_instructions = (ByteCode*) malloc(sizeof(ByteCode)*BCODE_BLOCKSIZE);
+	this->cb_length = 0;
+	this->cb_nalloced = BCODE_BLOCKSIZE;
+	this->cb_module = mi;
+	this->cb_instructions = (ByteCode*) malloc(sizeof(ByteCode)*BCODE_BLOCKSIZE);
 }
 
 /*****************************************************************************

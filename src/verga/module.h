@@ -20,6 +20,7 @@
 
 #include "mitem.h"
 #include "verilog.h"
+#include "circuit.h"
 
 #if __cplusplus >= 201103
 #include <unordered_map>
@@ -140,24 +141,41 @@ private:
 	ScopeDecl	 _scope;	
 };
 
-/*****************************************************************************
- *
- * ModuleInst - Context information for current module being expanded
- *
- *****************************************************************************/
+/**
+ * @brief Context information for current module being expanded
+ */
 class ModuleInst
 {
 public:
 	ModuleInst(ModuleDecl*, Circuit*, ModuleInst*, const char*);
 	~ModuleInst();
+	
+	const Circuit *circuit() const
+	{	
+		return (this->_circuit);
+	}
+	Circuit *circuit()
+	{	
+		return (this->_circuit);
+	}
+	
+	void init(ModuleDecl*, Circuit*, ModuleInst*,const char *path);
+	
 	char		*mc_path;	/* Path for this context */
 	ModuleInst	*mc_peer;	/* Peer module (used for simulation scripts) */
 	ModuleDecl	*mc_mod;	/* Module definition */
-	Circuit		*mc_circuit;	/* Circuit we are building */
-	ModuleInst	*mc_parent;	/* Parent instance */
-	List/*VGThread*/ mc_threads;	/* Threads in the module instance */
+	/**
+	 * @brief Parent instance
+	 */
+	ModuleInst	*_parent;	
+	List/*VGThread*/ _threads;	/* Threads in the module instance */
 	Scope		 mc_scope;	/* Scope in which varaibles/tasks are defined */
 	CodeBlock	*mc_codeBlock;	/* Code block for this module instance */
+private:
+	/**
+	 * @brief Circuit we are building
+	 */
+	Circuit		*_circuit;
 };
 
 /*****************************************************************************
@@ -228,7 +246,6 @@ void ModuleDecl_makeSpecify(ModuleDecl *m);
 /*****************************************************************************
  * ModuleInst member functions
  *****************************************************************************/
-void ModuleInst_init(ModuleInst *mc,ModuleDecl *md,Circuit *c,ModuleInst *parent,const char *path);
 void ModuleInst_uninit(ModuleInst *mc);
 Value *ModuleInst_findParm(ModuleInst *mc,const char *name);
 Net *ModuleInst_findNet(ModuleInst *mc,const char *name);
@@ -236,14 +253,13 @@ void ModuleInst_defParm(ModuleInst *mc,const char *name,Value *value);
 void ModuleInst_defNet(ModuleInst *mc,const char *name,Net *n);
 const char *ModuleInst_findLocalNetName(ModuleInst *mc,Net *n);
 #define ModuleInst_getPath(mc) (mc)->mc_path
-#define ModuleInst_getCircuit(mc) (mc)->mc_circuit
 #define ModuleInst_setCodeBlock(mc,cb) ((mc)->mc_codeBlock = (cb))
 #define ModuleInst_getModDecl(mc) (mc)->mc_mod
 UserTask *ModuleInst_findTask(ModuleInst *m,const char *name);
 int ModuleInst_defineTask(ModuleInst *m,const char *name,UserTask *ut);
 #define ModuleInst_getScope(mc) (&(mc)->mc_scope)
 #define ModuleInst_isPathDelayMod(mi) ModuleDecl_isPathDelayMod((mi)->mc_mod)
-#define ModuleInst_addThread(mi, t) List_addToTail(&(mi)->mc_threads,(t))
+#define ModuleInst_addThread(mi, t) List_addToTail(&(mi)->_threads,(t))
 #define ModuleInst_getTimescale(mi) ModuleDecl_getTimescale((mi)->mc_mod)
 
 FaninNode *new_FaninNode(ModuleItem *item);

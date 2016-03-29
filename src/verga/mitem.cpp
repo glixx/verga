@@ -953,12 +953,12 @@ static VGThread *MIGate_generate_multin(MIGate *mig, ModuleInst *mi,CodeBlock *c
     base_bit += Expr_getBitSize(lhs_e, ModuleInst_getScope(mi));
   }
 
-  /*
-   * Triggering condition for assign block.
-   */
-  t = Expr_getDefaultTriggerFromSet(&P, ModuleInst_getCircuit(mi));
-  BCTrigger_init(CodeBlock_nextEmpty(codeBlock),t);
-  BCGoto_init(CodeBlock_nextEmpty(codeBlock),0,0,codeBlock,top_bc);
+	/*
+	 * Triggering condition for assign block.
+	 */
+	t = Expr_getDefaultTriggerFromSet(&P, mi->circuit());
+	BCTrigger_init(CodeBlock_nextEmpty(codeBlock),t);
+	BCGoto_init(CodeBlock_nextEmpty(codeBlock),0,0,codeBlock,top_bc);
 
   /*
    * Create thread starting at the top of the gate instance handler code.
@@ -1100,7 +1100,7 @@ static VGThread *MIGate_generate_multout(MIGate *mig, ModuleInst *mi,CodeBlock *
   /*
    * Triggering condition for assign block.
    */
-  t = Expr_getDefaultTriggerFromSet(&P, ModuleInst_getCircuit(mi));
+  t = Expr_getDefaultTriggerFromSet(&P, mi->circuit());
   BCTrigger_init(CodeBlock_nextEmpty(codeBlock),t);
   BCGoto_init(CodeBlock_nextEmpty(codeBlock),0,0,codeBlock,top_bc);
 

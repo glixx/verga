@@ -151,7 +151,7 @@ static void Specify_generateTaskCall(Specify *s,ModuleInst *mi,CodeBlock *codeBl
   /*
    * Register this thread
    */
-  List_addToTail(&mi->mc_threads,thread);
+  List_addToTail(&mi->_threads, thread);
 
 
   if (which < 0) {

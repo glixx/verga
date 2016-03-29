@@ -386,9 +386,10 @@ static void SysTask_printfSSVec(VGThread *t,int numArgs, void **args)
  *     $tkg$reportBreak(id, value);
  *
  *****************************************************************************/
-static void SysTask_tkg_reportBreak(VGThread *t,Value *r,int numArgs,void **args,TaskContext *taskContext)
+static void
+SysTask_tkg_reportBreak(VGThread *t,Value *r,int numArgs,void **args,TaskContext *taskContext)
 {
-  EvQueue *Q = Circuit_getQueue(t->t_modCtx->mc_circuit);
+	EvQueue *Q = Circuit_getQueue(t->t_modCtx->circuit());
 
   /*
    * Stop the simulator
@@ -451,9 +452,9 @@ static void SysTask_monitor(VGThread *t,Value *r,int numArgs,void **args,TaskCon
       Net_addMonitor(taskContext->tc_nets[i]);
     }
 
-    Q = Circuit_getQueue(t->t_modCtx->mc_circuit);
-    EvQueue_enqueueMonitor(Q,e);
-    break;
+	Q = Circuit_getQueue(t->t_modCtx->circuit());
+	EvQueue_enqueueMonitor(Q,e);
+	break;
   case TA_STROBE :
     for (i = 0;i < taskContext->tc_numNets;i++) {
       if (!Value_isEqual(taskContext->tc_lastValues[i], Net_getValue(taskContext->tc_nets[i]))) {
@@ -504,9 +505,9 @@ static void SysTask_fmonitor(VGThread *t,Value *r,int numArgs,void **args,TaskCo
       Net_addMonitor(taskContext->tc_nets[i]);
     }
 
-    Q = Circuit_getQueue(t->t_modCtx->mc_circuit);
-    EvQueue_enqueueMonitor(Q,e);
-    break;
+	Q = Circuit_getQueue(t->t_modCtx->circuit());
+	EvQueue_enqueueMonitor(Q,e);
+	break;
   case TA_STROBE :
     for (i = 0;i < taskContext->tc_numNets;i++) {
       if (!Value_isEqual(taskContext->tc_lastValues[i], Net_getValue(taskContext->tc_nets[i]))) {
@@ -541,13 +542,14 @@ static void SysTask_fmonitor(VGThread *t,Value *r,int numArgs,void **args,TaskCo
  *     taskContext	Optional task context
  *
  *****************************************************************************/
-static void SysTask_tkg_probe(VGThread *t,Value *r,int numArgs,void **args,TaskContext *taskContext)
+static void
+SysTask_tkg_probe(VGThread *t,Value *r,int numArgs,void **args,TaskContext *taskContext)
 {
-  Circuit *c = t->t_modCtx->mc_circuit;
-  EvQueue *Q = Circuit_getQueue(c);
-  char who[STRMAX];
-  Event *e;
-  int i;
+	Circuit *c = t->t_modCtx->circuit();
+	EvQueue *Q = Circuit_getQueue(c);
+	char who[STRMAX];
+	Event *e;
+	int i;
 
   *who = 0;
   if (numArgs > 0 && (Value_getTypeFlags((Value*)args[0]) & SF_STRING)) {
@@ -598,7 +600,7 @@ static void SysTask_tkg_probe(VGThread *t,Value *r,int numArgs,void **args,TaskC
 static void
 SysTask_tkg_unprobe(VGThread *t,Value *r,int numArgs,void **args,TaskContext *taskContext)
 {
-	EvQueue *Q = Circuit_getQueue(t->t_modCtx->mc_circuit);
+	EvQueue *Q = Circuit_getQueue(t->t_modCtx->circuit());
 	char who[STRMAX];
 	int i;
 
@@ -888,7 +890,7 @@ static void SysTask_strobe(VGThread *t,Value *r,int numArgs,void **args,TaskCont
   switch (taskContext->tc_action) {
   case TA_SETUP :
     e = new_EvStrobe(SysTask_strobe,taskContext);
-    Q = Circuit_getQueue(t->t_modCtx->mc_circuit);
+    Q = Circuit_getQueue(t->t_modCtx->circuit());
     EvQueue_enqueueStrobe(Q,e);
     break;
   case TA_STROBE :
@@ -923,7 +925,7 @@ static void SysTask_fstrobe(VGThread *t,Value *r,int numArgs,void **args,TaskCon
   switch (taskContext->tc_action) {
   case TA_SETUP :
     e = new_EvStrobe(SysTask_fstrobe,taskContext);
-    Q = Circuit_getQueue(t->t_modCtx->mc_circuit);
+    Q = Circuit_getQueue(t->t_modCtx->circuit());
     EvQueue_enqueueStrobe(Q,e);
     break;
   case TA_STROBE :
@@ -965,10 +967,11 @@ static void SysTask_finish(VGThread *t,Value *r,int numArgs,void **args,TaskCont
  *     taskContext	Optional task context
  *
  *****************************************************************************/
-static void SysTask_monitoroff(VGThread *t,Value *r,int numArgs,void **args,TaskContext *tc)
+static void
+SysTask_monitoroff(VGThread *t,Value *r,int numArgs,void **args,TaskContext *tc)
 {
-  EvQueue *Q = Circuit_getQueue(t->t_modCtx->mc_circuit);
-  Q->eq_monitorOn = 0;
+	EvQueue *Q = Circuit_getQueue(t->t_modCtx->circuit());
+	Q->eq_monitorOn = 0;
 }
 
 /*****************************************************************************
@@ -983,10 +986,11 @@ static void SysTask_monitoroff(VGThread *t,Value *r,int numArgs,void **args,Task
  *     taskContext	Optional task context
  *
  *****************************************************************************/
-static void SysTask_monitoron(VGThread *t,Value *r,int numArgs,void **args,TaskContext *tc)
+static void
+SysTask_monitoron(VGThread *t,Value *r,int numArgs,void **args,TaskContext *tc)
 {
-  EvQueue *Q = Circuit_getQueue(t->t_modCtx->mc_circuit);
-  Q->eq_monitorOn = 1;
+	EvQueue *Q = Circuit_getQueue(t->t_modCtx->circuit());
+	Q->eq_monitorOn = 1;
 }
 
 /*****************************************************************************
@@ -1001,10 +1005,11 @@ static void SysTask_monitoron(VGThread *t,Value *r,int numArgs,void **args,TaskC
  *     taskContext	Optional task context
  *
  *****************************************************************************/
-static void SysTask_stop(VGThread *t,Value *r,int numArgs,void **args,TaskContext *tc)
+static void
+SysTask_stop(VGThread *t,Value *r,int numArgs,void **args,TaskContext *tc)
 {
-  EvQueue *Q = Circuit_getQueue(t->t_modCtx->mc_circuit);
-  int n = 0;
+	EvQueue *Q = Circuit_getQueue(t->t_modCtx->circuit());
+	int n = 0;
 
   if (numArgs > 0) {
     Value_toInt((Value*)args[0],(unsigned*)&n);
@@ -1059,12 +1064,13 @@ static void SysTask_random(VGThread *t, Value *r, int numArgs, void **args, Task
  *     taskContext	Optional task context
  *
  *****************************************************************************/
-static void SysTask_time(VGThread *t,Value *r,int numArgs,void **args,TaskContext *tc)
+static void
+SysTask_time(VGThread *t,Value *r,int numArgs,void **args,TaskContext *tc)
 {
-  if (r) {
-    EvQueue *Q = Circuit_getQueue(t->t_modCtx->mc_circuit);
-    Value_convertTime(r,EvQueue_getCurTime(Q));
-  }
+	if (r) {
+		EvQueue *Q = Circuit_getQueue(t->t_modCtx->circuit());
+		Value_convertTime(r,EvQueue_getCurTime(Q));
+	}
 }
 
 /*****************************************************************************
@@ -1079,12 +1085,13 @@ static void SysTask_time(VGThread *t,Value *r,int numArgs,void **args,TaskContex
  *     taskContext	Optional task context
  *
  *****************************************************************************/
-static void SysTask_stime(VGThread *t,Value *r,int numArgs,void **args,TaskContext *tc)
+static void
+SysTask_stime(VGThread *t,Value *r,int numArgs,void **args,TaskContext *tc)
 {
-  if (r) {
-    EvQueue *Q = Circuit_getQueue(t->t_modCtx->mc_circuit);
-    Value_convertI(r,(unsigned long)EvQueue_getCurTime(Q));
-  }
+	if (r) {
+		EvQueue *Q = Circuit_getQueue(t->t_modCtx->circuit());
+		Value_convertI(r,(unsigned long)EvQueue_getCurTime(Q));
+	}
 }
 
 /*****************************************************************************
@@ -1129,12 +1136,13 @@ static void SysTask_tkg_systime(VGThread *t, Value *r, int numArgs, void **args,
  * Usage: $tkg$wait(value)
  *
  *****************************************************************************/
-static void SysTask_tkg_wait(VGThread *t, Value *r, int numArgs, void **args, TaskContext *taskContext)
+static void
+SysTask_tkg_wait(VGThread *t, Value *r, int numArgs, void **args, TaskContext *taskContext)
 {
-  EvQueue *Q = Circuit_getQueue(t->t_modCtx->mc_circuit);
-  struct timeval tv;
-  simtime_t evTime;
-  unsigned ms;
+	EvQueue *Q = Circuit_getQueue(t->t_modCtx->circuit());
+	struct timeval tv;
+	simtime_t evTime;
+	unsigned ms;
 
   Value_toInt((Value*)args[0],&ms);
   VGThread_suspend(t);
@@ -1192,10 +1200,11 @@ static void SysTask_tkg_zoom(VGThread *t, Value *r, int numArgs, void **args, Ta
  * Usage: $tkg$waituntil(value)
  *
  *****************************************************************************/
-static void SysTask_tkg_waituntil(VGThread *t, Value *r, int numArgs, void **args, TaskContext *taskContext)
+static void
+SysTask_tkg_waituntil(VGThread *t, Value *r, int numArgs, void **args, TaskContext *taskContext)
 {
-  EvQueue *Q = Circuit_getQueue(t->t_modCtx->mc_circuit);
-  simtime_t evTime;
+	EvQueue *Q = Circuit_getQueue(t->t_modCtx->circuit());
+	simtime_t evTime;
 
   Value_toTime((Value*)args[0],&evTime);
   VGThread_suspend(t);
@@ -1233,7 +1242,7 @@ static void SysTask_tkg_recv(VGThread *t, Value *r, int numArgs, void **args, Ta
 
 	Value_toString((Value*)args[0],name);
 	string_expand(name, VGThread_getModCtx(t));
-	c = Circuit_getChannel(t->t_modCtx->mc_circuit, name);
+	c = Circuit_getChannel(t->t_modCtx->circuit(), name);
 
 	if (c->read(r) < 0) {
 	/*
@@ -1284,7 +1293,7 @@ static void SysTask_tkg_send(VGThread *t, Value *r, int numArgs, void **args, Ta
 
   Value_toString((Value*)args[0],name);
   string_expand(name, VGThread_getModCtx(t));
-  c = Circuit_getChannel(t->t_modCtx->mc_circuit, name);
+  c = Circuit_getChannel(t->t_modCtx->circuit(), name);
   Channel_write(c, (Value*) args[1]);
 }
 
@@ -1333,7 +1342,7 @@ static void SysTask_readmemb(VGThread *t,Value *r,int numArgs,void **args,TaskCo
       errorRun(ERR_BADSTOP,"$readmemb");
   }
 
-  Circuit_readMemory(t->t_modCtx->mc_circuit, fileName, net, start, stop, SF_BIN);
+  Circuit_readMemory(t->t_modCtx->circuit(), fileName, net, start, stop, SF_BIN);
 }
 
 /*****************************************************************************
@@ -1381,7 +1390,8 @@ static void SysTask_readmemh(VGThread *t,Value *r,int numArgs,void **args,TaskCo
       errorRun(ERR_BADSTOP,"$readmemh");
   }
 
-  Circuit_readMemory(t->t_modCtx->mc_circuit, fileName, net, start, stop, SF_HEX);
+	Circuit_readMemory(t->t_modCtx->circuit(), fileName, net, start, stop,
+	    SF_HEX);
 }
 
 static void SysTask_writememb(VGThread *t,Value *r,int numArgs,void **args,TaskContext *tc)
@@ -1416,8 +1426,9 @@ static void SysTask_writememb(VGThread *t,Value *r,int numArgs,void **args,TaskC
       errorRun(ERR_BADSTOP,"$writememb");
   }
 
-  if (Circuit_writeMemory(t->t_modCtx->mc_circuit, fileName, net, start, stop, SF_BIN) < 0)
-    errorRun(ERR_BADOPEN,"$writememb");
+	if (Circuit_writeMemory(t->t_modCtx->circuit(), fileName, net, start,
+	    stop, SF_BIN) < 0)
+		errorRun(ERR_BADOPEN,"$writememb");
 }
 
 static void SysTask_writememh(VGThread *t,Value *r,int numArgs,void **args,TaskContext *tc)
@@ -1452,8 +1463,9 @@ static void SysTask_writememh(VGThread *t,Value *r,int numArgs,void **args,TaskC
       errorRun(ERR_BADSTOP,"$writememh");
   }
 
-  if (Circuit_writeMemory(t->t_modCtx->mc_circuit, fileName, net, start, stop, SF_HEX)< 0)
-    errorRun(ERR_BADOPEN,"$writememh");
+	if (Circuit_writeMemory(t->t_modCtx->circuit(), fileName, net, start,
+	    stop, SF_HEX)< 0)
+		errorRun(ERR_BADOPEN,"$writememh");
 }
 
 static void SysTask_fclose(VGThread *t, Value *r, int numArgs, void **args, TaskContext *taskContext)
@@ -1562,13 +1574,14 @@ static void showSpecTaskCall(const char *name,int *argTypes,VGThread *t, Value *
 }
 #endif
 
-static void reportTimingViolation(const char *name,int *argTypes,VGThread *t, Value *r, int numArgs, void **args, TaskContext *taskContext)
+static void
+reportTimingViolation(const char *name,int *argTypes,VGThread *t, Value *r, int numArgs, void **args, TaskContext *taskContext)
 {
-  EvQueue *Q = Circuit_getQueue(t->t_modCtx->mc_circuit);
-  simtime_t now = EvQueue_getCurTime(Q);
-  ModuleInst *mi = VGThread_getModCtx(t);
-  ModuleDecl *m  = ModuleInst_getModDecl(mi);
-  char syscall[STRMAX],*p;
+	EvQueue *Q = Circuit_getQueue(t->t_modCtx->circuit());
+	simtime_t now = EvQueue_getCurTime(Q);
+	ModuleInst *mi = VGThread_getModCtx(t);
+	ModuleDecl *m  = ModuleInst_getModDecl(mi);
+	char syscall[STRMAX],*p;
   /** @TODO to remove */
   /*char now_s[STRMAX];*/
   int i;
@@ -1625,11 +1638,11 @@ static void reportTimingViolation(const char *name,int *argTypes,VGThread *t, Va
  *****************************************************************************/
 static void SysTask_setup(VGThread *t, Value *r, int numArgs, void **args, TaskContext *taskContext)
 {
-  static int argTypes[] = {TAT_VALUE,TAT_EXPR,TAT_EXPR, TAT_VALUE, TAT_NET};
-  EvQueue *Q = Circuit_getQueue(t->t_modCtx->mc_circuit);
-  simtime_t now = EvQueue_getCurTime(Q);
-  simtime_t *lastTrans;
-  int which = 0,constraint = 0;
+	static int argTypes[] = {TAT_VALUE,TAT_EXPR,TAT_EXPR, TAT_VALUE, TAT_NET};
+	EvQueue *Q = Circuit_getQueue(t->t_modCtx->circuit());
+	simtime_t now = EvQueue_getCurTime(Q);
+	simtime_t *lastTrans;
+	int which = 0,constraint = 0;
 
   Value_toInt((Value*)args[0], (unsigned*)&which);
   Value_toInt((Value*)args[3], (unsigned*)&constraint);
@@ -1672,13 +1685,14 @@ static void SysTask_setup(VGThread *t, Value *r, int numArgs, void **args, TaskC
   }
 }
 
-static void SysTask_hold(VGThread *t, Value *r, int numArgs, void **args, TaskContext *taskContext)
+static void
+SysTask_hold(VGThread *t, Value *r, int numArgs, void **args, TaskContext *taskContext)
 {
-  static int argTypes[] = {TAT_VALUE,TAT_EXPR,TAT_EXPR, TAT_VALUE, TAT_NET};
-  EvQueue *Q = Circuit_getQueue(t->t_modCtx->mc_circuit);
-  simtime_t now = EvQueue_getCurTime(Q);
-  simtime_t *lastTrans;
-  int which = 0,constraint = 0;
+	static int argTypes[] = {TAT_VALUE,TAT_EXPR,TAT_EXPR, TAT_VALUE, TAT_NET};
+	EvQueue *Q = Circuit_getQueue(t->t_modCtx->circuit());
+	simtime_t now = EvQueue_getCurTime(Q);
+	simtime_t *lastTrans;
+	int which = 0,constraint = 0;
 
   Value_toInt((Value*)args[0],(unsigned*)&which);
   Value_toInt((Value*)args[3],(unsigned*)&constraint);
@@ -1721,10 +1735,11 @@ static void SysTask_hold(VGThread *t, Value *r, int numArgs, void **args, TaskCo
   }
 }
 
-static void SysTask_width(VGThread *t, Value *r, int numArgs, void **args, TaskContext *taskContext)
+static void
+SysTask_width(VGThread *t, Value *r, int numArgs, void **args, TaskContext *taskContext)
 {
-  static int argTypes[] = {TAT_VALUE,TAT_EXPR, TAT_VALUE, TAT_NET};
-  EvQueue *Q = Circuit_getQueue(t->t_modCtx->mc_circuit);
+	static int argTypes[] = {TAT_VALUE,TAT_EXPR, TAT_VALUE, TAT_NET};
+	EvQueue *Q = Circuit_getQueue(t->t_modCtx->circuit());
   simtime_t now = EvQueue_getCurTime(Q);
   simtime_t *lastTrans;
   int which = 0,constraint = 0;
