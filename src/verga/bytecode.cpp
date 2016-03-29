@@ -32,11 +32,9 @@
  * Returns:		Newly created and initialized CodeBlock.
  *
  *****************************************************************************/
-CodeBlock *new_CodeBlock(ModuleInst *mi)
+CodeBlock::CodeBlock(ModuleInst *mi)
 {
-  CodeBlock *cb = (CodeBlock *) malloc(sizeof(CodeBlock));
-  CodeBlock_init(cb,mi);
-  return cb;
+	CodeBlock_init(this, mi);
 }
 
 /*****************************************************************************
@@ -47,10 +45,9 @@ CodeBlock *new_CodeBlock(ModuleInst *mi)
  *     cb		CodeBlock to be deleted.
  *
  *****************************************************************************/
-void delete_CodeBlock(CodeBlock *cb)
+CodeBlock::~CodeBlock()
 {
-  CodeBlock_uninit(cb);
-  free(cb);
+	CodeBlock_uninit(this);
 }
 
 /*****************************************************************************

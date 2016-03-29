@@ -767,7 +767,7 @@ void Circuit_finishModuleInst(Circuit *c, ModuleInst *mi, CodeBlock *codeBlock)
  *****************************************************************************/
 static void Circuit_buildHier(Circuit *c,ModuleInst *mi,ModuleInst *parent,char *path)
 {
-  CodeBlock *codeBlock = new_CodeBlock(mi);
+	CodeBlock *codeBlock = new CodeBlock(mi);
   ModuleDecl *m = mi->mc_mod;
   int error_count = 0;
   ListElem *le;

@@ -646,8 +646,8 @@ static Trigger *Circuit_dpath_getPortTrigger(Circuit *c, ModuleInst *mi, Scope *
  *****************************************************************************/
 void Circuit_buildPathDelayMod(Circuit *c,ModuleInst *mi,ModuleInst *parent,char *path)
 {
-  Scope *scope = ModuleInst_getScope(mi);
-  CodeBlock *codeBlock = new_CodeBlock(mi);
+	Scope *scope = ModuleInst_getScope(mi);
+	CodeBlock *codeBlock = new CodeBlock(mi);
   SHash/*Net*/ outset;
   SHash/*Net*/ inset;
   HashElem *he;
