@@ -38,6 +38,8 @@ public:
 	void wait(VGThread*);
 	int queueLen() const;
 	int read(Value *data);
+	int write(Value *data);
+	int setWatch(int doWatch, const char *format);
 	/**
 	 * @brief Name of channel
 	 */
@@ -47,8 +49,5 @@ public:
 	int		 c_isWatched;	/* Flag to indicated if this is a "watched" channel */
 	char		*c_format;	/* Format for watched data */
 };
-
-int Channel_write(Channel *c, Value *data);
-int Channel_setWatch(Channel *c, int doWatch, const char *format);
 
 #endif

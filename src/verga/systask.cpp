@@ -1295,7 +1295,7 @@ static void SysTask_tkg_send(VGThread *t, Value *r, int numArgs, void **args, Ta
 	Value_toString((Value*)args[0],name);
 	string_expand(name, VGThread_getModCtx(t));
 	c = t->t_modCtx->circuit()->channel(name);
-	Channel_write(c, (Value*) args[1]);
+	c->write((Value*) args[1]);
 }
 
 /*****************************************************************************

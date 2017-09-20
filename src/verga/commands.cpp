@@ -737,7 +737,7 @@ void Circuit_execWrite(Circuit*c,int argc,char *argv[])
   }
 #endif
 
-  Channel_write(channel, v);
+  channel->write(v);
   delete_Value(v);
 }
 
@@ -773,7 +773,7 @@ void Circuit_execQWatch(Circuit*c,int argc,char *argv[])
 
 	channel = c->channel(argv[1]);
 	if (channel)
-		Channel_setWatch(channel,1,format);
+		channel->setWatch(1,format);
 }
 
 

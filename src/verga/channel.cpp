@@ -100,15 +100,16 @@ Channel::queueLen() const
  *      format		Format in which to report values
  *
  *****************************************************************************/
-int Channel_setWatch(Channel *c, int isWatched, const char *format)
+int Channel::setWatch(int isWatched, const char *format)
 {
-  c->c_isWatched = isWatched;
-  if (c->c_format) free(c->c_format);
-  c->c_format = format ? strdup(format) : strdup("%h");
+  this->c_isWatched = isWatched;
+  if (this->c_format)
+    free(this->c_format);
+  this->c_format = format ? strdup(format) : strdup("%h");
   if (isWatched) {
-    while (c->queueLen() > 0) {
-      Value *v = (Value*) List_popHead(&c->_queue);
-      Channel_reportWatched(c,v);
+    while (this->queueLen() > 0) {
+      Value *v = (Value*) List_popHead(&this->_queue);
+      Channel_reportWatched(this, v);
     }
   }
   return 0;
@@ -130,31 +131,31 @@ Channel::read(Value *data)
 	return 0;
 }
 
-int Channel_write(Channel *c, Value *data)
+int Channel::write(Value *data)
 {
   Value *v;
 
-  if (c->c_isWatched) {
-    Channel_reportWatched(c,data);
+  if (this->c_isWatched) {
+    Channel_reportWatched(this, data);
     return 0;
   }
 
   v = new_Value(Value_nbits(data));
 
   Value_copy(v, data);
-	List_addToTail(&c->_queue, v);
+	List_addToTail(&this->_queue, v);
 
 #if 0
   {
     char buf[STRMAX];
 
     Value_getstr(data,buf);
-    vgio_echo("Channel_write(%s, %s)\n",c->_name,buf);
+    vgio_echo("Channel_write(%s, %s)\n",this->_name,buf);
   }
 #endif
 
-  while (List_numElems(&c->c_wake) > 0) {
-    Event *e = (Event*) List_popHead(&c->c_wake);
+  while (List_numElems(&this->c_wake) > 0) {
+    Event *e = (Event*) List_popHead(&this->c_wake);
     EvQueue_enqueueAfter(Circuit_getQueue(&vgsim.circuit()), e, 0);
   }
 
