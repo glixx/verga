@@ -1,3 +1,4 @@
 syntax: glob
 *.o
 *.o.d
+nbproject/private/*
