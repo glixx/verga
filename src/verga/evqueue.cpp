@@ -1237,7 +1237,7 @@ void EvQueue_interactiveMainEventLoop(EvQueue *Q)
       if (do_input_check && !(Q->eq_flags & EVF_NOCMD)) {
 	if (input_ready(0)) {
 	  if (!get_line(buf,STRMAX)) return;
-	  Circuit_exec(&Q->eq_circuit, buf);
+	  Q->eq_circuit.exec(buf);
 	} else {
 	  if (Q->eq_realQ) {
 	    struct timeval tv;
@@ -1311,7 +1311,7 @@ void EvQueue_interactiveMainEventLoop(EvQueue *Q)
 
       input_ready(1);
       if (!get_line(buf,STRMAX)) return;
-      Circuit_exec(&Q->eq_circuit, buf);
+      Q->eq_circuit.exec(buf);
       simulator_running = EvQueue_isRunning(Q);
     }
   }

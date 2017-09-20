@@ -815,19 +815,7 @@ void Circuit_execExit(Circuit*c,int argc,char *argv[])
 {
 }
 
-
-/*****************************************************************************
- *
- * Execute an interactive command from tkgate
- *
- * Parameters:
- *     c		Current circuit
- *     cmd		Command to execute (assumed in-place modifiable)
- *
- * See README file for a summary of command recognized by the simulator.
- *
- *****************************************************************************/
-void Circuit_exec(Circuit*c,char *cmd)
+void Circuit::exec(char *cmd)
 {
   char *argv[100];
   int argc = 0;
@@ -839,7 +827,8 @@ void Circuit_exec(Circuit*c,char *cmd)
    */
   while (*p) {
     while (isspace(*p)) p++;
-    if (!*p) break;
+    if (!*p)
+      break;
     argv[argc++] = p;
     while (*p && !isspace(*p)) p++;
     if (!*p) break;
@@ -850,7 +839,7 @@ void Circuit_exec(Circuit*c,char *cmd)
 
   for (i = 0;i < circExecTable_len;i++) {
     if (strcmp(argv[0],circExecTable[i].cet_command) == 0) {
-      (*circExecTable[i].cet_func)(c,argc,argv);
+      (*circExecTable[i].cet_func)(this, argc,argv);
       return;
     }
   }

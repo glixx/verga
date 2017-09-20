@@ -31,22 +31,25 @@
 class Channel
 {
 public:
-	
-	Channel(const char *name);
+	/**
+	 * @brief Constructor
+	 * @param name Name for new channel
+	 */
+	Channel(const char*);
 	~Channel();
 	
 	void wait(VGThread*);
 	int queueLen() const;
 	int read(Value *data);
 	int write(Value *data);
-	int setWatch(int doWatch, const char *format);
+	int setWatch(bool, const char *format);
 	/**
 	 * @brief Name of channel
 	 */
 	std::string	 _name;		
 	List/*Value*/	 _queue;	/* Queue of channel */
 	List/*Event*/	 c_wake;	/* Events to be executed on wake up */
-	int		 c_isWatched;	/* Flag to indicated if this is a "watched" channel */
+	bool		 _isWatched;	/* Flag to indicated if this is a "watched" channel */
 	char		*c_format;	/* Format for watched data */
 };
 

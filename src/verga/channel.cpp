@@ -19,22 +19,12 @@
 
 #include "verga.hpp"
 
-/*****************************************************************************
- *
- * Create a new channel with the specified name
- *
- * Parameters:
- *     name		Name for new channel
- *
- * Returns:		Newly created channel
- *
- *****************************************************************************/
 Channel::Channel(const char *name) :
 _name(name)
 {
 	List_init(&this->_queue);
 	List_init(&this->c_wake);
-	this->c_isWatched = 0;
+	this->_isWatched = false;
 	this->c_format = NULL;
 }
 
@@ -100,9 +90,9 @@ Channel::queueLen() const
  *      format		Format in which to report values
  *
  *****************************************************************************/
-int Channel::setWatch(int isWatched, const char *format)
+int Channel::setWatch(bool isWatched, const char *format)
 {
-  this->c_isWatched = isWatched;
+  this->_isWatched = isWatched;
   if (this->c_format)
     free(this->c_format);
   this->c_format = format ? strdup(format) : strdup("%h");
@@ -135,7 +125,7 @@ int Channel::write(Value *data)
 {
   Value *v;
 
-  if (this->c_isWatched) {
+  if (this->_isWatched) {
     Channel_reportWatched(this, data);
     return 0;
   }
@@ -143,7 +133,7 @@ int Channel::write(Value *data)
   v = new_Value(Value_nbits(data));
 
   Value_copy(v, data);
-	List_addToTail(&this->_queue, v);
+  List_addToTail(&this->_queue, v);
 
 #if 0
   {

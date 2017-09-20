@@ -49,12 +49,31 @@ class Circuit
 public:
 	
 	Circuit();
+	
 	~Circuit();
+	/**
+	 * @brief Execute an interactive command from tkgate
+	 * 
+	 * See README file for a summary of command recognized by the simulator.
+	 * 
+	 * @param cmd Command to execute (assumed in-place modifiable)
+	 */
+	void exec(char*);
 	
 	void build(ModuleDecl*);
-	
+	/**
+	 * @brief Begin simulating a circuit
+	 */
 	void run();
-	
+	/**
+	 * @brief Check a circuit for potential problems
+	 *
+	 * This function does a final check for errors/warnings in the circuit.  The
+	 * major check is for floating wires (wires with no driving signal).  When
+	 * reporting floating nets, we need to be sure to report them only once for
+	 * each module type, and not for each module instance.  We do this by reporting
+	 * the error in the first instance of a type that we find.
+	 */
 	void check();
 	
 	void sortThreads();
@@ -124,7 +143,6 @@ Trigger *Circuit_getTrigger(Circuit *c,List *posedge,List *negedge);
 Trigger *Circuit_getNetTrigger(Circuit *c,Net*,transtype_t);
 #define Circuit_getQueue(c) (c)->c_evQueue
 #define Circuit_update(c) EvQueue_update((c)->c_evQueue)
-void Circuit_exec(Circuit*c,char *cmd);
 void Circuit_readMemory(Circuit *c, const char *fileName, Net *net, unsigned start, unsigned stop, unsigned flags);
 int Circuit_writeMemory(Circuit *c, const char *fileName, Net *net, unsigned start, unsigned stop, unsigned flags);
 

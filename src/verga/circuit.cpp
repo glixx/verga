@@ -982,17 +982,6 @@ Circuit::installScript(ModuleDecl *m,DynamicModule *dm)
 	this->buildHier(mi, NULL, scriptRootName);
 }
 
-/*****************************************************************************
- *
- * Check a circuit for potential problems
- *
- * This function does a final check for errors/warnings in the circuit.  The
- * major check is for floating wires (wires with no driving signal).  When
- * reporting floating nets, we need to be sure to report them only once for
- * each module type, and not for each module instance.  We do this by reporting
- * the error in the first instance of a type that we find.
- *
- *****************************************************************************/
 void
 Circuit::check()
 {
@@ -1046,12 +1035,6 @@ Circuit::check()
 	SHash_uninit(&reported);
 }
 
-/*****************************************************************************
- *
- * Begin simulating a circuit
- *
- *
- *****************************************************************************/
 void
 Circuit::run()
 {
@@ -1399,7 +1382,7 @@ Circuit::channel(const char *name)
 		this->_channels.insert(ChannelHashElement(name, channel));
 	}
 
-	return (channel);
+	return channel;
 }
 
 
