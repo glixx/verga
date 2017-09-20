@@ -3,7 +3,7 @@ dnl	This file is an input file used by the GNU "autoconf" program to
 dnl	generate the file "configure", which is run during TkGate installation
 dnl	to configure the system for the local environment.
 
-AC_INIT([verga++],[0.0.1],[starling13@gmail.com],[verga++],[https://bitbucket.org/starling13/verga])
+AC_INIT([verga++],[0.1.0],[starling13@gmail.com],[verga++],[https://bitbucket.org/starling13/verga])
 AM_INIT_AUTOMAKE([foreign])
 AC_PREREQ(2.57)
 AC_CONFIG_HEADER(config.h)

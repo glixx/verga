@@ -1,2 +1,7 @@
+Version 0.1.0 - September 20, 2017
+    * Add parsing of N-output gates drive strength
+    * Fixed nets tri0 and tri1 behavior
+    * C++ conversions and refactoring
+
 Version 0.0.1 - March 17, 2015
      * first working standalone verga variant, ported to C++
