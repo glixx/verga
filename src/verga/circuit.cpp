@@ -1405,7 +1405,7 @@ void Circuit_unloadDynamicModule(Circuit *c,DynamicModule *dm)
   for (le = List_first(&dm->dm_threads);le;le = List_next(&dm->dm_threads,le)) {
     VGThread *t = (VGThread*)ListElem_obj(le);
 
-    VGThread_kill(t);
+    t->kill();
   }
 }
 
@@ -1430,7 +1430,7 @@ void Circuit_enableDynamicModule(Circuit *c,DynamicModule *dm)
 
     VGThread_enable(t);
     if (VGThread_isActive(t) && !wasActive)
-      VGThread_exec(t);
+      t->exec();
   }
 }
 

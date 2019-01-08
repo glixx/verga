@@ -16,7 +16,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
     Last edit by hansen on Thu Jan 29 10:04:52 2009
-****************************************************************************/
+ ****************************************************************************/
 #ifndef __bytecode_h
 #define __bytecode_h
 
@@ -61,7 +61,7 @@
  *
  *****************************************************************************/
 
-#define BCODE_BLOCKSIZE		64
+#define BCODE_BLOCKSIZE  64
 
 /*****************************************************************************
  *
@@ -82,8 +82,8 @@ enum ThreadState_t
  *****************************************************************************/
 struct VGFrame
 {
-	ByteCode	*f_pc;		/* Instruction to which to return */
-	VGFrame		*f_next;	/* Next address on stack */
+	ByteCode *f_pc; /* Instruction to which to return */
+	VGFrame *f_next; /* Next address on stack */
 };
 
 /*****************************************************************************
@@ -94,22 +94,39 @@ struct VGFrame
 class VGThread
 {
 public:
-	VGThread(CodeBlock *cb,unsigned pc,ModuleInst *modCtx,ModuleItem *mitem);
-	~VGThread();
+	VGThread(CodeBlock *cb, unsigned pc, ModuleInst *modCtx, ModuleItem *mitem);
 
-	Event		*t_pending;	/* Pointer to event if pending, null otherwise */
-	ThreadState_t	 t_state;	/* State of the thread (active, blocked, paused, etc.)  */
-	int		 t_isLive;	/* Non-zero if this thread is live */
-	int		 t_wait;	/* Suspend until this many threads end */
-	CodeBlock	*t_start_block;	/* CodeBlock to use for starting thread */
-	unsigned	 t_start_pc;	/* Offset into starting thread for PC */
-	ByteCode	*t_pc;		/* Thread program counter */
-	ModuleInst	*t_modCtx;	/* Module context in which thread was initiated */
-	ModuleItem	*t_mitem;	/* Module item of thead (if applicable) */
-	int		 t_numChild;	/* Number of running child tasks */
-	VGThread	*t_parent;	/* Parent task */
-	VGThread	*t_next;	/* Next pointer when we are in the active queue */
-	VGFrame		*t_callStack;	/* Call stack for any calls to user tasks/functions */
+	~VGThread();
+	/**
+	 * @brief  Initialize object
+	 * @param cb
+	 * @param pc
+	 * @param modCtx
+	 * @param mitem
+	 */
+	void init(CodeBlock*, unsigned, ModuleInst*, ModuleItem*);
+	
+	void uninit();
+	
+	void kill();
+	/**
+	 * @brief Execute a thread until it is suspended.
+	 */
+	void exec();
+
+	Event *t_pending; /* Pointer to event if pending, null otherwise */
+	ThreadState_t t_state; /* State of the thread (active, blocked, paused, etc.)  */
+	int t_isLive; /* Non-zero if this thread is live */
+	int t_wait; /* Suspend until this many threads end */
+	CodeBlock *t_start_block; /* CodeBlock to use for starting thread */
+	unsigned t_start_pc; /* Offset into starting thread for PC */
+	ByteCode *t_pc; /* Thread program counter */
+	ModuleInst *t_modCtx; /* Module context in which thread was initiated */
+	ModuleItem *t_mitem; /* Module item of thead (if applicable) */
+	int t_numChild; /* Number of running child tasks */
+	VGThread *t_parent; /* Parent task */
+	VGThread *t_next; /* Next pointer when we are in the active queue */
+	VGFrame *t_callStack; /* Call stack for any calls to user tasks/functions */
 };
 
 /*****************************************************************************
@@ -119,10 +136,10 @@ public:
  *****************************************************************************/
 struct BCOpr
 {
-	BCfunc		*o_func;	/* Function for */
-	valueop_f	*o_op;		/* Operation function */
-	Value		*o_dest;	/* Destination state */
-	Value		*o_opr[3];	/* Operand states */
+	BCfunc *o_func; /* Function for */
+	valueop_f *o_op; /* Operation function */
+	Value *o_dest; /* Destination state */
+	Value *o_opr[3]; /* Operand states */
 };
 
 /*****************************************************************************
@@ -132,10 +149,10 @@ struct BCOpr
  *****************************************************************************/
 struct BCMemFetch
 {
-	BCfunc	*m_func;	/* Handler function */
-	Net		*m_net;		/* Net for memory */
-	Value		*m_addr;	/* Address we are operating on */
-	Value		*m_data;	/* Value to store/retrieve from memory */
+	BCfunc *m_func; /* Handler function */
+	Net *m_net; /* Net for memory */
+	Value *m_addr; /* Address we are operating on */
+	Value *m_data; /* Value to store/retrieve from memory */
 };
 
 /*****************************************************************************
@@ -145,13 +162,13 @@ struct BCMemFetch
  *****************************************************************************/
 struct BCMemPut
 {
-	BCfunc	*m_func;	/* Handler function */
-	Net		*m_net;		/* Net for memory */
-	Value		*m_addr;	/* Address we are operating on */
-	Value		*m_netLsb;	/* LSB on net (memory) */
-	Value		*m_data;	/* Value to store/retrieve from memory */
-	unsigned	m_valLsb;	/* Lsb in value */
-	unsigned	m_width;	/* Width of assignment */
+	BCfunc *m_func; /* Handler function */
+	Net *m_net; /* Net for memory */
+	Value *m_addr; /* Address we are operating on */
+	Value *m_netLsb; /* LSB on net (memory) */
+	Value *m_data; /* Value to store/retrieve from memory */
+	unsigned m_valLsb; /* Lsb in value */
+	unsigned m_width; /* Width of assignment */
 };
 
 /*****************************************************************************
@@ -161,14 +178,14 @@ struct BCMemPut
  *****************************************************************************/
 struct BCNbMemPutD
 {
-	BCfunc		*m_func;	/* Handler function */
-	Net		*m_net;		/* Net for memory */
-	Value		*m_addr;	/* Address we are operating on */
-	Value		*m_netLsb;	/* LSB on net (memory) */
-	Value		*m_data;	/* Value to store/retrieve from memory */
-	unsigned	 m_valLsb;	/* Lsb in value */
-	unsigned	 m_width;	/* Width of assignment */
-	deltatime_t	 m_delay;	/* Delay for assignment */
+	BCfunc *m_func; /* Handler function */
+	Net *m_net; /* Net for memory */
+	Value *m_addr; /* Address we are operating on */
+	Value *m_netLsb; /* LSB on net (memory) */
+	Value *m_data; /* Value to store/retrieve from memory */
+	unsigned m_valLsb; /* Lsb in value */
+	unsigned m_width; /* Width of assignment */
+	deltatime_t m_delay; /* Delay for assignment */
 };
 
 /*****************************************************************************
@@ -178,14 +195,14 @@ struct BCNbMemPutD
  *****************************************************************************/
 struct BCNbMemPutE
 {
-	BCfunc	*m_func;	/* Handler function */
-	Net		*m_net;		/* Net for memory */
-	Value		*m_addr;	/* Address we are operating on */
-	Value		*m_netLsb;	/* LSB on net (memory) */
-	Value		*m_data;	/* Value to store/retrieve from memory */
-	unsigned	m_valLsb;	/* Lsb in value */
-	unsigned	m_width;	/* Width of assignment */
-	Trigger	*m_trigger;	/* Trigger for assignment */
+	BCfunc *m_func; /* Handler function */
+	Net *m_net; /* Net for memory */
+	Value *m_addr; /* Address we are operating on */
+	Value *m_netLsb; /* LSB on net (memory) */
+	Value *m_data; /* Value to store/retrieve from memory */
+	unsigned m_valLsb; /* Lsb in value */
+	unsigned m_width; /* Width of assignment */
+	Trigger *m_trigger; /* Trigger for assignment */
 };
 
 /*****************************************************************************
@@ -195,9 +212,9 @@ struct BCNbMemPutE
  *****************************************************************************/
 struct BCCopy
 {
-	BCfunc	*c_func;	/* Function for */
-	Value	*c_dst;		/* Destination state */
-	Value	*c_src;		/* Source states */
+	BCfunc *c_func; /* Function for */
+	Value *c_dst; /* Destination state */
+	Value *c_src; /* Source states */
 };
 
 /*****************************************************************************
@@ -205,13 +222,14 @@ struct BCCopy
  * BCCopyRange - Copy a range of bits from a value.
  *
  *****************************************************************************/
-typedef struct {
-  BCfunc	*r_func;	/* Function for */
-  Value		*r_dst;		/* Destination value */
-  unsigned	r_dLsb;		/* LSB in destination */
-  Value		*r_src;		/* Source value */
-  Value		*r_sLsb;	/* Least significant bit in Net (null for full assignment) */
-  unsigned	r_width;	/* Number of bits to assign */
+typedef struct
+{
+	BCfunc *r_func; /* Function for */
+	Value *r_dst; /* Destination value */
+	unsigned r_dLsb; /* LSB in destination */
+	Value *r_src; /* Source value */
+	Value *r_sLsb; /* Least significant bit in Net (null for full assignment) */
+	unsigned r_width; /* Number of bits to assign */
 } BCCopyRange;
 
 /*****************************************************************************
@@ -219,13 +237,14 @@ typedef struct {
  * BCAsgn - Assign a value to a net and invoke any resulting actions
  *
  *****************************************************************************/
-typedef struct {
-  BCfunc	*a_func;	/* Function for */
-  Net		*a_net;		/* Destination net */
-  Value		*a_value;	/* Value to assign */
-  unsigned	a_width;	/* Number of bits to assign */
-  unsigned	a_valLsb;	/* Least significant bit in Value */
-  Value		*a_netLsb;	/* Least significant bit in Net (null for full assignment) */
+typedef struct
+{
+	BCfunc *a_func; /* Function for */
+	Net *a_net; /* Destination net */
+	Value *a_value; /* Value to assign */
+	unsigned a_width; /* Number of bits to assign */
+	unsigned a_valLsb; /* Least significant bit in Value */
+	Value *a_netLsb; /* Least significant bit in Net (null for full assignment) */
 } BCAsgn;
 
 /*****************************************************************************
@@ -233,9 +252,10 @@ typedef struct {
  * BCRaise - Raise an event
  *
  *****************************************************************************/
-typedef struct {
-  BCfunc	*r_func;	/* Function for */
-  Net		*r_net;		/* Destination net */
+typedef struct
+{
+	BCfunc *r_func; /* Function for */
+	Net *r_net; /* Destination net */
 } BCRaise;
 
 /*****************************************************************************
@@ -244,14 +264,15 @@ typedef struct {
  * actions after a specified (possibly 0) delay.
  *
  *****************************************************************************/
-typedef struct {
-  BCfunc	*a_func;	/* Function for */
-  Net		*a_net;		/* Destination net */
-  Value		*a_value;	/* Value to assign */
-  unsigned	a_width;	/* Number of bits to assign */
-  unsigned	a_valLsb;	/* Least significant bit in Value */
-  Value		*a_netLsb;	/* Least significant bit in Net (null for full assignment) */
-  deltatime_t	a_delay;	/* Delay for assignment */
+typedef struct
+{
+	BCfunc *a_func; /* Function for */
+	Net *a_net; /* Destination net */
+	Value *a_value; /* Value to assign */
+	unsigned a_width; /* Number of bits to assign */
+	unsigned a_valLsb; /* Least significant bit in Value */
+	Value *a_netLsb; /* Least significant bit in Net (null for full assignment) */
+	deltatime_t a_delay; /* Delay for assignment */
 } BCNbAsgnD;
 
 /*****************************************************************************
@@ -260,14 +281,15 @@ typedef struct {
  * actions after a triggering event.
  *
  *****************************************************************************/
-typedef struct {
-  BCfunc	*a_func;	/* Function for */
-  Net		*a_net;		/* Destination net */
-  Value		*a_value;	/* Value to assign */
-  unsigned	a_width;	/* Number of bits to assign */
-  unsigned	a_valLsb;	/* Least significant bit in Value */
-  Value		*a_netLsb;	/* Least significant bit in Net (null for full assignment) */
-  Trigger	*a_trigger;	/* Event trigger */
+typedef struct
+{
+	BCfunc *a_func; /* Function for */
+	Net *a_net; /* Destination net */
+	Value *a_value; /* Value to assign */
+	unsigned a_width; /* Number of bits to assign */
+	unsigned a_valLsb; /* Least significant bit in Value */
+	Value *a_netLsb; /* Least significant bit in Net (null for full assignment) */
+	Trigger *a_trigger; /* Event trigger */
 } BCNbAsgnE;
 
 /*****************************************************************************
@@ -276,15 +298,16 @@ typedef struct {
  * resulting actions after a specified (possibly 0) delay.
  *
  *****************************************************************************/
-typedef struct {
-  BCfunc	*a_func;	/* Function for */
-  Net		*a_net;		/* Destination net */
-  int		a_id;		/* Driver ID for net driver that is changing */
-  Value		*a_value;	/* Value to assign */
-  unsigned	a_width;	/* Number of bits to assign */
-  unsigned	a_valLsb;	/* Least significant bit in Value */
-  Value		*a_netLsb;	/* Least significant bit in Net (null for full assignment) */
-  deltatime_t	a_delay;	/* Delay for assignment */
+typedef struct
+{
+	BCfunc *a_func; /* Function for */
+	Net *a_net; /* Destination net */
+	int a_id; /* Driver ID for net driver that is changing */
+	Value *a_value; /* Value to assign */
+	unsigned a_width; /* Number of bits to assign */
+	unsigned a_valLsb; /* Least significant bit in Value */
+	Value *a_netLsb; /* Least significant bit in Net (null for full assignment) */
+	deltatime_t a_delay; /* Delay for assignment */
 } BCWireAsgnD;
 
 /*****************************************************************************
@@ -293,12 +316,13 @@ typedef struct {
  * same bit size.
  *
  *****************************************************************************/
-typedef struct {
-  BCfunc	*a_func;	/* Function for */
-  Net		*a_net;		/* Destination net */
-  int		a_id;		/* Driver ID for net driver that is changing */
-  Value		*a_value;	/* Value to assign */
-  deltatime_t	a_delay;	/* Delay for assignment */
+typedef struct
+{
+	BCfunc *a_func; /* Function for */
+	Net *a_net; /* Destination net */
+	int a_id; /* Driver ID for net driver that is changing */
+	Value *a_value; /* Value to assign */
+	deltatime_t a_delay; /* Delay for assignment */
 } BCWireAsgnDF;
 
 /*****************************************************************************
@@ -306,8 +330,9 @@ typedef struct {
  * BCEnd - End execution of a thread
  *
  *****************************************************************************/
-typedef struct {
-  BCfunc	*e_func;
+typedef struct
+{
+	BCfunc *e_func;
 } BCEnd;
 
 /*****************************************************************************
@@ -315,8 +340,9 @@ typedef struct {
  * BCNoop - Null opperation
  *
  *****************************************************************************/
-typedef struct {
-  BCfunc	*n_func;
+typedef struct
+{
+	BCfunc *n_func;
 } BCNoop;
 
 /*****************************************************************************
@@ -324,12 +350,13 @@ typedef struct {
  * BCGoto - Conditional/unconditional goto
  *
  *****************************************************************************/
-typedef struct {
-  BCfunc	*g_func;	/* Handler function */
-  Value		*g_cond;	/* Condition or null for unconditional jump */
-  CodeBlock	*g_block;	/* Destination block of jump */
-  unsigned	g_offset;	/* Offset into block of jump */
-  int		g_neg;		/* Jump on negative of condition */
+typedef struct
+{
+	BCfunc *g_func; /* Handler function */
+	Value *g_cond; /* Condition or null for unconditional jump */
+	CodeBlock *g_block; /* Destination block of jump */
+	unsigned g_offset; /* Offset into block of jump */
+	int g_neg; /* Jump on negative of condition */
 } BCGoto;
 
 /*****************************************************************************
@@ -337,10 +364,11 @@ typedef struct {
  * BCSpawn - Spawn a child thread
  *
  *****************************************************************************/
-typedef struct {
-  BCfunc	*s_func;	/* Handler function */
-  CodeBlock	*s_block;	/* Codeblock for child thread */
-  unsigned	s_offset;	/* Offset for child thread */
+typedef struct
+{
+	BCfunc *s_func; /* Handler function */
+	CodeBlock *s_block; /* Codeblock for child thread */
+	unsigned s_offset; /* Offset for child thread */
 } BCSpawn;
 
 /*****************************************************************************
@@ -348,8 +376,9 @@ typedef struct {
  * BCWait - Suspend current thread until something interesting happends.
  *
  *****************************************************************************/
-typedef struct {
-  BCfunc	*w_func;	/* Handler function */
+typedef struct
+{
+	BCfunc *w_func; /* Handler function */
 } BCWait;
 
 /*****************************************************************************
@@ -357,13 +386,14 @@ typedef struct {
  * BCTask - Invoke a task
  *
  *****************************************************************************/
-typedef struct {
-  BCfunc	*t_func;	/* Handler function */
-  systask_f	*t_task;	/* Task function */
-  TaskContext	*t_context;	/* Task context if used */
-  Value		*t_rvalue;	/* Return value for task */
-  int		t_numArgs;	/* Number of arguments */
-  void		**t_args;	/* Array of arguments */
+typedef struct
+{
+	BCfunc *t_func; /* Handler function */
+	systask_f *t_task; /* Task function */
+	TaskContext *t_context; /* Task context if used */
+	Value *t_rvalue; /* Return value for task */
+	int t_numArgs; /* Number of arguments */
+	void **t_args; /* Array of arguments */
 } BCTask;
 
 /*****************************************************************************
@@ -371,9 +401,10 @@ typedef struct {
  * BCDelay - Delay current task (corresponds to #n )
  *
  *****************************************************************************/
-typedef struct {
-  BCfunc	*d_func;	/* Handler function */
-  deltatime_t	d_delay;	/* Relative delay time */
+typedef struct
+{
+	BCfunc *d_func; /* Handler function */
+	deltatime_t d_delay; /* Relative delay time */
 } BCDelay;
 
 /*****************************************************************************
@@ -381,9 +412,10 @@ typedef struct {
  * BCTrigger - Wait for a triggering event (corresponds to @(a) )
  *
  *****************************************************************************/
-typedef struct {
-  BCfunc	*t_func;	/* Handler function */
-  Trigger	*t_trigger;	/* Trigger event to wait for */
+typedef struct
+{
+	BCfunc *t_func; /* Handler function */
+	Trigger *t_trigger; /* Trigger event to wait for */
 } BCTrigger;
 
 /*****************************************************************************
@@ -391,10 +423,11 @@ typedef struct {
  * BCLock - Wait for semephore to be zero, set semaphore to 1 and advance
  *
  *****************************************************************************/
-typedef struct {
-  BCfunc	*l_func;	/* Handler function */
-  Trigger	*l_trigger;	/* Trigger indicating change in semephore value */
-  Value		*l_value;	/* Value of semephore variable */
+typedef struct
+{
+	BCfunc *l_func; /* Handler function */
+	Trigger *l_trigger; /* Trigger indicating change in semephore value */
+	Value *l_value; /* Value of semephore variable */
 } BCLock;
 
 /*****************************************************************************
@@ -402,10 +435,11 @@ typedef struct {
  * BCSubr - Jump to a subroutine
  *
  *****************************************************************************/
-typedef struct {
-  BCfunc	*s_func;	/* Handler function */
-  CodeBlock	*s_block;	/* Codeblock in which to jump to */
-  unsigned	s_offset;	/* Offsets of instructions to jump to */
+typedef struct
+{
+	BCfunc *s_func; /* Handler function */
+	CodeBlock *s_block; /* Codeblock in which to jump to */
+	unsigned s_offset; /* Offsets of instructions to jump to */
 } BCSubr;
 
 /*****************************************************************************
@@ -413,8 +447,9 @@ typedef struct {
  * BCReturn - Jump to a subroutine
  *
  *****************************************************************************/
-typedef struct {
-  BCfunc	*r_func;
+typedef struct
+{
+	BCfunc *r_func;
 } BCReturn;
 
 /*****************************************************************************
@@ -422,43 +457,44 @@ typedef struct {
  * BCSubr - Jump to a subroutine
  *
  *****************************************************************************/
-typedef struct {
-  BCfunc	*dp_func;
-  char		*dp_message;	/* Message to print */
+typedef struct
+{
+	BCfunc *dp_func;
+	char *dp_message; /* Message to print */
 } BCDebugPrint;
-
 
 /*****************************************************************************
  *
  * @brief A single byte code instruction.
  *
  *****************************************************************************/
-union ByteCode_union {
-  BCfunc	*bc_func;	/* Handler function for operation */
-  BCOpr		bc_opr;		/* Basic operation */
-  BCEnd		bc_end;		/* End thread */
-  BCNoop	bc_noop;	/* No-op */
-  BCGoto	bc_goto;	/* Goto (conditional or unconditional) */
-  BCSpawn	bc_spawn;	/* Spawn child thread */
-  BCCopy	bc_copy;	/* Copy */
-  BCCopyRange	bc_copyrange;	/* Copy of range */
-  BCTask	bc_task;	/* Invoke a task */
-  BCAsgn	bc_asgn;	/* Net assignment */
-  BCRaise	bc_raise;	/* Raise an event */
-  BCNbAsgnD	bc_nbasgnd;	/* Non-blocking reg net assignment (on delay) */
-  BCNbAsgnE	bc_nbasgne;	/* Non-blocking reg net assignment (on trigger) */
-  BCWireAsgnD	bc_wireasgnd;	/* Non-blocking wire net assignment (on trigger) */
-  BCWait	bc_wait;	/* Suspend current thread */
-  BCDelay	bc_delay;	/* Delay current task */
-  BCTrigger	bc_trigger;	/* Suspend and wait for trigger */
-  BCLock	bc_lock;	/* Lock/semephore */
-  BCMemFetch	bc_memfetch;	/* Memory fetch */
-  BCMemPut	bc_memput;	/* Memory store */
-  BCNbMemPutD	bc_nbmemputd;	/* Non-blocking memory store (on delay) */
-  BCNbMemPutE	bc_nbmempute;	/* Non-blocking memory store (on trigger) */
-  BCSubr	bc_subr;	/* Jump to a subroutine */
-  BCReturn	bc_ret;		/* Return from a subroutine */
-  BCDebugPrint	bc_dbgprint;	/* Print a debugging message */
+union ByteCode_union
+{
+	BCfunc *bc_func; /* Handler function for operation */
+	BCOpr bc_opr; /* Basic operation */
+	BCEnd bc_end; /* End thread */
+	BCNoop bc_noop; /* No-op */
+	BCGoto bc_goto; /* Goto (conditional or unconditional) */
+	BCSpawn bc_spawn; /* Spawn child thread */
+	BCCopy bc_copy; /* Copy */
+	BCCopyRange bc_copyrange; /* Copy of range */
+	BCTask bc_task; /* Invoke a task */
+	BCAsgn bc_asgn; /* Net assignment */
+	BCRaise bc_raise; /* Raise an event */
+	BCNbAsgnD bc_nbasgnd; /* Non-blocking reg net assignment (on delay) */
+	BCNbAsgnE bc_nbasgne; /* Non-blocking reg net assignment (on trigger) */
+	BCWireAsgnD bc_wireasgnd; /* Non-blocking wire net assignment (on trigger) */
+	BCWait bc_wait; /* Suspend current thread */
+	BCDelay bc_delay; /* Delay current task */
+	BCTrigger bc_trigger; /* Suspend and wait for trigger */
+	BCLock bc_lock; /* Lock/semephore */
+	BCMemFetch bc_memfetch; /* Memory fetch */
+	BCMemPut bc_memput; /* Memory store */
+	BCNbMemPutD bc_nbmemputd; /* Non-blocking memory store (on delay) */
+	BCNbMemPutE bc_nbmempute; /* Non-blocking memory store (on trigger) */
+	BCSubr bc_subr; /* Jump to a subroutine */
+	BCReturn bc_ret; /* Return from a subroutine */
+	BCDebugPrint bc_dbgprint; /* Print a debugging message */
 };
 
 /**
@@ -469,36 +505,40 @@ class CodeBlock
 public:
 	CodeBlock(ModuleInst*);
 	~CodeBlock();
-	
-	const ModuleInst *module() const
+
+	const ModuleInst *
+	module() const
 	{
 		return (_module);
 	}
-	ModuleInst *module()
+
+	ModuleInst *
+	module()
 	{
 		return (_module);
 	}
-	
-	int size() const
+
+	int
+	size() const
 	{
 		return (_length);
 	}
 	void close();
 	ByteCode *nextEmpty();
 	void copy(unsigned dpos, CodeBlock *src, unsigned start, unsigned stop);
-	
-	int		cb_nalloced;		/* Number of allocated entries */
-	ByteCode	*cb_instructions;	/* Vector of instructions */
-	
+
+	int cb_nalloced; /* Number of allocated entries */
+	ByteCode *cb_instructions; /* Vector of instructions */
+
 private:
 	/**
 	 * @brief Module instance we are in
 	 */
-	ModuleInst	*_module;
+	ModuleInst *_module;
 	/**
 	 * @brief Number of generated instructions
 	 */
-	int		_length;
+	int _length;
 };
 
 /*****************************************************************************
@@ -517,19 +557,19 @@ void CodeBlock_uninit(CodeBlock *cb);
  * BCEnd - member functions
  *****************************************************************************/
 void BCEnd_init(ByteCode*);
-void BCEnd_exec(BCEnd *bc,VGThread *t);
+void BCEnd_exec(BCEnd *bc, VGThread *t);
 
 /*****************************************************************************
  * BCNoop - member functions
  *****************************************************************************/
 void BCNoop_init(ByteCode*);
-void BCNoop_exec(BCNoop *bc,VGThread *t);
+void BCNoop_exec(BCNoop *bc, VGThread *t);
 
 /*****************************************************************************
  * BCOpr - member functions
  *****************************************************************************/
-void BCOpr_init(ByteCode*,valueop_f*S,Value*r,Value*a,Value*b,Value*c);
-void BCOpr_exec(BCOpr *bc,VGThread *t);
+void BCOpr_init(ByteCode*, valueop_f*S, Value*r, Value*a, Value*b, Value*c);
+void BCOpr_exec(BCOpr *bc, VGThread *t);
 
 /*****************************************************************************
  * BCCopy - member functions
@@ -540,7 +580,7 @@ void BCCopy_exec(BCCopy *bc, VGThread *t);
 /*****************************************************************************
  * BCCopyRange - member functions
  *****************************************************************************/
-void BCCopyRange_init(ByteCode *bc, Value *dst, unsigned dLsb,Value *src,Value *srcLsb, unsigned width);
+void BCCopyRange_init(ByteCode *bc, Value *dst, unsigned dLsb, Value *src, Value *srcLsb, unsigned width);
 void BCCopyRange_exec(BCCopyRange *bc, VGThread *t);
 
 /*****************************************************************************
@@ -558,127 +598,123 @@ void BCRaise_exec(BCRaise *br, VGThread *t);
 /*****************************************************************************
  * BCNbAsgnD - member functions
  *****************************************************************************/
-void BCNbAsgnD_init(ByteCode *bc, Net *net, Value *netLsb, Value *value, unsigned valLsb, unsigned width,deltatime_t delay);
+void BCNbAsgnD_init(ByteCode *bc, Net *net, Value *netLsb, Value *value, unsigned valLsb, unsigned width, deltatime_t delay);
 void BCNbAsgnD_exec(BCNbAsgnD *bc, VGThread *t);
 
 /*****************************************************************************
  * BCNbAsgnE - member functions
  *****************************************************************************/
-void BCNbAsgnE_init(ByteCode *bc, Net *net, Value *netLsb, Value *value, unsigned valLsb, unsigned width,Trigger *trigger);
+void BCNbAsgnE_init(ByteCode *bc, Net *net, Value *netLsb, Value *value, unsigned valLsb, unsigned width, Trigger *trigger);
 void BCNbAsgnE_exec(BCNbAsgnE *bc, VGThread *t);
 
 /*****************************************************************************
  * BCWireAsgnD - member functions
  *****************************************************************************/
-void BCWireAsgnD_init(ByteCode *bc, Net *net, int id, Value *netLsb, Value *value, unsigned valLsb, unsigned width,deltatime_t delay);
+void BCWireAsgnD_init(ByteCode *bc, Net *net, int id, Value *netLsb, Value *value, unsigned valLsb, unsigned width, deltatime_t delay);
 void BCWireAsgnD_exec(BCWireAsgnD *bc, VGThread *t);
 
 /*****************************************************************************
  * BCGoto - member functions
  *****************************************************************************/
-void BCGoto_init(ByteCode *g,Value*cond,int neg,CodeBlock *cb,unsigned offset);
-void BCGoto_exec(BCGoto *g,VGThread *t);
+void BCGoto_init(ByteCode *g, Value*cond, int neg, CodeBlock *cb, unsigned offset);
+void BCGoto_exec(BCGoto *g, VGThread *t);
 #define BCGoto_setOffset(g,offset) ((g)->g_offset = (offset))
 
 /*****************************************************************************
  * BCSpawn - member functions
  *****************************************************************************/
-void BCSpawn_init(ByteCode *s,CodeBlock *cb,unsigned offset);
-void BCSpawn_exec(BCSpawn *s,VGThread *t);
+void BCSpawn_init(ByteCode *s, CodeBlock *cb, unsigned offset);
+void BCSpawn_exec(BCSpawn *s, VGThread *t);
 #define BCSpawn_setOffset(s,offset) ((s)->s_offset = (offset))
 
 /*****************************************************************************
  * BCWait - member functions
  *****************************************************************************/
 void BCWait_init(ByteCode *w);
-void BCWait_exec(BCWait *w,VGThread *t);
+void BCWait_exec(BCWait *w, VGThread *t);
 
 /*****************************************************************************
  * BCTask - member functions
  *****************************************************************************/
-void BCTask_init(ByteCode *g,systask_f*, TaskContext *tctx, Value *rval,int numArgs,void **args);
-void BCTask_exec(BCTask *g,VGThread *t);
+void BCTask_init(ByteCode *g, systask_f*, TaskContext *tctx, Value *rval, int numArgs, void **args);
+void BCTask_exec(BCTask *g, VGThread *t);
 
 /*****************************************************************************
  * BCDelay - member functions
  *****************************************************************************/
-void BCDelay_init(ByteCode *d,deltatime_t t);
-void BCDelay_exec(BCDelay *d,VGThread *t);
+void BCDelay_init(ByteCode *d, deltatime_t t);
+void BCDelay_exec(BCDelay *d, VGThread *t);
 
 /*****************************************************************************
  * BCTrigger - member functions
  *****************************************************************************/
-void BCTrigger_init(ByteCode *bct,Trigger *t);
-void BCTrigger_exec(BCTrigger *bct,VGThread *t);
+void BCTrigger_init(ByteCode *bct, Trigger *t);
+void BCTrigger_exec(BCTrigger *bct, VGThread *t);
 
 /*****************************************************************************
  * BCLock - member functions
  *****************************************************************************/
-void BCLock_init(ByteCode *bc,Trigger *t, Value *value);
-void BCLock_exec(BCLock *lt,VGThread *t);
+void BCLock_init(ByteCode *bc, Trigger *t, Value *value);
+void BCLock_exec(BCLock *lt, VGThread *t);
 
 /*****************************************************************************
  * BCMemFetch - member functions
  *****************************************************************************/
-void BCMemFetch_init(ByteCode *bct,Net *n, Value *addr, Value *data);
-void BCMemFetch_exec(BCMemFetch *,VGThread *t);
+void BCMemFetch_init(ByteCode *bct, Net *n, Value *addr, Value *data);
+void BCMemFetch_exec(BCMemFetch *, VGThread *t);
 
 /*****************************************************************************
  * BCMemPut - member functions
  *****************************************************************************/
-void BCMemPut_init(ByteCode *bc,Net *n, Value *addr, Value *netLsb, Value *data,unsigned valLsb,unsigned width);
-void BCMemPut_exec(BCMemPut *bct,VGThread *t);
+void BCMemPut_init(ByteCode *bc, Net *n, Value *addr, Value *netLsb, Value *data, unsigned valLsb, unsigned width);
+void BCMemPut_exec(BCMemPut *bct, VGThread *t);
 
 /*****************************************************************************
  * BCNbMemPutD - member functions
  *****************************************************************************/
-void BCNbMemPutD_init(ByteCode *bc,Net *n, Value *addr, Value *netLsb, Value *data,unsigned valLsb,unsigned width,deltatime_t t);
-void BCNbMemPutD_exec(BCNbMemPutD *bct,VGThread *t);
+void BCNbMemPutD_init(ByteCode *bc, Net *n, Value *addr, Value *netLsb, Value *data, unsigned valLsb, unsigned width, deltatime_t t);
+void BCNbMemPutD_exec(BCNbMemPutD *bct, VGThread *t);
 
 /*****************************************************************************
  * BCNbMemPutE - member functions
  *****************************************************************************/
-void BCNbMemPutE_init(ByteCode *bc,Net *n, Value *addr, Value *netLsb, Value *data,unsigned valLsb,unsigned width,Trigger *t);
-void BCNbMemPutE_exec(BCNbMemPutE *bct,VGThread *t);
+void BCNbMemPutE_init(ByteCode *bc, Net *n, Value *addr, Value *netLsb, Value *data, unsigned valLsb, unsigned width, Trigger *t);
+void BCNbMemPutE_exec(BCNbMemPutE *bct, VGThread *t);
 
 /*****************************************************************************
  * BCSubr - member functions
  *****************************************************************************/
-void BCSubr_init(ByteCode *bc,CodeBlock *block,unsigned offset);
-void BCSubr_exec(BCSubr *s,VGThread *t);
+void BCSubr_init(ByteCode *bc, CodeBlock *block, unsigned offset);
+void BCSubr_exec(BCSubr *s, VGThread *t);
 
 /*****************************************************************************
  * BCReturn - member functions
  *****************************************************************************/
 void BCReturn_init(ByteCode *bc);
-void BCReturn_exec(BCReturn *r,VGThread *t);
+void BCReturn_exec(BCReturn *r, VGThread *t);
 
 /*****************************************************************************
  * BCDebugPrint - member functions
  *****************************************************************************/
-void BCDebugPrint_init(ByteCode *bc,char *msg,...);
-void BCDebugPrint_exec(BCDebugPrint *dp,VGThread *t);
+void BCDebugPrint_init(ByteCode *bc, char *msg, ...);
+void BCDebugPrint_exec(BCDebugPrint *dp, VGThread *t);
 
 /*****************************************************************************
  * VGFrame - member functions
  *****************************************************************************/
-VGFrame *new_VGFrame(ByteCode *bc,VGFrame *next);
+VGFrame *new_VGFrame(ByteCode *bc, VGFrame *next);
 void delete_VGFrame(VGFrame *);
 
 /*****************************************************************************
  * VGThread - member functions
  *****************************************************************************/
-void VGThread_init(VGThread *thread,CodeBlock *cb,unsigned pc,ModuleInst *modCtx,ModuleItem *mitem);
-void VGThread_uninit(VGThread *thread);
-void VGThread_exec(VGThread *thread);
-void VGThread_delay(VGThread *thread,deltatime_t);
+void VGThread_delay(VGThread *thread, deltatime_t);
 void VGThread_delayToEnd(VGThread *thread);
-void VGThread_eventWait(VGThread *thread,Trigger *t);
+void VGThread_eventWait(VGThread *thread, Trigger *t);
 void VGThread_start(VGThread *thread);
 void VGThread_childEndNotify(VGThread *thread);
-VGThread *VGThread_spawn(VGThread *parent,CodeBlock *cb,unsigned offset);
-void VGThread_goto(VGThread *thread,CodeBlock *codeBlock,unsigned offset);
-void VGThread_kill(VGThread *thread);
+VGThread *VGThread_spawn(VGThread *parent, CodeBlock *cb, unsigned offset);
+void VGThread_goto(VGThread *thread, CodeBlock *codeBlock, unsigned offset);
 #define VGThread_getModCtx(thread) (thread)->t_modCtx
 #define VGThread_getCircuit(thread) (thread)->t_modCtx->mc_circuit
 #define VGThread_getQueue(thread) Circuit_getQueue((thread)->t_modCtx->circuit())

@@ -187,7 +187,7 @@ EvThread_process(EvThread *tev,EvQueue *q)
 
 	thread->t_pending = 0;
 	if (thread->t_isLive)
-		VGThread_exec(thread);
+		thread->exec();
 	if (!thread->t_isLive)
 		delete thread;
 }
@@ -293,7 +293,7 @@ void EvStrobe_process(EvStrobe *e,EvQueue *q)
   if (tc) {
     tc->tc_action = TA_STROBE;
     VGThread_goto(tc->tc_thread,tc->tc_codeBlock,0);
-    VGThread_exec(tc->tc_thread);
+    tc->tc_thread->exec();
   }
 }
 

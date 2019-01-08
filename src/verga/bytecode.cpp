@@ -169,7 +169,7 @@ void BCEnd_exec(BCEnd *bc,VGThread *t)
 #if DEBUG
   vgio_echo("%p: BCEnd\n",t);
 #endif
-  VGThread_kill(t);
+  t->kill();
   if (t->t_parent)
     VGThread_childEndNotify(t->t_parent);
 }
@@ -1257,7 +1257,7 @@ void BCReturn_exec(BCReturn *r,VGThread *t)
   if (!vgf) {
     errorRun(ERR_IE_RETURN);
 
-    VGThread_kill(t);
+    t->kill();
     if (t->t_parent)
       VGThread_childEndNotify(t->t_parent);
     return;
@@ -1317,7 +1317,7 @@ void BCDebugPrint_exec(BCDebugPrint *dp,VGThread *t)
  *****************************************************************************/
 VGThread::VGThread(CodeBlock *cb,unsigned pc,ModuleInst *modCtx,ModuleItem *mitem)
 {
-  VGThread_init(this,cb,pc,modCtx,mitem);
+  init(cb,pc,modCtx,mitem);
 }
 
 /*****************************************************************************
@@ -1327,7 +1327,7 @@ VGThread::VGThread(CodeBlock *cb,unsigned pc,ModuleInst *modCtx,ModuleItem *mite
  *****************************************************************************/
 VGThread::~VGThread()
 {
-  VGThread_uninit(this);
+  uninit();
 }
 
 /*****************************************************************************
@@ -1342,21 +1342,21 @@ VGThread::~VGThread()
  *     mitem		Module item this thread manages if applicable
  *
  *****************************************************************************/
-void VGThread_init(VGThread *thread,CodeBlock *cb,unsigned pc, ModuleInst *modCtx,ModuleItem *mitem)
+void VGThread::init(CodeBlock *cb, unsigned pc, ModuleInst *modCtx,ModuleItem *mitem)
 {
-  thread->t_pending = 0;
-  thread->t_state = TS_ACTIVE;
-  thread->t_isLive = 1;
-  thread->t_wait = 0;
-  thread->t_start_block = cb;
-  thread->t_start_pc = pc;
-  thread->t_pc = 0;
-  thread->t_modCtx = modCtx;
-  thread->t_mitem = mitem;
-  thread->t_next = 0;
-  thread->t_numChild = 0;
-  thread->t_parent = 0;
-  thread->t_callStack = 0;
+  this->t_pending = 0;
+  this->t_state = TS_ACTIVE;
+  this->t_isLive = 1;
+  this->t_wait = 0;
+  this->t_start_block = cb;
+  this->t_start_pc = pc;
+  this->t_pc = 0;
+  this->t_modCtx = modCtx;
+  this->t_mitem = mitem;
+  this->t_next = 0;
+  this->t_numChild = 0;
+  this->t_parent = 0;
+  this->t_callStack = 0;
 }
 
 void VGThread_start(VGThread *thread)
@@ -1364,17 +1364,17 @@ void VGThread_start(VGThread *thread)
   thread->t_pc = CodeBlock_first(thread->t_start_block) + thread->t_start_pc;
 }
 
-void VGThread_kill(VGThread *t)
+void
+VGThread::kill()
 {
   /*  vgio_echo("killing thread %p.\n",t);*/
-  t->t_pending = 0;
-  t->t_state = TS_BLOCKED;
-  t->t_isLive = 0;
+  this->t_pending = 0;
+  this->t_state = TS_BLOCKED;
+  this->t_isLive = 0;
 
-  if (t->t_mitem)
-    ModuleItem_killNotify(t->t_mitem);
+  if (this->t_mitem)
+    ModuleItem_killNotify(this->t_mitem);
 }
-
 
 /*****************************************************************************
  *
@@ -1416,7 +1416,7 @@ void VGThread_childEndNotify(VGThread *thread)
  *     thread		VGThread object to be destroyed.
  *
  *****************************************************************************/
-void VGThread_uninit(VGThread *thread)
+void VGThread::uninit()
 {
   /* nothing to do now - placeholder for future use. */
 }
@@ -1426,26 +1426,17 @@ void VGThread_goto(VGThread *thread,CodeBlock *codeBlock,unsigned offset)
   thread->t_pc = CodeBlock_get(codeBlock,offset);
 }
 
-
-/*****************************************************************************
- *
- * Execute a thread until it is suspended.
- *
- * Parameters:
- *     thread		Thread to execute.
- *
- *****************************************************************************/
 void
-VGThread_exec(VGThread *thread)
+VGThread::exec()
 {
-	VGThread_resume(thread);
-	while (VGThread_isActive(thread)) {
+	VGThread_resume(this);
+	while (VGThread_isActive(this)) {
 		if (do_input_check) {
-			EvQueue *Q = VGThread_getQueue(thread);
-			VGThread_suspend(thread);
-			EvQueue_enqueueAtHead(Q,new_EvThread(thread));
+			EvQueue *Q = VGThread_getQueue(this);
+			VGThread_suspend(this);
+			EvQueue_enqueueAtHead(Q,new_EvThread(this));
 		} else
-		VGThread_doNextInsruction(thread);
+		VGThread_doNextInsruction(this);
 	}
 }
 
